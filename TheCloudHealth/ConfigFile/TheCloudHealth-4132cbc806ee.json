@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "thecloudhealthcare",
+  "private_key_id": "4132cbc806ee40e4f16f5f218d35b30d6ff57155",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC5KNn2wOarLYBy\nlHSfWmU9WnMuN1DPWWffpypSyRzExSAeWcHkCOTY6FgLCNEv2DNr9eA4Z68c8RQ4\nT02wkw0am++RIDc6gCHQlgQw3pFLPElFNhcbCr/dW2xEbRaBdndU066jX6s6x4uj\nO0Bg1fi/2lp2qfUBA7eBPRkk8wd9zHaF+HTW87mDW3wD2xc606xnBAD+rEgMKaoD\nAcuUmdN45v8nhEt85ooVwAT2LD7gL8jESYnL1IeQQ9LQz5+nun78M5EsUCYsWKUj\nPF9+99toQdG0v25iNrtqkQe6eVOy7Zfx7cGbBfNqddjXNwaeay6+V6DwM/Xitujj\nEldOPAYNAgMBAAECggEAB0BEzOeAAQseoR4UNRtepJjyssgix4P6T+VlgGl00XXg\nzJ96OtpoT+BFdmUpgASo+tzdo4fX8Tu1rYDZi4UuubCKoLXQw985s8f0MQ++Q+KA\nAhBctkfk/J+0bTeSbo57nNxPVgGMnJgs7T8IReKLQ8Qiz8vXFuuU16BTaEGGNRRo\nLJc1cO8MtapT6VCqRAWbD4BHfvDFby5/rkm1NurXOn0H/asJO6e10jJpnGn/fDVP\nGU4k4E2VTYusxFU0wXY909vcQyE3d4RRBT0eAHd65rkbF5d433Cb1GItOjyaaZTd\nBDEOXLEctu2lcRIJriyMe3SaTe2G8Nx/XRgS6RvxpwKBgQDjC4G90Mkz6/bETYkL\nbCupgJhOIFIHD36B1JQ0cM8gbcsEWclBnSrT0K2GxDwC2QztnVYwt47HiFVz1WEH\n4nl1zd7d+EjbyHpkhin9e/MjbiEakvQyurTbI+J2dtSDtVEGjU40aXzCvloJCFsK\nqDsy2VTWWWW292zZ2sjZEyJKuwKBgQDQxeJJ4w5hA0QK/IjZURaFwdRiGgY6zrEn\nzbwXQINqcd9V88gD+EbPqiRqqXlYrzrdSQor/7qLALOjjqkvay7aY8a/kqPu5ii1\nqS1j5gs3IkZwJHsKSdjUDtK27WE4G5ucT1HxdtAFB3DPFpRKinzsSKZAFnLKhpni\nL+SMhrkZ1wKBgQCJDB4RfKCmta0riv3JJk8orpXAuuOonWKoba/UA7ATDBL6mlPQ\nRlVeq9zCt1reATQ7jbhECdimepXSKJ+8Sak1QcJgTAl2mQm/+fgIqTP3U/epecDr\niiW3DW8aQNpAckbpZIwrOO11A7+HKkMCKNAq/mKmTCoIiktrKRQJa/JMFwKBgC0x\nmSHbiCJSHamvL0Sz/AcqhXpTHeQfGFSAgeYarhgd3HXz1umdFl8f+tAoLb+X90st\n44jQzCYJGdofKNq9/h+Cl+SiruApbMiefdfxVZ4yykK+cvAwOkL1joHQ80m9GDuH\nJDr8OF3OVYpO3f0g65gOxgZ7lY/oAWnoajZNd8ZzAoGBAMSeTcj8tHh/xvVpYWeJ\ngE1pZuwXM96O+JdS6FgSILwAPMeZ9alhiivXhF7AknO39ThdES28ZENu5BClDJ3x\n1H627TyUsGbz/dexdtK+OVVcGjWyg7yeH0bm18AmkpEwc8hqvXlm975SwHtDDIWc\nk59pqyPiq4KEGPnbcGjQblOI\n-----END PRIVATE KEY-----\n",
+  "client_email": "thecloudhealthcare@thecloudhealthcare.iam.gserviceaccount.com",
+  "client_id": "113315085444350236762",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/thecloudhealthcare%40thecloudhealthcare.iam.gserviceaccount.com"
+}

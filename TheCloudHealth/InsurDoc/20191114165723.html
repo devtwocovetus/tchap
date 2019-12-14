@@ -1,0 +1,583 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=9"><title>Eligibility Response</title><style>html {
+  box-sizing: border-box; *behavior: url(boxsizing.htc);
+  
+  font-family: Arial;
+  font-size: 12px;
+  font-weight: normal;
+  font-style: normal;
+  text-decoration: none;
+  color: #555555;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+.clearfix:after {
+	visibility: hidden;
+	display: block;
+	font-size: 0;
+	content: " ";
+	clear: both;
+	height: 0;
+}
+* html .clearfix             { zoom: 1; } /* IE6 */
+*:first-child+html .clearfix { zoom: 1; } /* IE7 */
+
+h1 {
+    font-family: Arial, sans-serif;
+    color: #f27b35;
+    font-size: 26px;
+    margin-bottom: 5px;
+}
+
+h2 {
+    font-family: Arial, sans-serif;
+    color: #565c65;
+    font-size: 20px;
+}
+
+h3 {
+    font-family: Arial, sans-serif;
+    color: #787d87;
+    font-size: 14px;
+}
+
+h4 {
+  font-family: Arial, sans-serif;
+  color: #565c65;
+  font-size: 12px;
+  font-weight: 400;
+  text-transform: uppercase;
+  padding: 0px;
+  margin: 0px;
+}
+
+
+a.medium {
+    font-family: Arial, sans-serif;
+    color: #0082b4;
+    font-size: 12px;
+    text-decoration: none;
+}
+
+a.medium:hover {
+    font-family: Arial, sans-serif;
+    color: #0082b4;
+    font-size: 12px;
+    text-decoration: underline;
+}
+
+a.medium:visited {
+    font-family: Arial, sans-serif;
+    color: #5b307e;
+    font-size: 12px;
+    text-decoration: none;
+}
+
+
+/* Begin Response Header Styles */
+
+.linkbarLink {
+    border-style: none;
+    padding-top:13px;
+    vertical-align: middle;
+    display: inline-block;
+}
+
+.linkbarLink a{
+    margin-right: 20px
+}
+
+.linkbar .Left, .linkbar .Right{
+    float:none;
+}
+
+.linkbarImage {
+    margin-right: 5px;
+    border-style: none;
+    vertical-align: bottom;
+}
+
+.header:after {
+    content: " ";
+    display: block;
+    height: 0;
+    clear: both;
+}
+
+.linkbar {
+    width: 100%;
+    min-height: 40px;
+    border-color: #C9C9C9;
+    border-width: 1px 0 1px 0;
+    border-style: solid;
+    background-color: #EFEFEF;
+    padding-bottom:10px;
+}
+.linkbar .container{
+    vertical-align: middle;
+    box-sizing: border-box;
+}
+
+.sticky {
+    position: fixed;
+    top: 0;
+}
+
+.Left {
+    float: left;
+}
+
+.Right {
+    float: right;
+}
+
+body {
+    margin: 0px;
+    background-color: #f9f9f9;
+}
+
+
+.linkbarButton {
+    height: 24px;
+    margin-top: 8px;
+}
+
+.SectionContents.Collapsed {
+    display: none;
+}
+
+.SectionHeader {
+    background-repeat: no-repeat;
+    background-position: 11px 11px;
+}
+
+.SectionHeader.Collapsible {
+    cursor: pointer;
+    background-image: url(../Images/arrow-white-down.png);
+}
+
+.SectionHeader.Collapsed {
+    border-radius: 5px;
+    background-image: url(../Images/arrow-white-right.png);
+}
+
+.ZPayButton {
+    float: right;
+}
+
+.Footer {
+    font-style: italic;
+    font-family: Arial;
+    font-size: 12px;
+    font-weight: normal;
+    color: #555555;
+}
+
+
+/* Begin Response Body Styles */
+
+.container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 2.5%;
+    overflow: hidden;
+}
+
+.CoverageBar {
+    height: 40px;
+    border-radius: 5px;
+    line-height: 40px;
+    background-repeat: no-repeat;
+    
+    font-family: Arial;
+    font-size: 11px;
+    color: #ffffff;
+    text-transform: uppercase;
+    font-weight: bold;
+    padding-left: 20px;
+}
+
+.ActiveCoverage {
+    background-color: #6a963b;
+}
+
+.CoverageBar.ActiveCoverage {
+    background-image: url(../Images/active.png);
+}
+
+.MixedCoverage {
+	background-color: #f59c00;
+}
+
+.CoverageBar.MixedCoverage {
+    background-image: url(../Images/mixed.png);
+}
+
+.InactiveCoverage {
+	background-color: #cf0000;
+}
+
+.CoverageBar.InactiveCoverage {
+    background-image: url(../Images/inactive.png);
+}
+
+.NoCoverage {
+	background-color: #565c65;
+}
+
+.CoverageBar.NoCoverage {
+    background-image: url(../Images/unspecified.png);
+}
+
+.ContentContainer {
+    min-height: 50px;
+    background-color: #ffffff;
+    border-radius: 5px;
+    border: 1px solid #d1d1d1;
+    padding: 15px 15px 0 15px;
+}
+
+.ContentShadow {
+  background: url(../Images/shadow-lg.png) no-repeat center;
+  min-height: 20px;
+}
+
+.HalfColumn {
+    line-height: 18px;
+    padding:0 0 20px 0;
+    vertical-align: top;
+    zoom: 1;
+}
+.LeftColumn{
+    line-height: 18px;
+    padding:0 0 20px 0;
+    vertical-align: top;
+    zoom: 1;
+}
+.RightColumn{
+    line-height: 18px;
+    padding:0 0 20px 0;
+    vertical-align: top;
+    zoom: 1;
+}
+.SmallColumn {
+    width: 264px;
+    line-height: 18px;
+    margin: 0 3px 15px 3px;
+    display: inline-block;
+    vertical-align: top;
+    zoom: 1;
+    *display: inline;
+}
+
+.FullColumn {
+    width: 100%;
+    line-height: 18px;
+    margin: 0 7px 15px 7px;
+    display: inline-block;
+    vertical-align: top;
+    zoom: 1;
+    *display: inline;
+}
+
+.FullColumnNoContent {
+    line-height: 18px;
+    margin: 0 15px 0 0px;
+    display: block;
+    vertical-align: top;
+    width: auto;
+}
+
+.Label {
+  font-size: 11px;
+  font-weight: bold;
+  width: 140px;
+  float: left;
+}
+
+.SmallColumn .Label {
+    width: 128px;
+}
+
+.ShortLabel {
+    font-size: 11px;
+    font-weight: bold;
+    width: 90px;
+    float: left;
+}
+
+.Text {
+	overflow: hidden;
+}
+
+.Empty {
+	font-style: italic;
+	color: #999999;
+}
+
+.Divider {
+	border: 0;
+	color: #C9C9C9;
+	background-color: #C9C9C9;
+	height: 1px;
+}
+
+.DividerNoBottom {
+	border: 0;
+	color: #C9C9C9;
+	background-color: #C9C9C9;
+	height: 1px;
+    margin-bottom: 0;
+}
+
+.SectionHeader {
+	border-radius: 5px 5px 0 0;
+	border-style: solid;
+	border-color: #D5D5D5;
+	border-width: 1px 1px 0 1px;
+	color: #FFFFFF;
+	text-transform: uppercase;
+	font-family: Arial, sans-serif;
+	line-height: 34px;
+}
+
+.SectionContents {
+	border-radius: 0 0 5px 5px;
+	border: 1px solid #D5D5D5;
+	padding: 15px;
+    background-color: white;
+}
+
+.SectionTitle {
+	margin-left: 28px;
+	font-size: 12px;
+	float: left;
+}
+
+.SectionStatus {
+	margin-right: 20px;
+	font-size: 10px;
+	float: right;
+}
+.NetworkLine {
+	font-family: Arial;
+	font-size: 14px;
+	font-weight: bold;
+	font-style: normal;
+	text-decoration: none;
+	color: #555555;
+	background-color: #F2F2F2;
+	border-radius: 5px;
+	padding: 10px;
+	margin-bottom: 15px;
+}
+
+.GroupingLabel {
+	font-family: Arial;
+	font-size: 13px;
+	font-weight: normal;
+	font-style: italic;
+	text-decoration: none;
+	color: #555555;
+}
+
+.InsuranceType {
+    font-family: Arial;
+    font-size: 13px;
+    font-weight: normal;
+    font-style: italic;
+    text-decoration: none;
+    color: #555555;
+}
+
+.CoverageLevel {
+    font-family: Arial;
+    font-size: 13px;
+    font-weight: bold;
+    font-style: normal;
+    text-decoration: none;
+    color: #555555;
+}
+
+.SubSection {
+	overflow: hidden;
+}
+
+.OtherCoverage {
+	font-family: Arial;
+	font-size: 12px;
+	font-weight: normal;
+	font-style: normal;
+	text-decoration: none;
+	color: #555555;
+	text-align: center;
+	background-color: #F2F2F2;
+	border: 1px solid #C9C9C9;
+	border-radius: 5px;
+	line-height: 30px;
+    margin: 5px 0 5px 0;
+}
+
+.ErrorHeader {
+    background-color: #ffdede;
+    border: 1px solid #e8c5c5;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+    margin-bottom: 0px;
+    padding-left: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    font-weight: bold;
+    color: #cf0000;
+}
+
+.ErrorContents {
+    background-color: #ffeeee;
+    border: 1px solid #e8c5c5;
+    border-top-right-radius: 0px;
+    border-top-left-radius: 0px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    margin-top: -1px;
+    padding: 10px;
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    font-weight: normal;
+    color: #cf0000;
+}
+
+.WarningHeader {
+    background-color: #ffee8e;
+    border: 1px solid #e2db85;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+    margin-bottom: 0px;
+    padding-left: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    font-weight: bold;
+    color: #555555;
+}
+
+.WarningContents {
+    background-color: #fffbcc;
+    border: 1px solid #e2db85;
+    border-top-right-radius: 0px;
+    border-top-left-radius: 0px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    margin-top: -1px;
+    padding: 10px;
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    font-weight: normal;
+    color: #555555;
+}
+
+.StatusText {
+    font-family: Arial;
+    font-size: 10px;
+    font-weight: bold;
+    font-style: normal;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
+.ActiveText {
+    color: #6B9757;
+}
+
+.InactiveText {
+    color: #CF0000;
+}
+
+.InlineLabel {
+    display: inline-block;
+    margin-right: 10px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.InlineText {    
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.HeaderLine {
+    margin-bottom: 10px;
+    zoom: 1;
+}
+
+.FullRow {
+    width: 100%;
+}
+
+.Row {
+    margin-bottom: 5px;
+}
+
+.NoBreak {
+    page-break-inside: avoid;
+}
+
+.PageBreak {
+    page-break-after: always;
+}
+
+.Hidden {
+    visibility: hidden;
+}
+
+
+@media (min-width: 540px) {     /* Media Query Allows columns on larger screens */
+    .HalfColumn {
+        width: 50%;
+        padding:0 15px 20px 0;
+        display: inline-block;
+        *display: inline;
+    }
+    .LeftColumn{
+        width: 30%;
+        padding: 0 15px 20px 0;
+        display: inline-block;
+        *display: inline;
+    }
+    .RightColumn{
+        width: 70%;
+        padding: 0 15px 20px 0;
+        display: inline-block;
+        *display: inline;
+    }
+    .linkbarLink{
+    margin-left: 15px;
+    border-style: none;
+    height: 30px;
+    padding-top:13px;
+    vertical-align: middle;
+    }
+    .linkbarLink a{
+    margin: 0 0 0 10px;
+    }
+    .linkbar .Left{
+        float: left;
+    }
+    .linkbar .Right{
+        float: right;
+    }
+}</style><style>@font-face {
+  font-family: 'Merriweather Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Merriweather Sans'), local('MerriweatherSans-Regular'), url(https://fonts.gstatic.com/s/merriweathersans/v11/2-c99IRs1JiJN1FRAMjTN5zd9vgsFHX1QjA.ttf) format('truetype');
+}
+</style></head><body><div class="container"><h1>Eligibility Response</h1><div class="HeaderLine"><div class="InlineLabel">Inquiry ID:</div><div class="InlineText">1156740674</div><div class="InlineLabel">Processed:</div><div class="InlineText">11/14/2019 6:27 AM</div></div><div class="CoverageBar InactiveCoverage"><span id="id_InquiryStatus">Subscriber Not Found</span></div><div class="ContentShadow"></div><div class="FullRow clearfix"><h2 class="Left">Coverage Details</h2><div class="ZPayButton"></div></div><h3>User Entered Information</h3><div class="ContentContainer"><div class="HalfColumn"><div class="ShortRow"><div class="ShortLabel">Payer</div><div class="Text">Humana (and subsidiaries) claims</div></div></div><div class="HalfColumn"><div class="ShortRow"><div class="ShortLabel">Service Dates</div><div class="Text">11/14/2019</div></div></div></div><div class="ContentShadow"></div><div class="ContentContainer"><div class="HalfColumn"><h4>Subscriber Information</h4><hr class="Divider" /><div class="Row clearfix"><div class="Label">Member ID</div><div class="Text">H333224444</div></div><div class="Row clearfix"><div class="Label">First Name</div><div class="Text">JOHN</div></div><div class="Row clearfix"><div class="Label">Last Name</div><div class="Text">DOE</div></div><div class="Row clearfix"><div class="Label">Date of Birth</div><div class="Text">09/05/1988</div></div></div><div class="HalfColumn"><h4>Service Types Requested</h4><hr class="Divider" /><div class="Text"> 30 - Health Benefit Plan Coverage </div></div></div><div class="ContentShadow"></div><h3>Payer Returned Information</h3><div class="ErrorHeader"> Inquiry Rejected - Subscriber Demographic Info </div><div class="ErrorContents"><div class="Row clearfix"><div class="Label">Reason</div><div class="Text">Subscriber / Insured Not Found</div></div><div class="Row clearfix"><div class="Label">Action</div><div class="Text">Please Correct and Resubmit</div></div></div><div class="ContentShadow"></div><div class="ContentContainer"><div class="HalfColumn"><h4>Subscriber Information</h4><hr class="Divider" /><div class="Text"> DOE, JOHN </div><div class="Row clearfix"><div class="Label">Member ID</div><div class="Text">H333224444</div></div></div></div><div class="ContentShadow"></div></div></body></html>

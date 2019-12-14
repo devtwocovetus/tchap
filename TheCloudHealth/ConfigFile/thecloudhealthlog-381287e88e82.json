@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "thecloudhealthlog",
+  "private_key_id": "381287e88e826a6a11c65238bf5db98d238486f7",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDGI/aToqe31R16\nU6O13JhxJB64Gl+sKOL789InlB/MGYdi0v5E2zfyt1q4a+2pr4lIT8DFdOhMne87\nip7WxTU2PRyNyVSdVtfKuIYdaXiZUSWu4DTEKQ4Op6PL0Mn7w9+GoYaOkGCPuJ32\njfd+xki47KDmmdvZvPUoc2VXaud+9/qHETwFANN96gpBS339looMqVOKiKQYHD/N\nPSzqOzlm6tWrXoF4u/ydrGlN8rl7jFb1eXcRHJ11MgRb+76XtiYcrBygDGeBCGaI\nSo/DYXL3ifp6bd8TGhjkLN5v1jV4JhkYVaF/YR3Gm7rdg4/eP93R8GYFNBg1QPtL\n+/rSVLgxAgMBAAECggEAPpbRpyU0Ua+yVhfhmOsMBIFiasl5+0oXGXuVoQb7XF+c\nEq2PwHR3Iealc6g0NOvMM9ltjXI2hy1EisxpDHLTMkTvpiI45lKua80KIHRWsied\n/bW5NVW6qQpvhUx44VyoWUDg3lvhBMVOsLl7usIr6q5kzTNA7XDxCEwbcRfF9KcW\nY4Efqkdvwm/GbXd+xcj3umzvjZUsBNyFIPpg8fuMP7FAtJgCqMc44ojYTAZawfCB\n/J+9K1ljYNxSYNJO81D/YoXC2nIYsqrsU7bMdr5DhdNRsyxqaD5BjLd2jN2QF3ep\nk4oJQ11eusUEBC/8LBZNbRHdgrMLruGfxJbuYTTtOQKBgQDi9ylXBEcHJnoysFYo\nVLtNWbCA3VCi2KIdTXdgR2rTbJjayZtmn64RxhcMIgYFYw6sal9mQJMa9h63i1SY\nTWt2RKw48asQFh2qcHfdF/WfGlqWW5BplyLnxwQ0dCPvY1R4mE48PHorG4bGnr94\n65YNHVMGgXfXW/gLclavH+w59wKBgQDffNGfEYFPX25Y8r/P0cQkvcvcUM+3IEI9\not+SKlBoaTMVvh1WC9rsoDZIwcq8pja8aRlNMkulcIMSrlEJL3VQ52S0USdnuzOO\n02aRXIR1EMP2KAoH8D8wYnhI+wb3/WzuMWLedIGrafdEHUdpYOM5Wp/D0frxqHkB\n+dzbNufVFwKBgESKHSrQ+N4Y6YgLJkmRpOpr7lhL/UDgKLyumyExD/p+7f4MKeio\nyflGF8mrMKRJ0LGSgfKwB3x53LbS1Z4UqyIRBO1BVcZK13ST+C6FQMBmRfrn9cld\nQcY6nHN2qy9skKLGY8HfBYmlC2NJp0rN4gdd1qe9S0J23IYgZjsGaeDrAoGAHIhD\n/unuN2L4pJSBVpfyUbqFf2A11KxiqJnVr0SFtX7QzdLSzfx/e7xMkedj6cfSryU/\n3LIyJDIEGet1XxXXBXg1TCwcOssUnwRwUNid9JAqZI/iD/dlKdk4gCDEV/7b3GEj\nvUDkmSzTK7gNOO/sspLWWNrDDf0zTcRHpRkSagsCgYBe+2/qlhkWMrDUVEBmql3R\nYQaeobXUEsnga5BoKXY7jhJJW5k7EIkrr8CWW27C0LWp9EMgIpdetyAi7W+1XJhe\nuNTex927aUhvuHG9hUbguGsnG76JC3hJO9wZjwDM3MJTmNjpovwAit8V2CM9O0hf\no0JqBtExz/U3H75QbQlXqw==\n-----END PRIVATE KEY-----\n",
+  "client_email": "thecloudhealthlog@appspot.gserviceaccount.com",
+  "client_id": "104834030276338441283",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/thecloudhealthlog%40appspot.gserviceaccount.com"
+}

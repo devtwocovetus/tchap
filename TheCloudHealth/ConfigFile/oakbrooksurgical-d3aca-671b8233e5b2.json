@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "oakbrooksurgical-d3aca",
+  "private_key_id": "671b8233e5b24e98fb6e8cdd3a92fa6ce4fcb319",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDdbAvEYE/RZ6I9\nFuyfLPHIB6HCPUrn5Ik0eUPYUYZflOTha6C0BIwZNWM3IgYCtNTm6rtHQwijYtM2\nmxs0cZuTjx9eRQAadIj2zhwbB13ZQaMvQnzsDxsJV6zCjecNDd3/TuvU+AEMOHm7\n3RSdySACNGU6p+7ZXbwCPtUaUNPLara20OPW4h7qVf+jeHxi9lK9J7d3rgJ+5Ugg\nfIbEO64XYkXQ2wCAa5eTp19bE77QSE2BcI2PDKeNxq3hisjiyEEkCG789A0fvuq2\n05NeI7KAqmwyrtFypHPDez6LH16PWlfi8jvykHwMVqvZN4BMN7TJ6g14sOelR1CX\nta1VHXv9AgMBAAECggEAD7/7cRgF69f9zW+ftc2juYrfCDe45/7OSnbxV8x3JorE\nrxfE4hkytMMitnPxzoGs/tHyliXGa9MzQYtngRb8FIZvmkW5NXVVnfML3Iy55O+Y\nAajhxVICJjhGayTFEYO+tBLmkCSl9Afhk0N6D6Rg5cpy6ujk6TETY9HmJNpb/l6/\nPywm6Ogdcpqn5PDmWIwQ3X+GM8V4RS26VWa3bFHYLkbfpLEx6Dewe5Kp/pZdRWrO\nwV3m+zAufDUBBYUQVEkAm3TYmk2hK7eg/mFLka6BjWvRlSirwRDbShPB7VoCc9lL\nUD59zS9XrC43kVHp0Pm4oOzVth7M97jrYo0RytF61wKBgQD6lN7aVQbEO0O9hHQh\ncz65adol78rtcRLdNbJf1F7GGgPo0FZFCN4bp2atOKLFh6yQBz7En61yDyGkjVMI\nnKmizLtOE9GeGEbw85dJDOD5P+yuO/vMP+ZTvFKHryWht8dzINhx78mm1GGSBC2X\nHLZw974FqeKFbqwC7VqieoBsjwKBgQDiNcJSa8NQj9czv/r8wlLEiltA4GP6Uuwe\nEnlyYi1O33bOG6lBtoTiYB3WU5qfwBFBadZi4WR3Qbo3P4KJtQOwNnsVi8J/Ys3l\nXdLRFOB3gD9Fb6ivOdCxzK6uPhXxLGY7mYBaOdlf7bkdLKyO0SyjyI7rpONxxm5o\n1AzQEUcsswKBgA2ggu4EqbWKM4je5yHajpKuuvpNLA/1kj0NaoHjnrPPPl8u1UIz\n1UBTvjW1WsS7OBstCbDPrjMBt6anONjDDEaaM6VvVnrufw0jchq65JEpdMmU4YCe\nCPyMxUAzuiwtPl94bczkaWb1LckvCPuqyBEkp+TO9E6lUh1mowMq/kjpAoGARdHZ\n/J6OVltPTQXAbit8aHVb3RZlRWo6vr1tBsUOvv1yKgOXplSzhzuree+sFgquSMZm\nCXcQD08WLt9HZ0GbtdPbAbd1fOP+MQFYhHgxIDFRVhk0s4DgzUAj2lwHYb0WgObM\nGw0n7tfs/vg++oXNhW/tzQXDveZFRc3NdpseoMkCgYAJdUvQA5jN4hnMRz39CS//\n1/9gFRwLsACdkBYh2LJepktceWyX9vi4PEz5jWusYhCzI5Iq3beepQNO4GV3MNL5\nBIqAf1vaMH+vwBVINZ34EhbTt+k1dIhI5ENZTcKP7QDXjYiVakiQp/TbhP4c8Pyb\nqELB7fi80gcfsivkpbczFA==\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-yhy9z@oakbrooksurgical-d3aca.iam.gserviceaccount.com",
+  "client_id": "100736245261543627904",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-yhy9z%40oakbrooksurgical-d3aca.iam.gserviceaccount.com"
+}
