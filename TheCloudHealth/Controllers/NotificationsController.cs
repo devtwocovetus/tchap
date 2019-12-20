@@ -48,6 +48,179 @@ namespace TheCloudHealth.Controllers
                 NSMD.NFT_Unique_ID = UniqueID;
                 NSMD.NFT_Create_Date = con.ConvertTimeZone(NSMD.NFT_TimeZone, Convert.ToDateTime(NSMD.NFT_Create_Date));
                 NSMD.NFT_Modify_Date = con.ConvertTimeZone(NSMD.NFT_TimeZone, Convert.ToDateTime(NSMD.NFT_Modify_Date));
+                NSMD.NFT_Actions = ActionList;
+                DocumentReference docRef = Db.Collection("MT_Notifications").Document(UniqueID);
+                WriteResult Result = await docRef.SetAsync(NSMD);
+                if (Result != null)
+                {
+                    Response.Status = con.StatusSuccess;
+                    Response.Message = con.MessageSuccess;
+                    Response.Data = NSMD;
+                }
+                else
+                {
+                    Response.Status = con.StatusNotInsert;
+                    Response.Message = con.MessageNotInsert;
+                    Response.Data = null;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Response.Status = con.StatusFailed;
+                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
+            }
+            return ConvertToJSON(Response);
+        }
+
+        [Route("API/Notifications/Update")]
+        [HttpPost]
+        public async Task<HttpResponseMessage> Update(MT_Notifications NSMD)
+        {
+            Db = con.SurgeryCenterDb(NSMD.Slug);
+            NotificationsResponse Response = new NotificationsResponse();
+            try
+            {
+
+                List<Notification_Action> ActionList = new List<Notification_Action>();
+                Dictionary<string, object> initialData = new Dictionary<string, object>
+                 {
+                    {"NFT_Category_ID", NSMD.NFT_Category_ID},
+                    {"NFT_Category_Name", NSMD.NFT_Category_Name},
+                    {"NFT_Category_Type_ID", NSMD.NFT_Category_Type_ID},
+                    {"NFT_Category_Type_Name", NSMD.NFT_Category_Type_Name},
+                    {"NFT_Name",NSMD.NFT_Name},
+                    {"NFT_Description",NSMD.NFT_Description},
+                    {"NFT_Modify_Date",con.ConvertTimeZone(NSMD.NFT_TimeZone,Convert.ToDateTime(NSMD.NFT_Modify_Date))},                    
+                    {"NFT_TimeZone", NSMD.NFT_TimeZone}                    
+                 };
+
+                DocumentReference docRef = Db.Collection("MT_Notifications").Document(NSMD.NFT_Unique_ID);
+                WriteResult Result = await docRef.UpdateAsync(initialData);
+                if (Result != null)
+                {
+                    Response.Status = con.StatusSuccess;
+                    Response.Message = con.MessageSuccess;
+                    Response.Data = NSMD;
+                }
+                else
+                {
+                    Response.Status = con.StatusNotInsert;
+                    Response.Message = con.MessageNotInsert;
+                    Response.Data = null;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Response.Status = con.StatusFailed;
+                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
+            }
+            return ConvertToJSON(Response);
+        }
+
+        [Route("API/Notifications/IsActive")]
+        [HttpPost]
+        public async Task<HttpResponseMessage> IsActive(MT_Notifications NSMD)
+        {
+            Db = con.SurgeryCenterDb(NSMD.Slug);
+            NotificationsResponse Response = new NotificationsResponse();
+            try
+            {
+                Dictionary<string, object> initialData = new Dictionary<string, object>
+                 {                    
+                    {"NFT_Is_Active",NSMD.NFT_Is_Active},
+                    {"NFT_Modify_Date",con.ConvertTimeZone(NSMD.NFT_TimeZone,Convert.ToDateTime(NSMD.NFT_Modify_Date))},
+                    {"NFT_TimeZone", NSMD.NFT_TimeZone}
+                 };
+
+                DocumentReference docRef = Db.Collection("MT_Notifications").Document(NSMD.NFT_Unique_ID);
+                WriteResult Result = await docRef.UpdateAsync(initialData);
+                if (Result != null)
+                {
+                    Response.Status = con.StatusSuccess;
+                    Response.Message = con.MessageSuccess;
+                    Response.Data = NSMD;
+                }
+                else
+                {
+                    Response.Status = con.StatusNotInsert;
+                    Response.Message = con.MessageNotInsert;
+                    Response.Data = null;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Response.Status = con.StatusFailed;
+                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
+            }
+            return ConvertToJSON(Response);
+        }
+
+        [Route("API/Notifications/IsDeleted")]
+        [HttpPost]
+        public async Task<HttpResponseMessage> IsDeleted(MT_Notifications NSMD)
+        {
+            Db = con.SurgeryCenterDb(NSMD.Slug);
+            NotificationsResponse Response = new NotificationsResponse();
+            try
+            {
+                Dictionary<string, object> initialData = new Dictionary<string, object>
+                 {
+                    {"NFT_Is_Deleted",NSMD.NFT_Is_Deleted},
+                    {"NFT_Modify_Date",con.ConvertTimeZone(NSMD.NFT_TimeZone,Convert.ToDateTime(NSMD.NFT_Modify_Date))},
+                    {"NFT_TimeZone", NSMD.NFT_TimeZone}
+                 };
+
+                DocumentReference docRef = Db.Collection("MT_Notifications").Document(NSMD.NFT_Unique_ID);
+                WriteResult Result = await docRef.UpdateAsync(initialData);
+                if (Result != null)
+                {
+                    Response.Status = con.StatusSuccess;
+                    Response.Message = con.MessageSuccess;
+                    Response.Data = NSMD;
+                }
+                else
+                {
+                    Response.Status = con.StatusNotInsert;
+                    Response.Message = con.MessageNotInsert;
+                    Response.Data = null;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Response.Status = con.StatusFailed;
+                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
+            }
+            return ConvertToJSON(Response);
+        }
+
+        [Route("API/Notifications/AddAction")]
+        [HttpPost]
+        public async Task<HttpResponseMessage> AddAction(MT_Notifications NSMD)
+        {
+            Db = con.SurgeryCenterDb(NSMD.Slug);
+            NotificationsResponse Response = new NotificationsResponse();
+            try
+            {
+
+                List<Notification_Action> ActionList = new List<Notification_Action>();
+                Query ObjQuery = Db.Collection("MT_Notifications").WhereEqualTo("NFT_Is_Deleted", false).WhereEqualTo("NFT_Is_Active", true).WhereEqualTo("NFT_Unique_ID", NSMD.NFT_Unique_ID);
+                QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
+                if (ObjQuerySnap != null)
+                {
+                    MT_Notifications noti = ObjQuerySnap.Documents[0].ConvertTo<MT_Notifications>();
+                    if (noti.NFT_Actions != null)
+                    {
+                        foreach (Notification_Action action in noti.NFT_Actions)
+                        {
+                            ActionList.Add(action);
+                        }
+                    }
+                }
+
                 if (NSMD.NFT_Actions != null)
                 {
                     foreach (Notification_Action Notia in NSMD.NFT_Actions)
@@ -55,25 +228,143 @@ namespace TheCloudHealth.Controllers
                         Notia.NFA_Unique_ID = con.GetUniqueKey();
                         Notia.NFA_Create_Date = con.ConvertTimeZone(Notia.NFA_TimeZone, Convert.ToDateTime(Notia.NFA_Create_Date));
                         Notia.NFA_Modify_Date = con.ConvertTimeZone(Notia.NFA_TimeZone, Convert.ToDateTime(Notia.NFA_Modify_Date));
-                        //if (Notia.NFA_Be_Af == 1)
-                        //{
-                        //    Notia.NFA_Action_Title = Notia.NFA_Action_Type.ToUpper() + Notia.NFA_Days.ToString() + "Days Before";
-                        //    Notia.NFA_Create_Date = con.ConvertTimeZone(Notia.NFA_TimeZone, Convert.ToDateTime(Notia.NFA_Create_Date));
-                        //    Notia.NFA_Modify_Date = con.ConvertTimeZone(Notia.NFA_TimeZone, Convert.ToDateTime(Notia.NFA_Modify_Date));
-                        //}
-                        //else if (Notia.NFA_Be_Af == 2)
-                        //{
-                        //    Notia.NFA_Action_Title = Notia.NFA_Action_Type.ToUpper() + Notia.NFA_Days.ToString() + "Days After";
-                        //    Notia.NFA_Create_Date = con.ConvertTimeZone(Notia.NFA_TimeZone, Convert.ToDateTime(Notia.NFA_Create_Date));
-                        //    Notia.NFA_Modify_Date = con.ConvertTimeZone(Notia.NFA_TimeZone, Convert.ToDateTime(Notia.NFA_Modify_Date));
-                        //}
-
                         ActionList.Add(Notia);
                     }
                 }
-                NSMD.NFT_Actions = ActionList;
-                DocumentReference docRef = Db.Collection("MT_Notifications").Document(UniqueID);
-                WriteResult Result = await docRef.SetAsync(NSMD);
+
+                Dictionary<string, object> initialData = new Dictionary<string, object>
+                 {
+                     {"NFT_Actions", ActionList},
+                     {"NFT_Modify_Date", con.ConvertTimeZone(NSMD.NFT_TimeZone, Convert.ToDateTime(NSMD.NFT_Modify_Date))},
+                 };
+
+                DocumentReference docRef = Db.Collection("MT_Notifications").Document(NSMD.NFT_Unique_ID);
+                WriteResult Result = await docRef.UpdateAsync(initialData);
+                if (Result != null)
+                {
+                    Response.Status = con.StatusSuccess;
+                    Response.Message = con.MessageSuccess;
+                    Response.Data = NSMD;
+                }
+                else
+                {
+                    Response.Status = con.StatusNotInsert;
+                    Response.Message = con.MessageNotInsert;
+                    Response.Data = null;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Response.Status = con.StatusFailed;
+                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
+            }
+            return ConvertToJSON(Response);
+        }
+
+        [Route("API/Notifications/EditAction")]
+        [HttpPost]
+        public async Task<HttpResponseMessage> EditAction(MT_Notifications NSMD)
+        {
+            Db = con.SurgeryCenterDb(NSMD.Slug);
+            NotificationsResponse Response = new NotificationsResponse();
+            try
+            {
+
+                List<Notification_Action> ActionList = new List<Notification_Action>();
+                Query ObjQuery = Db.Collection("MT_Notifications").WhereEqualTo("NFT_Is_Deleted", false).WhereEqualTo("NFT_Is_Active", true).WhereEqualTo("NFT_Unique_ID", NSMD.NFT_Unique_ID);
+                QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
+                if (ObjQuerySnap != null)
+                {
+                    MT_Notifications noti = ObjQuerySnap.Documents[0].ConvertTo<MT_Notifications>();
+                    if (noti.NFT_Actions != null)
+                    {
+                        foreach (Notification_Action action in noti.NFT_Actions)
+                        {
+                            if (action.NFA_Unique_ID == NSMD.NFT_Actions[0].NFA_Unique_ID)
+                            {
+                                action.NFA_Action_Type = NSMD.NFT_Actions[0].NFA_Action_Type;
+                                action.NFA_Action_Title = NSMD.NFT_Actions[0].NFA_Action_Title;
+                                action.NFA_Action_Icon = NSMD.NFT_Actions[0].NFA_Action_Icon;
+                                action.NFA_Be_Af = NSMD.NFT_Actions[0].NFA_Be_Af;
+                                action.NFA_Days = NSMD.NFT_Actions[0].NFA_Days;
+                                action.NFA_Message = NSMD.NFT_Actions[0].NFA_Message;
+                                action.NFA_Modify_Date = con.ConvertTimeZone(NSMD.NFT_Actions[0].NFA_TimeZone, Convert.ToDateTime(NSMD.NFT_Actions[0].NFA_Modify_Date));
+                                action.NFA_TimeZone = NSMD.NFT_Actions[0].NFA_TimeZone;
+                                ActionList.Add(action);
+                            }
+                            else
+                            {
+                                ActionList.Add(action);
+                            }                            
+                        }
+                    }
+                }
+
+                Dictionary<string, object> initialData = new Dictionary<string, object>
+                 {
+                     {"NFT_Actions", ActionList},
+                     {"NFT_Modify_Date", con.ConvertTimeZone(NSMD.NFT_TimeZone, Convert.ToDateTime(NSMD.NFT_Modify_Date))},
+                 };
+
+                DocumentReference docRef = Db.Collection("MT_Notifications").Document(NSMD.NFT_Unique_ID);
+                WriteResult Result = await docRef.UpdateAsync(initialData);
+                if (Result != null)
+                {
+                    Response.Status = con.StatusSuccess;
+                    Response.Message = con.MessageSuccess;
+                    Response.Data = NSMD;
+                }
+                else
+                {
+                    Response.Status = con.StatusNotInsert;
+                    Response.Message = con.MessageNotInsert;
+                    Response.Data = null;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Response.Status = con.StatusFailed;
+                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
+            }
+            return ConvertToJSON(Response);
+        }
+
+        [Route("API/Notifications/DeleteAction")]
+        [HttpPost]
+        public async Task<HttpResponseMessage> DeleteAction(MT_Notifications NSMD)
+        {
+            Db = con.SurgeryCenterDb(NSMD.Slug);
+            NotificationsResponse Response = new NotificationsResponse();
+            try
+            {
+
+                List<Notification_Action> ActionList = new List<Notification_Action>();
+                Query ObjQuery = Db.Collection("MT_Notifications").WhereEqualTo("NFT_Is_Deleted", false).WhereEqualTo("NFT_Is_Active", true).WhereEqualTo("NFT_Unique_ID", NSMD.NFT_Unique_ID);
+                QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
+                if (ObjQuerySnap != null)
+                {
+                    MT_Notifications noti = ObjQuerySnap.Documents[0].ConvertTo<MT_Notifications>();
+                    if (noti.NFT_Actions != null)
+                    {
+                        foreach (Notification_Action action in noti.NFT_Actions)
+                        {
+                            if (action.NFA_Unique_ID != NSMD.NFT_Actions[0].NFA_Unique_ID)
+                            {
+                                ActionList.Add(action);
+                            }
+                        }
+                    }
+                }
+
+                Dictionary<string, object> initialData = new Dictionary<string, object>
+                 {
+                     {"NFT_Actions", ActionList},                     
+                 };
+
+                DocumentReference docRef = Db.Collection("MT_Notifications").Document(NSMD.NFT_Unique_ID);
+                WriteResult Result = await docRef.UpdateAsync(initialData);
                 if (Result != null)
                 {
                     Response.Status = con.StatusSuccess;

@@ -48,7 +48,7 @@ namespace TheCloudHealth.Controllers
             {
                 UniqueID = con.GetUniqueKey();
                 PMD.PFU_Unique_ID = UniqueID;
-                PMD.PFU_Actual_URL = "http://tchdev.thecloudhealth.com/#/view-patient-forms/" + PMD.PFU_Booking_ID;
+                PMD.PFU_Actual_URL = "http://tchdev.thecloudhealth.com/#/in/" + PMD.PFU_Booking_ID + "/" + PMD.PFU_Form_ID;
                 PMD.PFU_Dummy_URL = "http://tchdev.thecloudhealth.com/#/r/" + con.GetUrlToken();
                 PMD.PFU_Is_Active = true;
 

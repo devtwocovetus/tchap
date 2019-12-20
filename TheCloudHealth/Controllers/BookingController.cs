@@ -717,10 +717,19 @@ namespace TheCloudHealth.Controllers
                 if (ObjQuerySnap != null)
                 {
                     BookingInfo = ObjQuerySnap.Documents[0].ConvertTo<MT_Patient_Booking>();
+                    if (BookingInfo.PB_Forms != null)
+                    {
+                        foreach (Patient_Forms PF in BookingInfo.PB_Forms)
+                        {
+                            FormsList.Add(PF);
+                        }
+                    }
                     if (PMD.PB_Forms != null)
                     {
                         foreach (Patient_Forms PF in PMD.PB_Forms)
                         {
+                            PF.PF_Create_Date = con.ConvertTimeZone(PF.PF_TimeZone, Convert.ToDateTime(PF.PF_Create_Date));
+                            PF.PF_Modify_Date = con.ConvertTimeZone(PF.PF_TimeZone, Convert.ToDateTime(PF.PF_Modify_Date));
                             FormsList.Add(PF);
                         }
                     }

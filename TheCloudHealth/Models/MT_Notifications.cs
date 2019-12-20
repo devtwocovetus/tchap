@@ -16,6 +16,10 @@ namespace TheCloudHealth.Models
         [FirestoreProperty]
         public string NFT_Category_Type_ID { get; set; }
         [FirestoreProperty]
+        public string NFT_Name { get; set; }
+        [FirestoreProperty]
+        public string NFT_Description { get; set; }
+        [FirestoreProperty]
         public string NFT_Category_Type_Name { get; set; }
         [FirestoreProperty]
         public List<Notification_Action> NFT_Actions { get; set; }

@@ -1,7 +1,11 @@
-﻿using System.Net;
+﻿using PhoneNumbers;
+using System;
+using System.Net;
 using TheCloudHealth.Models;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
+using Twilio.TwiML;
+using Twilio.TwiML.Messaging;
 
 namespace TheCloudHealth.Lib
 {
@@ -30,6 +34,35 @@ namespace TheCloudHealth.Lib
                 to: new Twilio.Types.PhoneNumber(sms.Receiver_Contact_No)
             );
             return message;
+        }
+
+        public MessagingResponse ResponseSMS()
+        {
+            ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072;
+            TwilioClient.Init(accountSid, authToken);
+
+            var response = new MessagingResponse();
+            var message = new Message();
+            message.Body("Hello World!");
+            response.Append(message);
+            //response.Redirect(url: new Uri("http://tchapi.thecloudhealth.com/API/Sms/GenTwiML?Text='hii sameer, How are you?'"));
+            return response;
+        }
+
+        public MessageResource SendMessageWithWhatsapp(Sms sms)
+        {
+            ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072;
+            TwilioClient.Init(accountSid, authToken);
+
+            var to = "whatsapp:" + sms.Receiver_Contact_No;
+
+            var messageOptions = new CreateMessageOptions(
+            new Twilio.Types.PhoneNumber(to.ToString()));
+            messageOptions.From = new Twilio.Types.PhoneNumber("whatsapp:+14155238886");
+            messageOptions.Body = sms.Message_Body;
+            var message = MessageResource.Create(messageOptions);
+            return message;
+
         }
     }
 }
