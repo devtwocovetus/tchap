@@ -91,26 +91,5 @@ namespace TheCloudHealth.Controllers
                 return res;
             }
         }
-
-
-        [Route("API/Sms/MessageToWhatsapp")]
-        [HttpPost]
-        //[Authorize(Roles ="SAdmin")]
-        public HttpResponseMessage MessageToWhatsapp(Sms sms)
-        {
-            SmsResponse Response = new SmsResponse();
-            try
-            {
-                var message = Objsms.SendMessageWithWhatsapp(sms);
-                Response.Message = con.MessageSuccess; ;
-                Response.Status = con.StatusSuccess;
-            }
-            catch (Exception ex)
-            {
-                Response.Status = con.StatusFailed;
-                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
-            }
-            return ConvertToJSON(Response);
-        }
     }
 }

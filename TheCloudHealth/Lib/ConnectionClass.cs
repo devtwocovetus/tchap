@@ -1,4 +1,6 @@
-﻿using Google.Cloud.Firestore;
+﻿using Google.Apis.Auth.OAuth2;
+using Google.Cloud.Firestore;
+using Google.Cloud.Storage.V1;
 using iTextSharp.text;
 using iTextSharp.text.html.simpleparser;
 using iTextSharp.text.pdf;
@@ -85,12 +87,15 @@ namespace TheCloudHealth.Lib
         #endregion  Credential For TheCloudHealthCare Database
 
         #region Credential For Google Cloud Storage
+
         //public FirestoreDb GCS()
         //{
         //    string fileName = "thecloudhealthcare-e25078639941.json";
         //    string filepath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"ConfigFile\", fileName);
         //    Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", filepath);
         //    string projectId = "thecloudhealthcare";
+
+        //    //return StorageClient.Create("GOOGLE_APPLICATION_CREDENTIALS");
         //    return fireStoreDb = FirestoreDb.Create(projectId);
         //}
 

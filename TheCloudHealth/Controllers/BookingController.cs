@@ -12,6 +12,11 @@ using System.Text;
 using System.Web;
 using Newtonsoft.Json.Linq;
 using System.Linq;
+using System.IO;
+using iTextSharp.text;
+using iTextSharp.text.html.simpleparser;
+using iTextSharp.text.pdf;
+using System.Net.Http.Headers;
 
 namespace TheCloudHealth.Controllers
 {
@@ -19,9 +24,11 @@ namespace TheCloudHealth.Controllers
     {
         ConnectionClass con;
         FirestoreDb Db;
-        string UniqueID = "";
+        ICreatePDF ObjPDF;
+        string UniqueID = "";        
         public BookingController() {
             con = new ConnectionClass();
+            ObjPDF = new CreatePDF();
             //Db = con.Db();
         }
 
@@ -1257,7 +1264,7 @@ namespace TheCloudHealth.Controllers
         }
 
         [Route("API/Booking/EditBooking")]
-        [HttpPost]
+        [HttpPost]        
         public async Task<HttpResponseMessage> EditBooking(MT_Patient_Booking PMD)
         {
             Db = con.SurgeryCenterDb(PMD.Slug);
@@ -1396,6 +1403,150 @@ namespace TheCloudHealth.Controllers
             }
             return ConvertToJSON(Response);
         }
+        [Route("API/Booking/DownloadPDF")]
+        [HttpGet]
+        //[Obsolete]
+        public async Task<HttpResponseMessage> DownloadPDF(string BookingID,string PatientID,string Slug)
+        {
+            string HTMLContent = "<html>";
+            Db = con.SurgeryCenterDb(Slug);
+            Query ObjQuery = Db.Collection("MT_PatientInfomation").WhereEqualTo("Patient_Unique_ID", PatientID).WhereEqualTo("Patient_Is_Active",true).WhereEqualTo("Patient_Is_Deleted", false);
+            QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
+            if (ObjQuerySnap != null)
+            {
+                MT_PatientInfomation patient = ObjQuerySnap.Documents[0].ConvertTo<MT_PatientInfomation>();
+                HTMLContent = HTMLContent + "<body style='padding:10px 10px 10px 10px'>" +
+                "<div id='Header' style='text-align: center;font-size: 12px;background: red;padding: 10px 0px 10px 0px;font-weight: bold;'>" +
+                    "Clinical Summary" +
+                "</div> " +
+                "<div id='DemographicsSection' style='padding: 10px 10px 10px 10px;'>" +
+                    //"<div  style = 'padding: 5px 0px 5px 5px;font-weight: bold;font-size: 14px'>" +
+                    "<table bgcolor='#B8DBFD' border='1' bordercolor='LightGray'><tr><td>" +
+                    "Demographics " +
+                    "<tr><td></table>" +
+                    //"</div>" +
+                        "<table  style='width:100%;padding: 2px 0px 0px 0px;border: solid 1px lightgray;' >" +
+                            "<tr>" +
+                                "<td>Name :</td>" +
+                                "<td>"+ patient.Patient_First_Name + " " + patient.Patient_Last_Name + "</td>" +
+                                "<td>Patient ID :</td>" +
+                                "<td>"+ patient.Patient_Code + "</td>" +
+                            "</tr>" +
+
+                            "<tr>" +
+                                "<td>Birth Date :</td>" +
+                                "<td>"+ patient.Patient_DOB + "</td>" +
+                                "<td>Gender :</td>" +
+                                "<td>"+ patient.Patient_Sex + "</td>" +
+                            "</tr>" +
+
+                            "<tr>" +
+                                "<td>Marital Status :</td>" +
+                                "<td>"+ patient.Patient_Marital_Status + "</td>" +
+                                "<td>Religious :</td>" +
+                                "<td>"+ patient.Patient_Religion + "</td>" +
+                            "</tr>" +
+
+                            "<tr>" +
+                                "<td>Race :</td>" +
+                                "<td>"+ patient.Patient_Race + "</td>" +
+                                "<td>Ethinic :</td>" +
+                                "<td>"+ patient.Patient_Ethinicity + "</td>" +
+                            "</tr>" +
+
+                            "<tr>" +
+                                "<td>Contact Information :</td>" +
+                                "<td> Tel(Primary Home)"+ patient.Patient_Primary_No + "</td>" +
+                                "<td>Primary Home :</td>" +
+                                "<td>" + patient.Patient_Address1 + "<br>"+ patient.Patient_Address2 + "</td>" +
+                            "</tr>" +
+
+                            "<tr>" +
+                                "<td>Language :</td>" +
+                                "<td>"+ patient.Patient_Language + "</td>" +
+                                "<td></td>" +
+                                "<td></td>" +
+                            "</tr>" +
+                        "</table>" +
+
+                        //Query ObjQuery1 = Db.Collection("MT_PatientInfomation").WhereEqualTo("Patient_Unique_ID", PatientID).WhereEqualTo("Patient_Is_Active", true).WhereEqualTo("Patient_Is_Deleted", false);
+                        //QuerySnapshot ObjQuerySnap1 = await ObjQuery.GetSnapshotAsync();
+                        //if (ObjQuerySnap != null)
+                        //{ 
+
+                        //}
+
+                    "</div>";
+            }
+            HTMLContent = HTMLContent + "</body></html>";
+            
+            HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK);
+
+            //Set the File Path.
+            //string filePath = HttpContext.Current.Server.MapPath("~/Images/") + "SCNavi_20191118194837.jpg";
+
+            ////Check whether File exists.
+            //if (!File.Exists(filePath))
+            //{
+            //    //Throw 404 (Not Found) exception if File not found.
+            //    response.StatusCode = HttpStatusCode.NotFound;
+            //    response.ReasonPhrase = string.Format("File not found: {0} .", "SCNavi_20191118194837.jpg");
+            //    throw new HttpResponseException(response);
+            //}
+
+            //Read the File into a Byte Array.
+            byte[] bytes = GetPDF(HTMLContent);
+
+            //Set the Response Content.
+            response.Content = new ByteArrayContent(bytes);
+
+            //Set the Response Content Length.
+            response.Content.Headers.ContentLength = bytes.LongLength;
+
+            //Set the Content Disposition Header Value and FileName.
+            response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment");
+            response.Content.Headers.ContentDisposition.FileName = "123.pdf";
+
+            //Set the File Content Type.
+            response.Content.Headers.ContentType = new MediaTypeHeaderValue(MimeMapping.GetMimeMapping("123.pdf"));
+            return response;
+        }
+
+        [Obsolete]
+        public byte[] GetPDF(string pHTML)
+        {
+            byte[] bPDF = null;
+
+            MemoryStream ms = new MemoryStream();
+            TextReader txtReader = new StringReader(pHTML);
+
+            // 1: create object of a itextsharp document class  
+            Document doc = new Document(PageSize.A4, 25, 25, 25, 25);
+
+            // 2: we create a itextsharp pdfwriter that listens to the document and directs a XML-stream to a file  
+            PdfWriter oPdfWriter = PdfWriter.GetInstance(doc, ms);
+
+            // 3: we create a worker parse the document  
+            HTMLWorker htmlWorker = new HTMLWorker(doc);
+
+            // 4: we open document and start the worker on the document  
+            doc.Open();
+            htmlWorker.StartDocument();
+
+
+            // 5: parse the html into the document  
+            htmlWorker.Parse(txtReader);
+
+            // 6: close the document and the worker  
+            htmlWorker.EndDocument();
+            htmlWorker.Close();
+            doc.Close();
+
+            bPDF = ms.ToArray();
+
+            return bPDF;
+        }
+
 
     }
 }

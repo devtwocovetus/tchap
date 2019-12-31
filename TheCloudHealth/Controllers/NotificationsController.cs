@@ -197,6 +197,46 @@ namespace TheCloudHealth.Controllers
             return ConvertToJSON(Response);
         }
 
+        [Route("API/Notifications/SelectAction")]
+        [HttpPost]
+        public async Task<HttpResponseMessage> SelectAction(MT_Notifications NSMD)
+        {
+            Db = con.SurgeryCenterDb(NSMD.Slug);
+            NotificationsResponse Response = new NotificationsResponse();
+            try
+            {
+
+                List<Notification_Action> ActionList = new List<Notification_Action>();
+                Query ObjQuery = Db.Collection("MT_Notifications").WhereEqualTo("NFT_Is_Deleted", false).WhereEqualTo("NFT_Is_Active", true).WhereEqualTo("NFT_Unique_ID", NSMD.NFT_Unique_ID);
+                QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
+                if (ObjQuerySnap != null)
+                {
+                    MT_Notifications noti = ObjQuerySnap.Documents[0].ConvertTo<MT_Notifications>();
+                    if (noti.NFT_Actions != null)
+                    {
+                        foreach (Notification_Action action in noti.NFT_Actions)
+                        {
+                            if (action.NFA_Unique_ID == NSMD.NFT_Actions[0].NFA_Unique_ID)
+                            {
+                                ActionList.Add(action);
+                            }
+                            
+                        }
+                    }
+                    noti.NFT_Actions = ActionList;
+                    Response.Data = noti;
+                    Response.Status = con.StatusSuccess;
+                    Response.Message = con.MessageSuccess;
+                }
+            }
+            catch (Exception ex)
+            {
+                Response.Status = con.StatusFailed;
+                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
+            }
+            return ConvertToJSON(Response);
+        }
+
         [Route("API/Notifications/AddAction")]
         [HttpPost]
         public async Task<HttpResponseMessage> AddAction(MT_Notifications NSMD)
@@ -286,8 +326,10 @@ namespace TheCloudHealth.Controllers
                                 action.NFA_Action_Type = NSMD.NFT_Actions[0].NFA_Action_Type;
                                 action.NFA_Action_Title = NSMD.NFT_Actions[0].NFA_Action_Title;
                                 action.NFA_Action_Icon = NSMD.NFT_Actions[0].NFA_Action_Icon;
+                                action.NFA_Action_Subject = NSMD.NFT_Actions[0].NFA_Action_Subject;
                                 action.NFA_Be_Af = NSMD.NFT_Actions[0].NFA_Be_Af;
                                 action.NFA_Days = NSMD.NFT_Actions[0].NFA_Days;
+                                action.NFA_DayOrWeek = NSMD.NFT_Actions[0].NFA_DayOrWeek;
                                 action.NFA_Message = NSMD.NFT_Actions[0].NFA_Message;
                                 action.NFA_Modify_Date = con.ConvertTimeZone(NSMD.NFT_Actions[0].NFA_TimeZone, Convert.ToDateTime(NSMD.NFT_Actions[0].NFA_Modify_Date));
                                 action.NFA_TimeZone = NSMD.NFT_Actions[0].NFA_TimeZone;
@@ -408,6 +450,33 @@ namespace TheCloudHealth.Controllers
                     Response.Status = con.StatusSuccess;
                     Response.Message = con.MessageSuccess;
                     Response.DataList = NotiList;
+                }
+            }
+            catch (Exception ex)
+            {
+                Response.Status = con.StatusFailed;
+                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
+            }
+            return ConvertToJSON(Response);
+        }
+
+        [Route("API/Notifications/Select")]
+        [HttpPost]
+        public async Task<HttpResponseMessage> Select(MT_Notifications NSMD)
+        {
+            Db = con.SurgeryCenterDb(NSMD.Slug);
+            NotificationsResponse Response = new NotificationsResponse();
+            try
+            {
+                MT_Notifications notification = new MT_Notifications();
+                Query ObjQuery = Db.Collection("MT_Notifications").WhereEqualTo("NFT_Is_Deleted", false).WhereEqualTo("NFT_Is_Active", true).WhereEqualTo("NFT_Unique_ID", NSMD.NFT_Unique_ID);
+                QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
+                if (ObjQuerySnap != null)
+                {
+                    notification = ObjQuerySnap.Documents[0].ConvertTo<MT_Notifications>();
+                    Response.Status = con.StatusSuccess;
+                    Response.Message = con.MessageSuccess;
+                    Response.Data = notification;
                 }
             }
             catch (Exception ex)

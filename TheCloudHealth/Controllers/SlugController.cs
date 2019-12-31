@@ -15,7 +15,7 @@ namespace TheCloudHealth.Controllers
     public class SlugController : ApiController
     {
         FirestoreDb Db;
-        FirestoreDb DbLog;
+        //FirestoreDb DbLog;
 
         ConnectionClass con;
         string UniqueID = "";

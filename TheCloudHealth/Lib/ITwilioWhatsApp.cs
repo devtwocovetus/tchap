@@ -4,9 +4,8 @@ using Twilio.TwiML;
 
 namespace TheCloudHealth.Lib
 {
-    interface ITwilioSMS
+    interface ITwilioWhatsApp
     {
-        MessageResource SendSMS(Sms sms);
-        MessagingResponse ResponseSMS();
+        MessageResource SendMessageWithWhatsapp(Whatsapp whatsapp);
     }
 }

@@ -15,15 +15,14 @@ using System.Linq;
 
 namespace TheCloudHealth.Controllers
 {
-    public class KBCategoryController : ApiController
+    public class DocumentCategoryController : ApiController
     {
         ConnectionClass con;
         FirestoreDb Db;
         string UniqueID = "";
-        public KBCategoryController()
+        public DocumentCategoryController()
         {
             con = new ConnectionClass();
-            //Db = con.Db();
         }
 
         public HttpResponseMessage ConvertToJSON(object objectToConvert)
@@ -34,27 +33,27 @@ namespace TheCloudHealth.Controllers
             return response;
         }
 
-        [Route("API/KBCategory/Create")]
+        [Route("API/DocumentCategory/Create")]
         [HttpPost]
-        public async Task<HttpResponseMessage> CreateAsync(MT_KBCategory KCMD)
+        public async Task<HttpResponseMessage> CreateAsync(MT_Document_Category DCMD)
         {
-            Db = con.SurgeryCenterDb(KCMD.Slug);
-            KBCategoryResponse Response = new KBCategoryResponse();
+            Db = con.SurgeryCenterDb(DCMD.Slug);
+            DocuCategoryResponse Response = new DocuCategoryResponse();
             try
             {
                 List<string> List = new List<string>();
                 UniqueID = con.GetUniqueKey();
-                KCMD.KBC_Unique_ID = UniqueID;
-                KCMD.KBC_Create_Date = con.ConvertTimeZone(KCMD.KBC_TimeZone, Convert.ToDateTime(KCMD.KBC_Create_Date));
-                KCMD.KBC_Modify_Date = con.ConvertTimeZone(KCMD.KBC_TimeZone, Convert.ToDateTime(KCMD.KBC_Modify_Date));
+                DCMD.DOC_Unique_ID = UniqueID;
+                DCMD.DOC_Create_Date = con.ConvertTimeZone(DCMD.DOC_TimeZone, Convert.ToDateTime(DCMD.DOC_Create_Date));
+                DCMD.DOC_Modify_Date = con.ConvertTimeZone(DCMD.DOC_TimeZone, Convert.ToDateTime(DCMD.DOC_Modify_Date));
 
-                DocumentReference docRef = Db.Collection("MT_KBCategory").Document(UniqueID);
-                WriteResult Result = await docRef.SetAsync(KCMD);
+                DocumentReference docRef = Db.Collection("MT_Document_Category").Document(UniqueID);
+                WriteResult Result = await docRef.SetAsync(DCMD);
                 if (Result != null)
                 {
                     Response.Status = con.StatusSuccess;
                     Response.Message = con.MessageSuccess;
-                    Response.Data = KCMD;
+                    Response.Data = DCMD;
                 }
                 else
                 {
@@ -72,32 +71,32 @@ namespace TheCloudHealth.Controllers
             return ConvertToJSON(Response);
         }
 
-        [Route("API/KBCategory/Update")]
+        [Route("API/DocumentCategory/Update")]
         [HttpPost]
-        public async Task<HttpResponseMessage> Update(MT_KBCategory KCMD)
+        public async Task<HttpResponseMessage> Update(MT_Document_Category DCMD)
         {
-            Db = con.SurgeryCenterDb(KCMD.Slug);
-            KBCategoryResponse Response = new KBCategoryResponse();
+            Db = con.SurgeryCenterDb(DCMD.Slug);
+            DocuCategoryResponse Response = new DocuCategoryResponse();
             try
             {
                 List<string> List = new List<string>();
 
                 Dictionary<string, object> initialData = new Dictionary<string, object>
                  {
-                    {"KBC_Sub_Category", KCMD.KBC_Sub_Category},
-                    {"KBC_Category", KCMD.KBC_Category},
-                    {"KBC_Description", KCMD.KBC_Description},
-                    {"KBC_Modify_Date", con.ConvertTimeZone(KCMD.KBC_TimeZone, Convert.ToDateTime(KCMD.KBC_Modify_Date))},
-                    {"KBC_TimeZone", KCMD.KBC_TimeZone}
+                    {"DOC_Sub_Category", DCMD.DOC_Sub_Category},
+                    {"DOC_Category", DCMD.DOC_Category},
+                    {"DOC_Description", DCMD.DOC_Description},
+                    {"DOC_Modify_Date", con.ConvertTimeZone(DCMD.DOC_TimeZone, Convert.ToDateTime(DCMD.DOC_Modify_Date))},
+                    {"DOC_TimeZone", DCMD.DOC_TimeZone}
                  };
 
-                DocumentReference docRef = Db.Collection("MT_KBCategory").Document(KCMD.KBC_Unique_ID);
+                DocumentReference docRef = Db.Collection("MT_Document_Category").Document(DCMD.DOC_Unique_ID);
                 WriteResult Result = await docRef.UpdateAsync(initialData);
                 if (Result != null)
                 {
                     Response.Status = con.StatusSuccess;
                     Response.Message = con.MessageSuccess;
-                    Response.Data = KCMD;
+                    Response.Data = DCMD;
                 }
                 else
                 {
@@ -116,28 +115,28 @@ namespace TheCloudHealth.Controllers
         }
 
 
-        [Route("API/KBCategory/IsActive")]
+        [Route("API/DocumentCategory/IsActive")]
         [HttpPost]
-        public async Task<HttpResponseMessage> IsActive(MT_KBCategory KCMD)
+        public async Task<HttpResponseMessage> IsActive(MT_Document_Category DCMD)
         {
-            Db = con.SurgeryCenterDb(KCMD.Slug);
-            KBCategoryResponse Response = new KBCategoryResponse();
+            Db = con.SurgeryCenterDb(DCMD.Slug);
+            DocuCategoryResponse Response = new DocuCategoryResponse();
             try
             {
                 Dictionary<string, object> initialData = new Dictionary<string, object>
                  {
-                    {"KBC_Is_Active", KCMD.KBC_Is_Active},
-                    {"KBC_Modify_Date", con.ConvertTimeZone(KCMD.KBC_TimeZone, Convert.ToDateTime(KCMD.KBC_Modify_Date))},
-                    {"KBC_TimeZone", KCMD.KBC_TimeZone}
+                    {"DOC_Is_Active", DCMD.DOC_Is_Active},
+                    {"DOC_Modify_Date", con.ConvertTimeZone(DCMD.DOC_TimeZone, Convert.ToDateTime(DCMD.DOC_Modify_Date))},
+                    {"DOC_TimeZone", DCMD.DOC_TimeZone}
                  };
 
-                DocumentReference docRef = Db.Collection("MT_KBCategory").Document(KCMD.KBC_Unique_ID);
+                DocumentReference docRef = Db.Collection("MT_Document_Category").Document(DCMD.DOC_Unique_ID);
                 WriteResult Result = await docRef.UpdateAsync(initialData);
                 if (Result != null)
                 {
                     Response.Status = con.StatusSuccess;
                     Response.Message = con.MessageSuccess;
-                    Response.Data = KCMD;
+                    Response.Data = DCMD;
                 }
                 else
                 {
@@ -155,28 +154,28 @@ namespace TheCloudHealth.Controllers
             return ConvertToJSON(Response);
         }
 
-        [Route("API/KBCategory/IsDeleted")]
+        [Route("API/DocumentCategory/IsDeleted")]
         [HttpPost]
-        public async Task<HttpResponseMessage> IsDeleted(MT_KBCategory KCMD)
+        public async Task<HttpResponseMessage> IsDeleted(MT_Document_Category DCMD)
         {
-            Db = con.SurgeryCenterDb(KCMD.Slug);
-            KBCategoryResponse Response = new KBCategoryResponse();
+            Db = con.SurgeryCenterDb(DCMD.Slug);
+            DocuCategoryResponse Response = new DocuCategoryResponse();
             try
             {
                 Dictionary<string, object> initialData = new Dictionary<string, object>
                  {
-                    {"KBC_Is_Deleted", KCMD.KBC_Is_Deleted},
-                    {"KBC_Modify_Date", con.ConvertTimeZone(KCMD.KBC_TimeZone, Convert.ToDateTime(KCMD.KBC_Modify_Date))},
-                    {"KBC_TimeZone", KCMD.KBC_TimeZone}
+                    {"DOC_Is_Deleted", DCMD.DOC_Is_Deleted},
+                    {"DOC_Modify_Date", con.ConvertTimeZone(DCMD.DOC_TimeZone, Convert.ToDateTime(DCMD.DOC_Modify_Date))},
+                    {"DOC_TimeZone", DCMD.DOC_TimeZone}
                  };
 
-                DocumentReference docRef = Db.Collection("MT_KBCategory").Document(KCMD.KBC_Unique_ID);
+                DocumentReference docRef = Db.Collection("MT_Document_Category").Document(DCMD.DOC_Unique_ID);
                 WriteResult Result = await docRef.UpdateAsync(initialData);
                 if (Result != null)
                 {
                     Response.Status = con.StatusSuccess;
                     Response.Message = con.MessageSuccess;
-                    Response.Data = KCMD;
+                    Response.Data = DCMD;
                 }
                 else
                 {
@@ -194,22 +193,22 @@ namespace TheCloudHealth.Controllers
             return ConvertToJSON(Response);
         }
 
-        [Route("API/KBCategory/List")]
+        [Route("API/DocumentCategory/List")]
         [HttpPost]
-        public async Task<HttpResponseMessage> List(MT_KBCategory KCMD)
+        public async Task<HttpResponseMessage> List(MT_Document_Category DCMD)
         {
-            Db = con.SurgeryCenterDb(KCMD.Slug);
-            KBCategoryResponse Response = new KBCategoryResponse();
+            Db = con.SurgeryCenterDb(DCMD.Slug);
+            DocuCategoryResponse Response = new DocuCategoryResponse();
             try
             {
-                List<MT_KBCategory> List = new List<MT_KBCategory>();
-                Query docRef = Db.Collection("MT_KBCategory").WhereEqualTo("KBC_Is_Deleted", false).OrderBy("KBC_Category");
+                List<MT_Document_Category> List = new List<MT_Document_Category>();
+                Query docRef = Db.Collection("MT_Document_Category").WhereEqualTo("DOC_Is_Deleted", false).OrderBy("DOC_Category");
                 QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
                 if (ObjQuerySnap != null)
                 {
                     foreach (DocumentSnapshot Docsnapshot in ObjQuerySnap.Documents)
                     {
-                        List.Add(Docsnapshot.ConvertTo<MT_KBCategory>());
+                        List.Add(Docsnapshot.ConvertTo<MT_Document_Category>());
                     }
                     Response.DataList = List;
                 }
@@ -224,22 +223,22 @@ namespace TheCloudHealth.Controllers
             return ConvertToJSON(Response);
         }
 
-        [Route("API/KBCategory/ListDD")]
+        [Route("API/DocumentCategory/ListDD")]
         [HttpPost]
-        public async Task<HttpResponseMessage> ListDD(MT_KBCategory KCMD)
+        public async Task<HttpResponseMessage> ListDD(MT_Document_Category DCMD)
         {
-            Db = con.SurgeryCenterDb(KCMD.Slug);
-            KBCategoryResponse Response = new KBCategoryResponse();
+            Db = con.SurgeryCenterDb(DCMD.Slug);
+            DocuCategoryResponse Response = new DocuCategoryResponse();
             try
             {
-                List<MT_KBCategory> List = new List<MT_KBCategory>();
-                Query docRef = Db.Collection("MT_KBCategory").WhereEqualTo("KBC_Is_Deleted", false).WhereEqualTo("KBC_Is_Active", true).WhereEqualTo("KBC_Sub_Category", null).OrderBy("KBC_Category");
+                List<MT_Document_Category> List = new List<MT_Document_Category>();
+                Query docRef = Db.Collection("MT_Document_Category").WhereEqualTo("DOC_Is_Deleted", false).WhereEqualTo("DOC_Is_Active", true).WhereEqualTo("DOC_Sub_Category", null).OrderBy("DOC_Category");
                 QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
                 if (ObjQuerySnap != null)
                 {
                     foreach (DocumentSnapshot Docsnapshot in ObjQuerySnap.Documents)
                     {
-                        List.Add(Docsnapshot.ConvertTo<MT_KBCategory>());
+                        List.Add(Docsnapshot.ConvertTo<MT_Document_Category>());
                     }
                     Response.DataList = List;
                 }
@@ -254,63 +253,22 @@ namespace TheCloudHealth.Controllers
             return ConvertToJSON(Response);
         }
 
-        [Route("API/KBCategory/GetDeletedList")]
+        [Route("API/DocumentCategory/GetDeletedList")]
         [HttpPost]
-        public async Task<HttpResponseMessage> GetDeletedList(MT_KBCategory KCMD)
+        public async Task<HttpResponseMessage> GetDeletedList(MT_Document_Category DCMD)
         {
-            Db = con.SurgeryCenterDb(KCMD.Slug);
-            KBCategoryResponse Response = new KBCategoryResponse();
+            Db = con.SurgeryCenterDb(DCMD.Slug);
+            DocuCategoryResponse Response = new DocuCategoryResponse();
             try
             {
-                List<MT_KBCategory> List = new List<MT_KBCategory>();
-                Query docRef = Db.Collection("MT_KBCategory").WhereEqualTo("KBC_Is_Deleted", true).OrderBy("KBC_Category");
+                List<MT_Document_Category> List = new List<MT_Document_Category>();
+                Query docRef = Db.Collection("MT_Document_Category").WhereEqualTo("DOC_Is_Deleted", true).OrderBy("DOC_Category");
                 QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
                 if (ObjQuerySnap != null)
                 {
                     foreach (DocumentSnapshot Docsnapshot in ObjQuerySnap.Documents)
                     {
-                        List.Add(Docsnapshot.ConvertTo<MT_KBCategory>());
-                    }
-                    Response.DataList = List;
-                }
-                Response.Status = con.StatusSuccess;
-                Response.Message = con.MessageSuccess;
-            }
-            catch (Exception ex)
-            {
-                Response.Status = con.StatusFailed;
-                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
-            }
-            return ConvertToJSON(Response);
-        }
-
-        [Route("API/KBCategory/SubCategoryListDD")]
-        [HttpPost]
-        public async Task<HttpResponseMessage> SubCategoryListDD(MT_KBCategory KCMD)
-        {
-            Db = con.SurgeryCenterDb(KCMD.Slug);
-            KBCategoryResponse Response = new KBCategoryResponse();
-            try
-            {
-                List<MT_KBCategory> List = new List<MT_KBCategory>();
-                Query docRef = Db.Collection("MT_KBCategory").WhereEqualTo("KBC_Is_Deleted", false).WhereEqualTo("KBC_Is_Active", true).OrderBy("KBC_Category");
-                QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
-                if (ObjQuerySnap != null)
-                {
-                    
-                    if (KCMD.KBC_Categories != null)
-                    {
-                        foreach (DocumentSnapshot Docsnapshot in ObjQuerySnap.Documents)
-                        {
-                            MT_KBCategory cate = Docsnapshot.ConvertTo<MT_KBCategory>();
-                            foreach (string str in KCMD.KBC_Categories)
-                            {
-                                if (cate.KBC_Category == str && cate.KBC_Sub_Category != null)
-                                {
-                                    List.Add(cate);
-                                }
-                            }
-                        }
+                        List.Add(Docsnapshot.ConvertTo<MT_Document_Category>());
                     }
                     Response.DataList = List;
                 }

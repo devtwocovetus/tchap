@@ -14,11 +14,15 @@ namespace TheCloudHealth.Models
         [FirestoreProperty]
         public string NFA_Action_Title { get; set; }
         [FirestoreProperty]
+        public string NFA_Action_Subject { get; set; }
+        [FirestoreProperty]
         public string NFA_Action_Icon { get; set; }
         [FirestoreProperty]
         public int NFA_Be_Af { get; set; }
         [FirestoreProperty]
         public int NFA_Days { get; set; }
+        [FirestoreProperty]
+        public int NFA_DayOrWeek { get; set; }
         [FirestoreProperty]
         public string NFA_Message { get; set; }
         [FirestoreProperty]

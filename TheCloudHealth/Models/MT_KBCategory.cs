@@ -13,8 +13,6 @@ namespace TheCloudHealth.Models
         public string KBC_Category { get; set; }
         [FirestoreProperty]
         public string KBC_Sub_Category { get; set; }
-        //[FirestoreProperty]
-        //public string KBC_Sub_Category_Text { get; set; }
         [FirestoreProperty]
         public string KBC_Description { get; set; }
         [FirestoreProperty]
@@ -33,6 +31,8 @@ namespace TheCloudHealth.Models
         public string KBC_TimeZone { get; set; }
         [FirestoreProperty]
         public string Slug { get; set; }
+        [FirestoreProperty]
+        public string[] KBC_Categories { get; set; }
     }
 
     public class KBCategoryResponse

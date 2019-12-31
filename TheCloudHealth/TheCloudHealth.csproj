@@ -271,10 +271,6 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.EnterpriseServices" />
-    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
-      <HintPath>packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
-    </Reference>
     <Reference Include="System.Net.Http">
     </Reference>
     <Reference Include="System.Net.Http.WebRequest">
@@ -334,9 +330,11 @@
     <Compile Include="Controllers\ControllerBase.cs" />
     <Compile Include="Controllers\CPTController.cs" />
     <Compile Include="Controllers\DesignationController.cs" />
+    <Compile Include="Controllers\DocumentCategoryController.cs" />
     <Compile Include="Controllers\EmailController.cs" />
     <Compile Include="Controllers\EquipmentsController.cs" />
     <Compile Include="Controllers\EthinicityController.cs" />
+    <Compile Include="Controllers\FileUploadController.cs" />
     <Compile Include="Controllers\FormsController.cs" />
     <Compile Include="Controllers\ICDController.cs" />
     <Compile Include="Controllers\IncidentController.cs" />
@@ -373,6 +371,7 @@
     <Compile Include="Controllers\TokenController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\VoiceController.cs" />
+    <Compile Include="Controllers\WhatsAppController.cs" />
     <Compile Include="Domain\Configuration.cs" />
     <Compile Include="Domain\TokenGenerator.cs" />
     <Compile Include="Filters\AllowCrossSiteJsonAttribute.cs" />
@@ -380,16 +379,22 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Lib\ConnectionClass.cs" />
+    <Compile Include="Lib\Constant.cs" />
+    <Compile Include="Lib\CreatePDF.cs" />
     <Compile Include="Lib\CryptoEngineData.cs" />
     <Compile Include="Lib\Emailer.cs" />
+    <Compile Include="Lib\ICreatePDF.cs" />
     <Compile Include="Lib\ICryptoEngine.cs" />
     <Compile Include="Lib\IEmailer.cs" />
+    <Compile Include="Lib\ImageUploader.cs" />
     <Compile Include="Lib\IOtherFunction.cs" />
     <Compile Include="Lib\ITwilioSMS.cs" />
     <Compile Include="Lib\ITwilioVoice.cs" />
+    <Compile Include="Lib\ITwilioWhatsApp.cs" />
     <Compile Include="Lib\OtherFunctionData.cs" />
     <Compile Include="Lib\TwilioSMS.cs" />
     <Compile Include="Lib\TwilioVoice.cs" />
+    <Compile Include="Lib\TwilioWhatsApp.cs" />
     <Compile Include="Models\Alerts.cs" />
     <Compile Include="Models\Appearance.cs" />
     <Compile Include="Models\CPTSelected.cs" />
@@ -401,6 +406,8 @@
     <Compile Include="Models\ICDSelected.cs" />
     <Compile Include="Models\Incident_Details.cs" />
     <Compile Include="Models\Insurance_Precertification_Authorization.cs" />
+    <Compile Include="Models\KBAttachment.cs" />
+    <Compile Include="Models\KBReference.cs" />
     <Compile Include="Models\Language.cs" />
     <Compile Include="Models\Logo.cs" />
     <Compile Include="Models\Miscellaneous.cs" />
@@ -410,6 +417,7 @@
     <Compile Include="Models\MT_CPT.cs" />
     <Compile Include="Models\MT_DBCollection.cs" />
     <Compile Include="Models\MT_Designation.cs" />
+    <Compile Include="Models\MT_Document_Category.cs" />
     <Compile Include="Models\MT_Equipment.cs" />
     <Compile Include="Models\MT_Ethinicity.cs" />
     <Compile Include="Models\MT_Forms.cs" />
@@ -457,6 +465,7 @@
     <Compile Include="Models\Patient_Secondary3_Insurance_Details.cs" />
     <Compile Include="Models\Preoprative_Medical_Clearance.cs" />
     <Compile Include="Models\ProcedureSelected.cs" />
+    <Compile Include="Models\Specilities.cs" />
     <Compile Include="Models\Suggestion.cs" />
     <Compile Include="Models\SiteURL.cs" />
     <Compile Include="Models\MT_User.cs" />
@@ -468,6 +477,7 @@
     <Compile Include="Models\MT_SurgicalProcedureInformationTemplates.cs" />
     <Compile Include="Models\Token.cs" />
     <Compile Include="Models\Voice.cs" />
+    <Compile Include="Models\Whatsapp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -517,6 +527,7 @@
     <Folder Include="App_Data\" />
     <Folder Include="images\" />
     <Folder Include="InsurDoc\" />
+    <Folder Include="KBAttachment\" />
     <Folder Include="Views\ControllerBase\" />
     <Folder Include="Views\Menu\" />
     <Folder Include="XML\" />
@@ -535,6 +546,9 @@
     <Content Include="Scripts\jquery-3.3.1.min.map" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Google.Cloud.Storage.V1">
+      <Version>2.4.0</Version>
+    </PackageReference>
     <PackageReference Include="iTextSharp">
       <Version>5.5.13.1</Version>
     </PackageReference>

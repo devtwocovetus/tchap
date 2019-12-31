@@ -10,19 +10,23 @@ namespace TheCloudHealth.Models
         [FirestoreProperty]
         public string KNB_Unique_ID { get; set; }
         [FirestoreProperty]
-        public string KNB_Category { get; set; }
+        public string KNB_Name { get; set; }
         [FirestoreProperty]
-        public string KNB_Sub_Category { get; set; }
+        public List<string> KNB_Category { get; set; }
+        [FirestoreProperty]
+        public List<string> KNB_Sub_Category { get; set; }
         [FirestoreProperty]
         public string KNB_Short_Description { get; set; }
         [FirestoreProperty]
         public string KNB_Long_Description { get; set; }
         [FirestoreProperty]
-        public string KNB_Document { get; set; }
+        public List<KBAttachment> KNB_Document { get; set; }
         [FirestoreProperty]
-        public string KNB_References { get; set; }
+        public List<KBReference> KNB_References { get; set; }
         [FirestoreProperty]
         public List<Suggestion> KNB_Suggestions { get; set; }
+        [FirestoreProperty]
+        public List<Specilities> KNB_Speciality { get; set; }
         [FirestoreProperty]
         public Boolean KNB_Is_Active { get; set; }
         [FirestoreProperty]

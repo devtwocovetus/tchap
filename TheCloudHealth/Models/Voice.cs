@@ -8,6 +8,7 @@ namespace TheCloudHealth.Models
     public class Voice
     {
         public string Voice_Receiver_Contact_No { get; set; }
+        public string Voice_Receiver_Name { get; set; }
         public string Voice_Call_Body { get; set; }
         public DateTime Voice_Call_Date { get; set; }
         public string Voice_Call_Title { get; set; }        

@@ -227,6 +227,8 @@ namespace TheCloudHealth.Controllers
                 Dictionary<string, object> initialData = new Dictionary<string, object>
                 {
                     {"Form_Data",FMD.Form_Data},
+                    {"Form_Logo",FMD.Form_Logo},
+                    {"Form_Signature",FMD.Form_Signature},
                     {"Form_Modify_Date",con.ConvertTimeZone(FMD.Form_TimeZone, Convert.ToDateTime(FMD.Form_Modify_Date))}
                 };
 

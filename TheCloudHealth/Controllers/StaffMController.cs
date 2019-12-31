@@ -16,7 +16,7 @@ namespace TheCloudHealth.Controllers
     public class StaffMController : ApiController
     {
         FirestoreDb Db;
-        FirestoreDb DbLog;
+        //FirestoreDb DbLog;
 
         ConnectionClass con;
         ICryptoEngine ObjectCrypto;

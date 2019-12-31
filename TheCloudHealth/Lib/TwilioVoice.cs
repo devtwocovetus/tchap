@@ -37,8 +37,9 @@ namespace TheCloudHealth.Lib
                 var call = CallResource.Create(
                     new Twilio.Types.PhoneNumber(voice.Voice_Receiver_Contact_No),
                     new Twilio.Types.PhoneNumber(RegisterPhoneNo),
-                    //url: new Uri("http://demo.twilio.com/docs/voice.xml"));
-                    url: new Uri("https://handler.twilio.com/twiml/EHf1de6e7e87a1ff389c6b5b06bbfaa58d"));
+                    //url: new Uri("https://handler.twilio.com/twiml/EHf1de6e7e87a1ff389c6b5b06bbfaa58d?Name=" + voice.Voice_Receiver_Name + "&Body=" + voice.Voice_Call_Body)
+                    url:new Uri("https://handler.twilio.com/twiml/EH108a09c76cc8cf8c7148d7d5c81eeeef?Name=" + voice.Voice_Receiver_Name + "&Message=" + voice.Voice_Call_Body)
+                    );
                 return call;
             }
             catch (Exception ex)
