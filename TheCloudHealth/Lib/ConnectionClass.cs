@@ -1,6 +1,6 @@
 ﻿using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Firestore;
-using Google.Cloud.Storage.V1;
+//using Google.Cloud.Storage.V1;
 using iTextSharp.text;
 using iTextSharp.text.html.simpleparser;
 using iTextSharp.text.pdf;
@@ -105,28 +105,33 @@ namespace TheCloudHealth.Lib
 
         public FirestoreDb SurgeryCenterDb(string ProjectID)
         {
-
             string fileName = "";// = "thecloudhealthcare-e25078639941.json";
             string filepath = "";// = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"ConfigFile\", fileName);
             string projectId = "";// = "thecloudhealthcare";
-            if (ProjectID == "oakbrooksurgical-d3aca")
+            try
             {
-                fileName = "oakbrooksurgical-d3aca-71ded5e2bcff.json";
-                filepath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"ConfigFile\", fileName);
-                Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", filepath);
-                projectId = "oakbrooksurgical-d3aca";
-                fireStoreDb = FirestoreDb.Create(projectId);
+                if (ProjectID == "oakbrooksurgical-d3aca")
+                {
+                    fileName = "oakbrooksurgical-d3aca-71ded5e2bcff.json";
+                    filepath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"ConfigFile\", fileName);
+                    Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", filepath);
+                    projectId = "oakbrooksurgical-d3aca";
+                    fireStoreDb = FirestoreDb.Create(projectId);
+                }
+                else
+                {
+                    fileName = "thecloudhealthcare-e25078639941.json";
+                    filepath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"ConfigFile\", fileName);
+                    Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", filepath);
+                    projectId = "thecloudhealthcare";
+                    fireStoreDb = FirestoreDb.Create(projectId);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                fileName = "thecloudhealthcare-e25078639941.json";
-                filepath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"ConfigFile\", fileName);
-                Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", filepath);
-                projectId = "thecloudhealthcare";
-                fireStoreDb = FirestoreDb.Create(projectId);
+
+                throw;
             }
-
-
             return fireStoreDb;
         }
 

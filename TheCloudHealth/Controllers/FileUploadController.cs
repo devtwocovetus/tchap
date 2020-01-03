@@ -24,7 +24,7 @@ namespace TheCloudHealth.Controllers
         public FileUploadController()
         {
             con = new ConnectionClass();
-            _imageUploader = new ImageUploader("thecloudhealth_bucket-1");
+            //_imageUploader = new ImageUploader("thecloudhealth_bucket-1");
             //Db = con.Db();
         }
 
@@ -55,7 +55,7 @@ namespace TheCloudHealth.Controllers
 
                         string changed_name = DateTime.Now.ToString("yyyyMMddHHmmss") + postedFile.FileName.Substring(postedFile.FileName.IndexOf('.'), (postedFile.FileName.Length - postedFile.FileName.IndexOf('.')));
 
-                        imageUrl = await _imageUploader.UploadImage(postedFile, 10);
+                       // imageUrl = await _imageUploader.UploadImage(postedFile, 10);
                     }
                 }
                 Response.Status = con.StatusSuccess;

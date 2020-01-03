@@ -254,7 +254,7 @@ namespace TheCloudHealth.Controllers
             try
             {
                 List<MT_Designation> AnesList = new List<MT_Designation>();
-                Query docRef = con.Db().Collection("MT_Designation").WhereEqualTo("Desi_Is_Deleted", false);
+                Query docRef = con.Db().Collection("MT_Designation").WhereEqualTo("Desi_Is_Deleted", false).WhereEqualTo("Desi_Created_By", DMD.Desi_Created_By);
                 QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
                 if (ObjQuerySnap != null)
                 {
@@ -286,7 +286,7 @@ namespace TheCloudHealth.Controllers
             try
             {
                 List<MT_Designation> AnesList = new List<MT_Designation>();
-                Query docRef = con.Db().Collection("MT_Designation").WhereEqualTo("Desi_Is_Deleted", false).WhereEqualTo("Desi_Is_Active", true);
+                Query docRef = con.Db().Collection("MT_Designation").WhereEqualTo("Desi_Is_Deleted", false).WhereEqualTo("Desi_Is_Active", true).WhereEqualTo("Desi_Created_By", DMD.Desi_Created_By);
                 QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
                 if (ObjQuerySnap != null)
                 {
@@ -318,7 +318,7 @@ namespace TheCloudHealth.Controllers
             try
             {
                 List<MT_Designation> AnesList = new List<MT_Designation>();
-                Query docRef = con.Db().Collection("MT_Designation").WhereEqualTo("Desi_Is_Deleted", true);
+                Query docRef = con.Db().Collection("MT_Designation").WhereEqualTo("Desi_Is_Deleted", true).WhereEqualTo("Desi_Created_By", DMD.Desi_Created_By);
                 QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
                 if (ObjQuerySnap != null)
                 {

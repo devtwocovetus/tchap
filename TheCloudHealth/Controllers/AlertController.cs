@@ -247,7 +247,7 @@ namespace TheCloudHealth.Controllers
             try
             {
                 List<MT_Alert> AnesList = new List<MT_Alert>();
-                Query docRef = Db.Collection("MT_Alert").WhereEqualTo("Alert_Is_Deleted", false).OrderBy("Alert_Name");
+                Query docRef = Db.Collection("MT_Alert").WhereEqualTo("Alert_Is_Deleted", false).WhereEqualTo("Alert_Create_By", AMD.Alert_Create_By).OrderBy("Alert_Name");
                 QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
                 if (ObjQuerySnap != null)
                 {
@@ -278,7 +278,7 @@ namespace TheCloudHealth.Controllers
             try
             {
                 List<MT_Alert> AnesList = new List<MT_Alert>();
-                Query docRef = Db.Collection("MT_Alert").WhereEqualTo("Alert_Is_Deleted", false).WhereEqualTo("Alert_Is_Active", true).OrderBy("Alert_Name");
+                Query docRef = Db.Collection("MT_Alert").WhereEqualTo("Alert_Is_Deleted", false).WhereEqualTo("Alert_Is_Active", true).WhereEqualTo("Alert_Create_By", AMD.Alert_Create_By).OrderBy("Alert_Name");
                 QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
                 if (ObjQuerySnap != null)
                 {
@@ -309,7 +309,7 @@ namespace TheCloudHealth.Controllers
             try
             {
                 List<MT_Alert> AnesList = new List<MT_Alert>();
-                Query docRef = Db.Collection("MT_Alert").WhereEqualTo("Alert_Is_Deleted", true);
+                Query docRef = Db.Collection("MT_Alert").WhereEqualTo("Alert_Is_Deleted", true).WhereEqualTo("Alert_Create_By", AMD.Alert_Create_By);
                 QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
                 if (ObjQuerySnap != null)
                 {
