@@ -42,6 +42,8 @@ namespace TheCloudHealth.Models
         [FirestoreProperty]
         public string NFT_TimeZone { get; set; }
         [FirestoreProperty]
+        public string NFT_Status { get; set; }
+        [FirestoreProperty]
         public string Slug { get; set; }
     }
     public class NotificationsResponse

@@ -16,6 +16,10 @@ namespace TheCloudHealth.Models
         [FirestoreProperty]
         public string Desi_Description { get; set; }
         [FirestoreProperty]
+        public string Desi_Surgery_Physician_Id { get; set; }
+        [FirestoreProperty]
+        public string Desi_Office_Type { get; set; }
+        [FirestoreProperty]
         public Boolean Desi_Is_Active { get; set; }
         [FirestoreProperty]
         public Boolean Desi_Is_Deleted { get; set; }

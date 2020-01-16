@@ -14,6 +14,10 @@ namespace TheCloudHealth.Models
         [FirestoreProperty]
         public string UM_Password { get; set; }
         [FirestoreProperty]
+        public string UM_Passcode { get; set; }
+        [FirestoreProperty]
+        public string UM_Member_ID { get; set; }
+        [FirestoreProperty]
         public string UM_Email { get; set; }
         [FirestoreProperty]
         public string UM_PhoneNo { get; set; }

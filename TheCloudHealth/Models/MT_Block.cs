@@ -16,6 +16,10 @@ namespace TheCloudHealth.Models
         [FirestoreProperty]
         public Boolean Block_Is_Active { get; set; }
         [FirestoreProperty]
+        public string Block_Surgery_Physician_Id { get; set; }
+        [FirestoreProperty]
+        public string Block_Office_Type { get; set; }
+        [FirestoreProperty]
         public string Block_Create_By { get; set; }
         [FirestoreProperty]
         public string Block_CB_Name { get; set; }

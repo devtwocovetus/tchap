@@ -247,7 +247,7 @@ namespace TheCloudHealth.Controllers
             try
             {
                 List<MT_Alert> AnesList = new List<MT_Alert>();
-                Query docRef = Db.Collection("MT_Alert").WhereEqualTo("Alert_Is_Deleted", false).WhereEqualTo("Alert_Create_By", AMD.Alert_Create_By).OrderBy("Alert_Name");
+                Query docRef = Db.Collection("MT_Alert").WhereEqualTo("Alert_Is_Deleted", false).OrderBy("Alert_Name");
                 QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
                 if (ObjQuerySnap != null)
                 {
@@ -278,13 +278,54 @@ namespace TheCloudHealth.Controllers
             try
             {
                 List<MT_Alert> AnesList = new List<MT_Alert>();
-                Query docRef = Db.Collection("MT_Alert").WhereEqualTo("Alert_Is_Deleted", false).WhereEqualTo("Alert_Is_Active", true).WhereEqualTo("Alert_Create_By", AMD.Alert_Create_By).OrderBy("Alert_Name");
+                Query docRef = Db.Collection("MT_Alert").WhereEqualTo("Alert_Is_Deleted", false).WhereEqualTo("Alert_Is_Active", true).OrderBy("Alert_Name");
                 QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
                 if (ObjQuerySnap != null)
                 {
                     foreach (DocumentSnapshot Docsnapshot in ObjQuerySnap.Documents)
                     {
                         AnesList.Add(Docsnapshot.ConvertTo<MT_Alert>());
+                    }
+                    Response.DataList = AnesList.OrderBy(o => o.Alert_Name).ToList();
+                }
+                Response.Status = con.StatusSuccess;
+                Response.Message = con.MessageSuccess;
+            }
+            catch (Exception ex)
+            {
+                Response.Status = con.StatusFailed;
+                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
+            }
+            return ConvertToJSON(Response);
+        }
+
+        [Route("API/Alert/GetAlertListFilterWithSCPO")]
+        [HttpPost]
+        //[Authorize(Roles ="SAdmin")]
+        public async Task<HttpResponseMessage> GetAlertListFilterWithSCPO(MT_Alert AMD)
+        {
+            Db = con.SurgeryCenterDb(AMD.Slug);
+            AlertResponse Response = new AlertResponse();
+            try
+            {
+                List<MT_Alert> AnesList = new List<MT_Alert>();
+                MT_Alert Alert = new MT_Alert();
+                Query docRef = Db.Collection("MT_Alert").WhereEqualTo("Alert_Is_Deleted", false).WhereEqualTo("Alert_Is_Active", true).OrderBy("Alert_Name");
+                QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
+                if (ObjQuerySnap != null)
+                {
+                    foreach (DocumentSnapshot Docsnapshot in ObjQuerySnap.Documents)
+                    {
+                        Alert = Docsnapshot.ConvertTo<MT_Alert>();
+                        if (AMD.Alert_Surgery_Physician_Id == Alert.Alert_Surgery_Physician_Id)
+                        {
+                            AnesList.Add(Alert);
+                        }
+                        else if (Alert.Alert_Surgery_Physician_Id == "0")
+                        {
+                            AnesList.Add(Alert);
+                        }
+                        
                     }
                     Response.DataList = AnesList.OrderBy(o => o.Alert_Name).ToList();
                 }

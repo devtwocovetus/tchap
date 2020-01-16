@@ -20,18 +20,26 @@ namespace TheCloudHealth.Lib
 
         public async Task<Response> SendEmail(Email email)
         {
-            var client = new SendGridClient(_sendGridApiKey);
-            var msg = MailHelper.CreateSingleEmail(
-                email.From, email.To, email.Subject, email.PlainTextContent, email.HtmlContent);
-            var response = await client.SendEmailAsync(msg);
-            return response;
+            try
+            {
+                var client = new SendGridClient(_sendGridApiKey);
+                var msg = MailHelper.CreateSingleEmail(
+                    email.From, email.To, email.Subject, email.PlainTextContent, email.HtmlContent);
+                var response = await client.SendEmailAsync(msg);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         public async Task<string> Send(Email EML)
         {
 
             EML.To = new EmailAddress(EML.To_Email, EML.To_Name);
-            EML.From = new EmailAddress("tch.techconnect@gmail.com", "TheCloudHealth");
+            //EML.From = new EmailAddress("tch.techconnect@gmail.com", "TheCloudHealth");
+            EML.From = new EmailAddress(EML.From_Email, EML.From_Name);
 
             var response = await SendEmail(EML);
 

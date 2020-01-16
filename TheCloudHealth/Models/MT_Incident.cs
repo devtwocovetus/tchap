@@ -16,6 +16,10 @@ namespace TheCloudHealth.Models
         [FirestoreProperty]
         public string Inci_Name { get; set; }
         [FirestoreProperty]
+        public string Inci_Surgery_Physician_Id { get; set; }
+        [FirestoreProperty]
+        public string Inci_Office_Type { get; set; }
+        [FirestoreProperty]
         public Boolean Inci_Is_Active { get; set; }
         [FirestoreProperty]
         public string Inci_Create_By { get; set; }

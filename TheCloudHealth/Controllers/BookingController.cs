@@ -49,7 +49,7 @@ namespace TheCloudHealth.Controllers
             try
             {
                 UniqueID = con.GetUniqueKey();
-                PMD.PB_Unique_ID= UniqueID;
+                PMD.PB_Unique_ID = UniqueID;
                 Query ObjQuery = Db.Collection("MT_Patient_Booking");//.WhereEqualTo("PB_Surgery_Physician_Center_ID", PMD.PB_Surgery_Physician_Center_ID).WhereEqualTo("PB_Office_Type", PMD.PB_Office_Type);
                 QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
                 if (ObjQuerySnap != null)
@@ -63,7 +63,6 @@ namespace TheCloudHealth.Controllers
                 PMD.PB_Booking_Date = con.ConvertTimeZone(PMD.PB_TimeZone, Convert.ToDateTime(PMD.PB_Booking_Date));
                 PMD.PB_Create_Date = con.ConvertTimeZone(PMD.PB_TimeZone, Convert.ToDateTime(PMD.PB_Create_Date));
                 PMD.PB_Modify_Date = con.ConvertTimeZone(PMD.PB_TimeZone, Convert.ToDateTime(PMD.PB_Modify_Date));
-                PMD.PB_Is_Deleted = true;
                 DocumentReference docRef = Db.Collection("MT_Patient_Booking").Document(UniqueID);
                 WriteResult Result = await docRef.SetAsync(PMD);
                 if (Result != null)
@@ -87,445 +86,6 @@ namespace TheCloudHealth.Controllers
             }
             return ConvertToJSON(Response);
         }
-
-        [Route("API/Booking/AddIncident")]
-        [HttpPost]
-        public async Task<HttpResponseMessage> AddIncident(MT_Patient_Booking PMD)
-        {
-            Db = con.SurgeryCenterDb(PMD.Slug);
-            BookingResponse Response = new BookingResponse();
-            try
-            {
-                Incident_Details InciDetails = new Incident_Details();
-                MT_Patient_Booking BookingInfo = new MT_Patient_Booking();
-                Query ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Unique_ID", PMD.PB_Unique_ID);//.WhereEqualTo("PB_Is_Deleted", false);
-                QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
-                if (ObjQuerySnap != null)
-                {
-                    BookingInfo = ObjQuerySnap.Documents[0].ConvertTo<MT_Patient_Booking>();
-                    InciDetails.Inci_Unique_ID = con.GetUniqueKey();
-                    InciDetails.Inci_Type_ID = PMD.PB_Incient_Detail.Inci_Type_ID;
-                    InciDetails.Inci_Type = PMD.PB_Incient_Detail.Inci_Type;
-                    InciDetails.Inci_Claim_No = PMD.PB_Incient_Detail.Inci_Claim_No;
-                    InciDetails.Inci_DOI = con.ConvertTimeZone(PMD.PB_Incient_Detail.Inci_TimeZone, Convert.ToDateTime(PMD.PB_Incient_Detail.Inci_DOI));
-                    InciDetails.Inci_Employee_Name = PMD.PB_Incient_Detail.Inci_Employee_Name;
-                    InciDetails.Inci_Employee_Address = PMD.PB_Incient_Detail.Inci_Employee_Address;
-                    InciDetails.Inci_Employee_Phone_No = PMD.PB_Incient_Detail.Inci_Employee_Phone_No;
-                    InciDetails.Inci_Is_This_Lien = PMD.PB_Incient_Detail.Inci_Is_This_Lien;
-                    InciDetails.Inci_Attorney_Name = PMD.PB_Incient_Detail.Inci_Attorney_Name;
-                    InciDetails.Inci_Attorney_Phone_No = PMD.PB_Incient_Detail.Inci_Attorney_Phone_No;
-                    InciDetails.Inci_TimeOfIncident = PMD.PB_Incient_Detail.Inci_TimeOfIncident;
-                    InciDetails.Inci_Comment = PMD.PB_Incient_Detail.Inci_Comment;
-                    InciDetails.Inci_Created_By = PMD.PB_Incient_Detail.Inci_Created_By;
-                    InciDetails.Inci_User_Name = PMD.PB_Incient_Detail.Inci_User_Name;
-                    InciDetails.Inci_Create_Date = con.ConvertTimeZone(PMD.PB_Incient_Detail.Inci_TimeZone, Convert.ToDateTime(PMD.PB_Incient_Detail.Inci_Create_Date));
-                    InciDetails.Inci_Modify_Date = con.ConvertTimeZone(PMD.PB_Incient_Detail.Inci_TimeZone, Convert.ToDateTime(PMD.PB_Incient_Detail.Inci_Modify_Date));
-                    InciDetails.Inci_Is_Active = PMD.PB_Incient_Detail.Inci_Is_Active;
-                    InciDetails.Inci_Is_Deleted = PMD.PB_Incient_Detail.Inci_Is_Deleted;
-                    InciDetails.Inci_TimeZone = PMD.PB_Incient_Detail.Inci_TimeZone;
-
-                    BookingInfo.PB_TimeZone = PMD.PB_TimeZone;
-                    BookingInfo.PB_Incient_Detail = InciDetails;
-                    BookingInfo.PB_Is_Deleted = false;
-
-                    DocumentReference docRef = Db.Collection("MT_Patient_Booking").Document(BookingInfo.PB_Unique_ID);
-                    WriteResult Result = await docRef.SetAsync(BookingInfo, SetOptions.Overwrite);
-                    if (Result != null)
-                    {
-                        Response.Status = con.StatusSuccess;
-                        Response.Message = con.MessageSuccess;
-                        Response.Data = PMD;
-                    }
-                    else
-                    {
-                        Response.Status = con.StatusNotInsert;
-                        Response.Message = con.MessageNotInsert;
-                        Response.Data = null;
-                    }
-                }
-                else
-                {
-                    Response.Status = con.StatusDNE;
-                    Response.Message = con.MessageDNE;
-                }
-
-            }
-            catch (Exception ex)
-            {
-                Response.Status = con.StatusFailed;
-                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
-            }
-            return ConvertToJSON(Response);
-        }
-
-        [Route("API/Booking/AddSurgicalProcedureInformation")]
-        [HttpPost]
-        public async Task<HttpResponseMessage> AddSurgicalProcedureInformation(MT_Patient_Booking PMD)
-        {
-            Db = con.SurgeryCenterDb(PMD.Slug);
-            BookingResponse Response = new BookingResponse();
-            try
-            {
-                Surgical_Procedure_Information SPInfo = new Surgical_Procedure_Information();
-                //List<CPTSelected> CPTSelList = new List<CPTSelected>();
-                //List<ICDSelected> ICDSelList = new List<ICDSelected>();
-                //List<ProcedureSelected> ProcSelList = new List<ProcedureSelected>();
-                MT_Patient_Booking BookingInfo = new MT_Patient_Booking();
-                Query ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Unique_ID", PMD.PB_Unique_ID);//.WhereEqualTo("PB_Is_Deleted", false);
-                QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
-                if (ObjQuerySnap != null)
-                {
-                    BookingInfo = ObjQuerySnap.Documents[0].ConvertTo<MT_Patient_Booking>();
-                    SPInfo.SPI_Unique_ID = con.GetUniqueKey();
-                    SPInfo.SPI_Surgery_Center_ID = PMD.PB_Surgical_Procedure_Information.SPI_Surgery_Center_ID;
-                    SPInfo.SPI_Surgery_Center_Name = PMD.PB_Surgical_Procedure_Information.SPI_Surgery_Center_Name;
-                    SPInfo.SPI_Surgeon_ID = PMD.PB_Surgical_Procedure_Information.SPI_Surgeon_ID;
-                    SPInfo.SPI_Surgeon_Name = PMD.PB_Surgical_Procedure_Information.SPI_Surgeon_Name;
-                    SPInfo.SPI_Assi_Surgeon_ID = PMD.PB_Surgical_Procedure_Information.SPI_Assi_Surgeon_ID;
-                    SPInfo.SPI_Assi_Surgeon_Name = PMD.PB_Surgical_Procedure_Information.SPI_Assi_Surgeon_Name;
-                    SPInfo.SPI_Date = con.ConvertTimeZone(PMD.PB_Surgical_Procedure_Information.SPI_TimeZone, Convert.ToDateTime(PMD.PB_Surgical_Procedure_Information.SPI_Date));
-                    SPInfo.SPI_Time = PMD.PB_Surgical_Procedure_Information.SPI_Time;
-                    SPInfo.SPI_Duration = PMD.PB_Surgical_Procedure_Information.SPI_Duration;
-                    SPInfo.SPI_Anesthesia_Type_ID = PMD.PB_Surgical_Procedure_Information.SPI_Anesthesia_Type_ID;
-                    SPInfo.SPI_Anesthesia_Type = PMD.PB_Surgical_Procedure_Information.SPI_Anesthesia_Type;
-                    SPInfo.SPI_Block_ID = PMD.PB_Surgical_Procedure_Information.SPI_Block_ID;
-                    SPInfo.SPI_Block_Type = PMD.PB_Surgical_Procedure_Information.SPI_Block_Type;
-                    // SPInfo.SPI_Procedure = PMD.PB_Surgical_Procedure_Information.SPI_Procedure;
-                    SPInfo.SPI_Created_By = PMD.PB_Surgical_Procedure_Information.SPI_Created_By;
-                    SPInfo.SPI_User_Name = PMD.PB_Surgical_Procedure_Information.SPI_User_Name;
-                    SPInfo.SPI_Create_Date = con.ConvertTimeZone(PMD.PB_Surgical_Procedure_Information.SPI_TimeZone, Convert.ToDateTime(PMD.PB_Surgical_Procedure_Information.SPI_Create_Date));
-                    SPInfo.SPI_Modify_Date = con.ConvertTimeZone(PMD.PB_Surgical_Procedure_Information.SPI_TimeZone, Convert.ToDateTime(PMD.PB_Surgical_Procedure_Information.SPI_Modify_Date));
-                    SPInfo.SPI_Is_Active = PMD.PB_Surgical_Procedure_Information.SPI_Is_Active;
-                    SPInfo.SPI_Is_Deleted = PMD.PB_Surgical_Procedure_Information.SPI_Is_Deleted;
-                    SPInfo.SPI_TimeZone = PMD.PB_Surgical_Procedure_Information.SPI_TimeZone;
-
-                    //if (PMD.PB_Surgical_Procedure_Information.SPI_CPT_SelectedList != null)
-                    //{
-                    //    foreach (CPTSelected Sel in PMD.PB_Surgical_Procedure_Information.SPI_CPT_SelectedList)
-                    //    {
-                    //        CPTSelected cptsel = Sel;
-                    //        cptsel.CPTS_Unique_ID = con.GetUniqueKey();
-                    //        //cptsel.CPTS_Create_Date = con.ConvertTimeZone(cptsel.CPTS_TimeZone, Convert.ToDateTime(cptsel.CPTS_Create_Date));
-                    //        //cptsel.CPTS_Modify_Date = con.ConvertTimeZone(cptsel.CPTS_TimeZone, Convert.ToDateTime(cptsel.CPTS_Modify_Date));
-                    //        CPTSelList.Add(cptsel);
-                    //    }
-                    //}
-
-                    //if (PMD.PB_Surgical_Procedure_Information.SPI_ICD_SelectedList != null)
-                    //{
-                    //    foreach (ICDSelected Sel in PMD.PB_Surgical_Procedure_Information.SPI_ICD_SelectedList)
-                    //    {
-                    //        ICDSelected icdsel = Sel;
-                    //        icdsel.ICD_Unique_ID = con.GetUniqueKey();
-                    //        //icdsel.ICD_Create_Date = con.ConvertTimeZone(icdsel.ICD_TimeZone, Convert.ToDateTime(icdsel.ICD_Create_Date));
-                    //        //icdsel.ICD_Modify_Date = con.ConvertTimeZone(icdsel.ICD_TimeZone, Convert.ToDateTime(icdsel.ICD_Modify_Date));
-                    //        ICDSelList.Add(icdsel);
-                    //    }
-                    //}
-
-                    //if (PMD.PB_Surgical_Procedure_Information.SPI_Procedure_SelectedList != null)
-                    //{
-                    //    foreach (ProcedureSelected Sel in PMD.PB_Surgical_Procedure_Information.SPI_Procedure_SelectedList)
-                    //    {
-                    //        ProcedureSelected Procsel = Sel;
-                    //        Procsel.Proc_Unique_ID = con.GetUniqueKey();
-                    //        //Procsel.Proc_Create_Date = con.ConvertTimeZone(Procsel.Proc_TimeZone, Convert.ToDateTime(Procsel.Proc_Create_Date));
-                    //        //Procsel.Proc_Modify_Date = con.ConvertTimeZone(Procsel.Proc_TimeZone, Convert.ToDateTime(Procsel.Proc_Modify_Date));
-                    //        ProcSelList.Add(Procsel);
-                    //    }
-                    //}
-
-                    //SPInfo.SPI_ICD_SelectedList = ICDSelList;
-                    //SPInfo.SPI_CPT_SelectedList = CPTSelList;
-                    //SPInfo.SPI_Procedure_SelectedList = ProcSelList;
-                    BookingInfo.PB_Booking_Surgery_Center_ID = PMD.PB_Booking_Surgery_Center_ID;
-                    BookingInfo.PB_Booking_Surgery_Center_Name = PMD.PB_Booking_Surgery_Center_Name;
-                    BookingInfo.PB_TimeZone = PMD.PB_TimeZone;
-                    BookingInfo.PB_Surgical_Procedure_Information = SPInfo;
-                    BookingInfo.PB_Booking_Date= con.ConvertTimeZone(PMD.PB_Surgical_Procedure_Information.SPI_TimeZone, Convert.ToDateTime(PMD.PB_Surgical_Procedure_Information.SPI_Date));
-                    BookingInfo.PB_Booking_Duration = PMD.PB_Surgical_Procedure_Information.SPI_Duration;
-                    BookingInfo.PB_Booking_Time = PMD.PB_Surgical_Procedure_Information.SPI_Time;
-                    BookingInfo.PB_Is_Deleted = false;
-
-
-                    DocumentReference docRef = Db.Collection("MT_Patient_Booking").Document(BookingInfo.PB_Unique_ID);
-                    WriteResult Result = await docRef.SetAsync(BookingInfo, SetOptions.Overwrite);
-                    if (Result != null)
-                    {
-                        Response.Status = con.StatusSuccess;
-                        Response.Message = con.MessageSuccess;
-                        Response.Data = PMD;
-                    }
-                    else
-                    {
-                        Response.Status = con.StatusNotInsert;
-                        Response.Message = con.MessageNotInsert;
-                        Response.Data = null;
-                    }
-                }
-                else
-                {
-                    Response.Status = con.StatusDNE;
-                    Response.Message = con.MessageDNE;
-                }
-
-            }
-            catch (Exception ex)
-            {
-                Response.Status = con.StatusFailed;
-                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
-            }
-            return ConvertToJSON(Response);
-        }
-
-        [Route("API/Booking/AddPreoperativeMedicalClearance")]
-        [HttpPost]
-        public async Task<HttpResponseMessage> AddPreoperativeMedicalClearance(MT_Patient_Booking PMD)
-        {
-            Db = con.SurgeryCenterDb(PMD.Slug);
-            BookingResponse Response = new BookingResponse();
-            try
-            {
-                Preoprative_Medical_Clearance PMClearance = new Preoprative_Medical_Clearance();
-                MT_Patient_Booking BookingInfo = new MT_Patient_Booking();
-                Query ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Unique_ID", PMD.PB_Unique_ID);//.WhereEqualTo("PB_Is_Deleted", false);
-                QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
-                if (ObjQuerySnap != null)
-                {
-                    BookingInfo = ObjQuerySnap.Documents[0].ConvertTo<MT_Patient_Booking>();
-                    PMClearance.PMC_Unique_ID = con.GetUniqueKey();
-                    PMClearance.PMC_Is_Require_Pre_Op_Medi_Clearance = PMD.PB_Preoprative_Medical_Clearance.PMC_Is_Require_Pre_Op_Medi_Clearance;
-                    PMClearance.PMC_Clearing_Physician_Name = PMD.PB_Preoprative_Medical_Clearance.PMC_Clearing_Physician_Name;
-                    PMClearance.PMC_Is_Require_EKG = PMD.PB_Preoprative_Medical_Clearance.PMC_Is_Require_EKG;
-                    PMClearance.PMC_Created_By = PMD.PB_Preoprative_Medical_Clearance.PMC_Created_By;
-                    PMClearance.PMC_User_Name = PMD.PB_Preoprative_Medical_Clearance.PMC_User_Name;
-                    PMClearance.PMC_Create_Date = con.ConvertTimeZone(PMD.PB_Preoprative_Medical_Clearance.PMC_TimeZone, Convert.ToDateTime(PMD.PB_Preoprative_Medical_Clearance.PMC_Create_Date));
-                    PMClearance.PMC_Modify_Date = con.ConvertTimeZone(PMD.PB_Preoprative_Medical_Clearance.PMC_TimeZone, Convert.ToDateTime(PMD.PB_Preoprative_Medical_Clearance.PMC_Modify_Date));
-                    PMClearance.PMC_Is_Active = PMD.PB_Preoprative_Medical_Clearance.PMC_Is_Active;
-                    PMClearance.PMC_Is_Deleted = PMD.PB_Preoprative_Medical_Clearance.PMC_Is_Deleted;
-                    PMClearance.PMC_TimeZone = PMD.PB_Preoprative_Medical_Clearance.PMC_TimeZone;
-
-                    BookingInfo.PB_TimeZone = PMD.PB_TimeZone;
-                    BookingInfo.PB_Preoprative_Medical_Clearance = PMClearance;
-
-                    DocumentReference docRef = Db.Collection("MT_Patient_Booking").Document(BookingInfo.PB_Unique_ID);
-                    WriteResult Result = await docRef.SetAsync(BookingInfo, SetOptions.Overwrite);
-                    if (Result != null)
-                    {
-                        Response.Status = con.StatusSuccess;
-                        Response.Message = con.MessageSuccess;
-                        Response.Data = PMD;
-                    }
-                    else
-                    {
-                        Response.Status = con.StatusNotInsert;
-                        Response.Message = con.MessageNotInsert;
-                        Response.Data = null;
-                    }
-                }
-                else
-                {
-                    Response.Status = con.StatusDNE;
-                    Response.Message = con.MessageDNE;
-                }
-
-            }
-            catch (Exception ex)
-            {
-                Response.Status = con.StatusFailed;
-                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
-            }
-            return ConvertToJSON(Response);
-        }
-
-
-        [Route("API/Booking/AddSpecialRequest")]
-        [HttpPost]
-        public async Task<HttpResponseMessage> AddSpecialRequest(MT_Patient_Booking PMD)
-        {
-            Db = con.SurgeryCenterDb(PMD.Slug);
-            BookingResponse Response = new BookingResponse();
-            try
-            {
-                Special_Request SpeRequest = new Special_Request();
-                MT_Patient_Booking BookingInfo = new MT_Patient_Booking();
-                Query ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Unique_ID", PMD.PB_Unique_ID);//.WhereEqualTo("PB_Is_Deleted", false);
-                QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
-                if (ObjQuerySnap != null)
-                {
-                    BookingInfo = ObjQuerySnap.Documents[0].ConvertTo<MT_Patient_Booking>();
-                    SpeRequest.SR_Unique_ID = con.GetUniqueKey();
-                    SpeRequest.SR_Is_Special_Equip_Req = PMD.PB_Special_Request.SR_Is_Special_Equip_Req;
-                    SpeRequest.SR_Equip_ID = PMD.PB_Special_Request.SR_Equip_ID;
-                    SpeRequest.SR_Equip_Name = PMD.PB_Special_Request.SR_Equip_Name;
-                    SpeRequest.SR_Supplies_ID = PMD.PB_Special_Request.SR_Supplies_ID;
-                    SpeRequest.SR_Supplies_Name = PMD.PB_Special_Request.SR_Supplies_Name;
-                    SpeRequest.SR_Instrumentation_ID = PMD.PB_Special_Request.SR_Instrumentation_ID;
-                    SpeRequest.SR_Instrumentation_Name = PMD.PB_Special_Request.SR_Instrumentation_Name;
-                    SpeRequest.SR_Other = PMD.PB_Special_Request.SR_Other;
-                    SpeRequest.SR_Created_By = PMD.PB_Special_Request.SR_Created_By;
-                    SpeRequest.SR_User_Name = PMD.PB_Special_Request.SR_User_Name;
-                    SpeRequest.SR_Create_Date = con.ConvertTimeZone(PMD.PB_Special_Request.SR_TimeZone, Convert.ToDateTime(PMD.PB_Special_Request.SR_Create_Date));
-                    SpeRequest.SR_Modify_Date = con.ConvertTimeZone(PMD.PB_Special_Request.SR_TimeZone, Convert.ToDateTime(PMD.PB_Special_Request.SR_Modify_Date));
-                    SpeRequest.SR_Is_Active = PMD.PB_Special_Request.SR_Is_Active;
-                    SpeRequest.SR_Is_Deleted = PMD.PB_Special_Request.SR_Is_Deleted;
-                    SpeRequest.SR_TimeZone = PMD.PB_Special_Request.SR_TimeZone;
-
-                    BookingInfo.PB_TimeZone = PMD.PB_TimeZone;
-                    BookingInfo.PB_Special_Request = SpeRequest;
-                    BookingInfo.PB_Is_Deleted = false;
-
-                    DocumentReference docRef = Db.Collection("MT_Patient_Booking").Document(BookingInfo.PB_Unique_ID);
-                    WriteResult Result = await docRef.SetAsync(BookingInfo, SetOptions.Overwrite);
-                    if (Result != null)
-                    {
-                        Response.Status = con.StatusSuccess;
-                        Response.Message = con.MessageSuccess;
-                        Response.Data = PMD;
-                    }
-                    else
-                    {
-                        Response.Status = con.StatusNotInsert;
-                        Response.Message = con.MessageNotInsert;
-                        Response.Data = null;
-                    }
-                }
-                else
-                {
-                    Response.Status = con.StatusDNE;
-                    Response.Message = con.MessageDNE;
-                }
-
-            }
-            catch (Exception ex)
-            {
-                Response.Status = con.StatusFailed;
-                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
-            }
-            return ConvertToJSON(Response);
-        }
-
-
-        [Route("API/Booking/AddAlerts")]
-        [HttpPost]
-        public async Task<HttpResponseMessage> AddAlerts(MT_Patient_Booking PMD)
-        {
-            Db = con.SurgeryCenterDb(PMD.Slug);
-            BookingResponse Response = new BookingResponse();
-            try
-            {
-                List<Alerts> AlrtList = new List<Alerts>();
-                MT_Patient_Booking BookingInfo = new MT_Patient_Booking();
-                Query ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Unique_ID", PMD.PB_Unique_ID);//.WhereEqualTo("PB_Is_Deleted", false);
-                QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
-                if (ObjQuerySnap != null)
-                {
-                    BookingInfo = ObjQuerySnap.Documents[0].ConvertTo<MT_Patient_Booking>();
-                    if (PMD.PB_Alerts != null)
-                    {
-                        foreach (Alerts Alt in PMD.PB_Alerts)
-                        {
-                            //Alt.Alrt_Unique_ID = con.GetUniqueKey();
-                            AlrtList.Add(Alt);
-                        }
-                    }
-
-                    BookingInfo.PB_TimeZone = PMD.PB_TimeZone;
-                    BookingInfo.PB_Alerts = AlrtList.OrderBy(o =>o.Alrt_Name).ToList();
-                    BookingInfo.PB_Is_Deleted = false;
-
-                    DocumentReference docRef = Db.Collection("MT_Patient_Booking").Document(BookingInfo.PB_Unique_ID);
-                    WriteResult Result = await docRef.SetAsync(BookingInfo, SetOptions.Overwrite);
-                    if (Result != null)
-                    {
-                        Response.Status = con.StatusSuccess;
-                        Response.Message = con.MessageSuccess;
-                        Response.Data = PMD;
-                    }
-                    else
-                    {
-                        Response.Status = con.StatusNotInsert;
-                        Response.Message = con.MessageNotInsert;
-                        Response.Data = null;
-                    }
-                }
-                else
-                {
-                    Response.Status = con.StatusDNE;
-                    Response.Message = con.MessageDNE;
-                }
-
-            }
-            catch (Exception ex)
-            {
-                Response.Status = con.StatusFailed;
-                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
-            }
-            return ConvertToJSON(Response);
-        }
-
-        [Route("API/Booking/AddInsurancePrecertificationAuthorization")]
-        [HttpPost]
-        public async Task<HttpResponseMessage> AddInsurancePrecertificationAuthorization(MT_Patient_Booking PMD)
-        {
-            Db = con.SurgeryCenterDb(PMD.Slug);
-            BookingResponse Response = new BookingResponse();
-            try
-            {
-                Insurance_Precertification_Authorization PIPA = new Insurance_Precertification_Authorization();
-                MT_Patient_Booking BookingInfo = new MT_Patient_Booking();
-                Query ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Unique_ID", PMD.PB_Unique_ID);//.WhereEqualTo("PB_Is_Deleted", false);
-                QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
-                if (ObjQuerySnap != null)
-                {
-                    BookingInfo = ObjQuerySnap.Documents[0].ConvertTo<MT_Patient_Booking>();
-                    PIPA.IPA_Unique_ID = con.GetUniqueKey();
-                    PIPA.IPA_Insurace_Company_Phone_No = PMD.PB_Insurance_Precertification_Authorization.IPA_Insurace_Company_Phone_No;
-                    PIPA.IPA_Insurace_Company_Representative = PMD.PB_Insurance_Precertification_Authorization.IPA_Insurace_Company_Representative;
-                    PIPA.IPA_Authorization_Name = PMD.PB_Insurance_Precertification_Authorization.IPA_Authorization_Name;
-                    PIPA.IPA_DOA = con.ConvertTimeZone(PMD.PB_Insurance_Precertification_Authorization.IPA_TimeZone, Convert.ToDateTime(PMD.PB_Insurance_Precertification_Authorization.IPA_DOA));
-                    PIPA.IPA_Created_By = PMD.PB_Insurance_Precertification_Authorization.IPA_Created_By;
-                    PIPA.IPA_User_Name = PMD.PB_Insurance_Precertification_Authorization.IPA_User_Name;
-                    PIPA.IPA_Create_Date = con.ConvertTimeZone(PMD.PB_Insurance_Precertification_Authorization.IPA_TimeZone, Convert.ToDateTime(PMD.PB_Insurance_Precertification_Authorization.IPA_Create_Date));
-                    PIPA.IPA_Modify_Date = con.ConvertTimeZone(PMD.PB_Insurance_Precertification_Authorization.IPA_TimeZone, Convert.ToDateTime(PMD.PB_Insurance_Precertification_Authorization.IPA_Modify_Date));
-                    PIPA.IPA_Is_Active = PMD.PB_Insurance_Precertification_Authorization.IPA_Is_Active;
-                    PIPA.IPA_Is_Deleted = PMD.PB_Insurance_Precertification_Authorization.IPA_Is_Deleted;
-                    PIPA.IPA_TimeZone = PMD.PB_Insurance_Precertification_Authorization.IPA_TimeZone;
-
-                    BookingInfo.PB_TimeZone = PMD.PB_TimeZone;
-                    BookingInfo.PB_Insurance_Precertification_Authorization = PIPA;
-                    BookingInfo.PB_Is_Deleted = false;
-
-                    DocumentReference docRef = Db.Collection("MT_Patient_Booking").Document(BookingInfo.PB_Unique_ID);
-                    WriteResult Result = await docRef.SetAsync(BookingInfo, SetOptions.Overwrite);
-                    if (Result != null)
-                    {
-                        Response.Status = con.StatusSuccess;
-                        Response.Message = con.MessageSuccess;
-                        Response.Data = PMD;
-                    }
-                    else
-                    {
-                        Response.Status = con.StatusNotInsert;
-                        Response.Message = con.MessageNotInsert;
-                        Response.Data = null;
-                    }
-                }
-                else
-                {
-                    Response.Status = con.StatusDNE;
-                    Response.Message = con.MessageDNE;
-                }
-
-            }
-            catch (Exception ex)
-            {
-                Response.Status = con.StatusFailed;
-                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
-            }
-            return ConvertToJSON(Response);
-        }
-
         public MT_Patient_Booking GetImages()
         {
             MT_Patient_Booking Surcenter = new MT_Patient_Booking();
@@ -740,12 +300,18 @@ namespace TheCloudHealth.Controllers
                             FormsList.Add(PF);
                         }
                     }
-                    BookingInfo.PB_Modify_Date = con.ConvertTimeZone(PMD.PB_TimeZone,Convert.ToDateTime(PMD.PB_Modify_Date));                    
-                    BookingInfo.PB_Forms = FormsList;
-                    BookingInfo.PB_Is_Deleted = false;
+
+                    Dictionary<string, object> initialData = new Dictionary<string, object>
+                    {
+                        {"PB_Modify_Date", con.ConvertTimeZone(PMD.PB_TimeZone,Convert.ToDateTime(PMD.PB_Modify_Date))},
+                        {"PB_Forms", FormsList}
+                    };
+                    //BookingInfo.PB_Modify_Date = con.ConvertTimeZone(PMD.PB_TimeZone,Convert.ToDateTime(PMD.PB_Modify_Date));                    
+                    //BookingInfo.PB_Forms = FormsList;
+                    //BookingInfo.PB_Is_Deleted = false;
 
                     DocumentReference docRef = Db.Collection("MT_Patient_Booking").Document(BookingInfo.PB_Unique_ID);
-                    WriteResult Result = await docRef.SetAsync(BookingInfo, SetOptions.Overwrite);
+                    WriteResult Result = await docRef.UpdateAsync(initialData);
                     if (Result != null)
                     {
                         Response.Status = con.StatusSuccess;
@@ -765,6 +331,42 @@ namespace TheCloudHealth.Controllers
                     Response.Message = con.MessageDNE;
                 }
 
+            }
+            catch (Exception ex)
+            {
+                Response.Status = con.StatusFailed;
+                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
+            }
+            return ConvertToJSON(Response);
+        }
+
+
+        [Route("API/Booking/GetPatientBookingList")]
+        [HttpPost]
+        public async Task<HttpResponseMessage> GetPatientBookingList(MT_Patient_Booking PMD)
+        {
+            Db = con.SurgeryCenterDb(PMD.Slug);
+            BookingResponse Response = new BookingResponse();
+            try
+            {
+                List<MT_Patient_Booking> patilist = new List<MT_Patient_Booking>();
+                Query ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booking_Physician_Office_ID", PMD.PB_Booking_Physician_Office_ID).WhereEqualTo("PB_Patient_ID", PMD.PB_Patient_ID).OrderByDescending("PB_Booking_Date");
+                QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
+                if (ObjQuerySnap != null)
+                {
+                    foreach (DocumentSnapshot Docsnapshot in ObjQuerySnap.Documents)
+                    {
+                        patilist.Add(Docsnapshot.ConvertTo<MT_Patient_Booking>());
+                    }
+                    Response.DataList = patilist;
+                    Response.Status = con.StatusSuccess;
+                    Response.Message = con.MessageSuccess;
+                }
+                else
+                {
+                    Response.Status = con.StatusDNE;
+                    Response.Message = con.MessageDNE;
+                }
             }
             catch (Exception ex)
             {
@@ -804,13 +406,140 @@ namespace TheCloudHealth.Controllers
                     {
                         if (PMD.PB_Booking_Physician_Office_ID != null)
                         {
-                            patilist.Add(Docsnapshot.ConvertTo<MT_Patient_Booking>());
+                            if (Docsnapshot.ConvertTo<MT_Patient_Booking>().PB_Status == "Draft" || Docsnapshot.ConvertTo<MT_Patient_Booking>().PB_Status == "Action Required")
+                            {
+                                patilist.Add(Docsnapshot.ConvertTo<MT_Patient_Booking>());
+                            }                            
                         }
                         else if (PMD.PB_Booking_Surgery_Center_ID == "0")
                         {
                             patilist.Add(Docsnapshot.ConvertTo<MT_Patient_Booking>());
                         }
                         else 
+                        {
+                            if (Docsnapshot.ConvertTo<MT_Patient_Booking>().PB_Status != "Draft")
+                            {
+                                patilist.Add(Docsnapshot.ConvertTo<MT_Patient_Booking>());
+                            }
+                        }
+                    }
+                    Response.DataList = patilist;
+                    Response.Status = con.StatusSuccess;
+                    Response.Message = con.MessageSuccess;
+                }
+                else
+                {
+                    Response.Status = con.StatusDNE;
+                    Response.Message = con.MessageDNE;
+                }
+            }
+            catch (Exception ex)
+            {
+                Response.Status = con.StatusFailed;
+                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
+            }
+            return ConvertToJSON(Response);
+        }
+
+        [Route("API/Booking/GetQuickBookingList")]
+        [HttpPost]
+        public async Task<HttpResponseMessage> GetQuickBookingList(MT_Patient_Booking PMD)
+        {
+            Db = con.SurgeryCenterDb(PMD.Slug);
+            BookingResponse Response = new BookingResponse();
+            try
+            {
+                List<MT_Patient_Booking> patilist = new List<MT_Patient_Booking>();
+                Query ObjQuery;
+                if (PMD.PB_Booking_Surgery_Center_ID == "0")
+                {
+                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false);
+                }
+                else if (PMD.PB_Booking_Surgery_Center_ID != "0" && PMD.PB_Booking_Surgery_Center_ID != null)
+                {
+                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booked_From", "QB").WhereEqualTo("PB_Booking_Surgery_Center_ID", PMD.PB_Booking_Surgery_Center_ID);
+                }
+                else
+                {
+                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Status", "QB").WhereEqualTo("PB_Booked_From", "QB").WhereEqualTo("PB_Booking_Physician_Office_ID", PMD.PB_Booking_Physician_Office_ID);
+                }
+
+                QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
+                if (ObjQuerySnap != null)
+                {
+                    foreach (DocumentSnapshot Docsnapshot in ObjQuerySnap.Documents)
+                    {
+                        if (PMD.PB_Booking_Physician_Office_ID != null)
+                        {
+                            patilist.Add(Docsnapshot.ConvertTo<MT_Patient_Booking>());
+                        }
+                        else if (PMD.PB_Booking_Surgery_Center_ID == "0")
+                        {
+                            patilist.Add(Docsnapshot.ConvertTo<MT_Patient_Booking>());
+                        }
+                        else
+                        {
+                            if (Docsnapshot.ConvertTo<MT_Patient_Booking>().PB_Status != "Draft")
+                            {
+                                patilist.Add(Docsnapshot.ConvertTo<MT_Patient_Booking>());
+                            }
+                        }
+                    }
+                    Response.DataList = patilist;
+                    Response.Status = con.StatusSuccess;
+                    Response.Message = con.MessageSuccess;
+                }
+                else
+                {
+                    Response.Status = con.StatusDNE;
+                    Response.Message = con.MessageDNE;
+                }
+            }
+            catch (Exception ex)
+            {
+                Response.Status = con.StatusFailed;
+                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
+            }
+            return ConvertToJSON(Response);
+        }
+
+        [Route("API/Booking/GetWalkInBookingList")]
+        [HttpPost]
+        public async Task<HttpResponseMessage> GetWalkInBookingList(MT_Patient_Booking PMD)
+        {
+            Db = con.SurgeryCenterDb(PMD.Slug);
+            BookingResponse Response = new BookingResponse();
+            try
+            {
+                List<MT_Patient_Booking> patilist = new List<MT_Patient_Booking>();
+                Query ObjQuery;
+                if (PMD.PB_Booking_Surgery_Center_ID == "0")
+                {
+                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false);
+                }
+                else if (PMD.PB_Booking_Surgery_Center_ID != "0" && PMD.PB_Booking_Surgery_Center_ID != null)
+                {
+                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booked_From", "WK").WhereEqualTo("PB_Booking_Surgery_Center_ID", PMD.PB_Booking_Surgery_Center_ID);
+                }
+                else
+                {
+                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Status", "WK").WhereEqualTo("PB_Booked_From", "WK").WhereEqualTo("PB_Booking_Physician_Office_ID", PMD.PB_Booking_Physician_Office_ID);
+                }
+
+                QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
+                if (ObjQuerySnap != null)
+                {
+                    foreach (DocumentSnapshot Docsnapshot in ObjQuerySnap.Documents)
+                    {
+                        if (PMD.PB_Booking_Physician_Office_ID != null)
+                        {
+                            patilist.Add(Docsnapshot.ConvertTo<MT_Patient_Booking>());
+                        }
+                        else if (PMD.PB_Booking_Surgery_Center_ID == "0")
+                        {
+                            patilist.Add(Docsnapshot.ConvertTo<MT_Patient_Booking>());
+                        }
+                        else
                         {
                             if (Docsnapshot.ConvertTo<MT_Patient_Booking>().PB_Status != "Draft")
                             {
@@ -845,13 +574,75 @@ namespace TheCloudHealth.Controllers
             try
             {
                 List<MT_Patient_Booking> patilist = new List<MT_Patient_Booking>();
-                Query ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booking_Physician_Office_ID", PMD.PB_Booking_Physician_Office_ID).OrderByDescending("PB_Booking_Date");
+                Query ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booked_From", "NB").WhereEqualTo("PB_Booking_Physician_Office_ID", PMD.PB_Booking_Physician_Office_ID).OrderByDescending("PB_Booking_Date");
                 QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
                 if (ObjQuerySnap != null)
                 {
                     foreach (DocumentSnapshot Docsnapshot in ObjQuerySnap.Documents)
                     {
                         patilist.Add(Docsnapshot.ConvertTo<MT_Patient_Booking>());
+                    }
+                    Response.DataList = patilist;
+                    Response.Status = con.StatusSuccess;
+                    Response.Message = con.MessageSuccess;
+                }
+                else
+                {
+                    Response.Status = con.StatusDNE;
+                    Response.Message = con.MessageDNE;
+                }
+            }
+            catch (Exception ex)
+            {
+                Response.Status = con.StatusFailed;
+                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
+            }
+            return ConvertToJSON(Response);
+        }
+
+        [Route("API/Booking/GetCompletedBookingList")]
+        [HttpPost]
+        public async Task<HttpResponseMessage> GetCompletedBookingList(MT_Patient_Booking PMD)
+        {
+            Db = con.SurgeryCenterDb(PMD.Slug);
+            BookingResponse Response = new BookingResponse();
+            try
+            {
+                List<MT_Patient_Booking> patilist = new List<MT_Patient_Booking>();
+                Query ObjQuery;
+                if (PMD.PB_Booking_Surgery_Center_ID == "0")
+                {
+                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false);
+                }
+                else if (PMD.PB_Booking_Surgery_Center_ID != "0" && PMD.PB_Booking_Surgery_Center_ID != null)
+                {
+                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booking_Surgery_Center_ID", PMD.PB_Booking_Surgery_Center_ID).WhereEqualTo("PB_Status", "Complete");
+                }
+                else
+                {
+                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booking_Physician_Office_ID", PMD.PB_Booking_Physician_Office_ID).WhereEqualTo("PB_Status", "Complete");
+                }
+
+                QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
+                if (ObjQuerySnap != null)
+                {
+                    foreach (DocumentSnapshot Docsnapshot in ObjQuerySnap.Documents)
+                    {
+                        if (PMD.PB_Booking_Physician_Office_ID != null)
+                        {
+                            patilist.Add(Docsnapshot.ConvertTo<MT_Patient_Booking>());
+                        }
+                        else if (PMD.PB_Booking_Surgery_Center_ID == "0")
+                        {
+                            patilist.Add(Docsnapshot.ConvertTo<MT_Patient_Booking>());
+                        }
+                        else
+                        {
+                            if (Docsnapshot.ConvertTo<MT_Patient_Booking>().PB_Status != "Draft")
+                            {
+                                patilist.Add(Docsnapshot.ConvertTo<MT_Patient_Booking>());
+                            }
+                        }
                     }
                     Response.DataList = patilist;
                     Response.Status = con.StatusSuccess;
@@ -915,17 +706,37 @@ namespace TheCloudHealth.Controllers
             {
                 Incident_Details InciDetails = new Incident_Details();
                 MT_Patient_Booking BookingInfo = new MT_Patient_Booking();
+                List<Reject_Reason> RReasonList = new List<Reject_Reason>();
                 Query ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Unique_ID", PMD.PB_Unique_ID).WhereEqualTo("PB_Is_Deleted", false);
                 QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
                 if (ObjQuerySnap != null)
                 {
-                    BookingInfo = ObjQuerySnap.Documents[0].ConvertTo<MT_Patient_Booking>();
-                    BookingInfo.PB_Modify_Date = con.ConvertTimeZone(PMD.PB_TimeZone, Convert.ToDateTime(PMD.PB_Modify_Date));
-                    BookingInfo.PB_Status = PMD.PB_Status;
-                    BookingInfo.PB_Reason = PMD.PB_Reason;
+                    BookingInfo = ObjQuerySnap.Documents[0].ConvertTo<MT_Patient_Booking>();                    
+                    if (BookingInfo.PB_Reason != null)
+                    {
+                        foreach (Reject_Reason RR in BookingInfo.PB_Reason)
+                        {
+                            RReasonList.Add(RR);
+                        }
+                    }
+
+                    if (PMD.PB_Reason != null)
+                    {
+                        foreach (Reject_Reason RR in PMD.PB_Reason)
+                        {
+                            RR.RR_Create_Date = con.ConvertTimeZone(RR.RR_TimeZone, Convert.ToDateTime(RR.RR_Create_Date));
+                            RReasonList.Add(RR);
+                        }
+                    }
+                    Dictionary<string, object> initialData = new Dictionary<string, object>
+                    {
+                        {"PB_Modify_Date", con.ConvertTimeZone(PMD.PB_TimeZone, Convert.ToDateTime(PMD.PB_Modify_Date))},
+                        {"PB_Reason", RReasonList},
+                        {"PB_Status",PMD.PB_Status }
+                    };
 
                     DocumentReference docRef = Db.Collection("MT_Patient_Booking").Document(BookingInfo.PB_Unique_ID);
-                    WriteResult Result = await docRef.SetAsync(BookingInfo, SetOptions.Overwrite);
+                    WriteResult Result = await docRef.UpdateAsync(initialData);
                     if (Result != null)
                     {
                         Response.Status = con.StatusSuccess;
@@ -1103,9 +914,6 @@ namespace TheCloudHealth.Controllers
                 //Main section 
                 UniqueID = con.GetUniqueKey();
                 PMD.PB_Unique_ID = UniqueID;
-                //List<CPTSelected> CPTSelList = new List<CPTSelected>();
-                //List<ICDSelected> ICDSelList = new List<ICDSelected>();
-                //List<ProcedureSelected> ProcSelList = new List<ProcedureSelected>();
                 List<Alerts> AlrtList = new List<Alerts>();
                 Query ObjQuery = Db.Collection("MT_Patient_Booking");
                 QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
@@ -1120,7 +928,7 @@ namespace TheCloudHealth.Controllers
                 PMD.PB_Booking_Date = con.ConvertTimeZone(PMD.PB_TimeZone, Convert.ToDateTime(PMD.PB_Booking_Date));
                 PMD.PB_Create_Date = con.ConvertTimeZone(PMD.PB_TimeZone, Convert.ToDateTime(PMD.PB_Create_Date));
                 PMD.PB_Modify_Date = con.ConvertTimeZone(PMD.PB_TimeZone, Convert.ToDateTime(PMD.PB_Modify_Date));
-                PMD.PB_Is_Deleted = false;
+                ////PMD.PB_Is_Deleted = false;
                 //Main section Edit
 
                 //Incident_Details
@@ -1142,55 +950,14 @@ namespace TheCloudHealth.Controllers
                 if (PMD.PB_Surgical_Procedure_Information != null)
                 {
                     PMD.PB_Surgical_Procedure_Information.SPI_Unique_ID = con.GetUniqueKey();
-                    PMD.PB_Surgical_Procedure_Information.SPI_Date = con.ConvertTimeZone(PMD.PB_Surgical_Procedure_Information.SPI_TimeZone, Convert.ToDateTime(PMD.PB_Surgical_Procedure_Information.SPI_Date));
+                    PMD.PB_Surgical_Procedure_Information.SPI_Date = con.ConvertTimeZone(PMD.PB_Surgical_Procedure_Information.SPI_TimeZone, Convert.ToDateTime(PMD.PB_Surgical_Procedure_Information.SPI_Date),1);
                     PMD.PB_Surgical_Procedure_Information.SPI_Create_Date = con.ConvertTimeZone(PMD.PB_Surgical_Procedure_Information.SPI_TimeZone, Convert.ToDateTime(PMD.PB_Surgical_Procedure_Information.SPI_Create_Date));
                     PMD.PB_Surgical_Procedure_Information.SPI_Modify_Date = con.ConvertTimeZone(PMD.PB_Surgical_Procedure_Information.SPI_TimeZone, Convert.ToDateTime(PMD.PB_Surgical_Procedure_Information.SPI_Modify_Date));
-                    PMD.PB_Surgical_Procedure_Information.SPI_TimeZone = PMD.PB_Surgical_Procedure_Information.SPI_TimeZone;
-
-                    //if (PMD.PB_Surgical_Procedure_Information.SPI_CPT_SelectedList != null)
-                    //{
-                    //    foreach (CPTSelected Sel in PMD.PB_Surgical_Procedure_Information.SPI_CPT_SelectedList)
-                    //    {
-                    //        CPTSelected cptsel = Sel;
-                    //        cptsel.CPTS_Unique_ID = con.GetUniqueKey();
-                    //        //cptsel.CPTS_Create_Date = con.ConvertTimeZone(cptsel.CPTS_TimeZone, Convert.ToDateTime(cptsel.CPTS_Create_Date));
-                    //        //cptsel.CPTS_Modify_Date = con.ConvertTimeZone(cptsel.CPTS_TimeZone, Convert.ToDateTime(cptsel.CPTS_Modify_Date));
-                    //        CPTSelList.Add(cptsel);
-                    //    }
-                    //}
-                    
-
-                    //if (PMD.PB_Surgical_Procedure_Information.SPI_ICD_SelectedList != null)
-                    //{
-                    //    foreach (ICDSelected Sel in PMD.PB_Surgical_Procedure_Information.SPI_ICD_SelectedList)
-                    //    {
-                    //        ICDSelected icdsel = Sel;
-                    //        icdsel.ICD_Unique_ID = con.GetUniqueKey();
-                    //        //icdsel.ICD_Create_Date = con.ConvertTimeZone(icdsel.ICD_TimeZone, Convert.ToDateTime(icdsel.ICD_Create_Date));
-                    //        //icdsel.ICD_Modify_Date = con.ConvertTimeZone(icdsel.ICD_TimeZone, Convert.ToDateTime(icdsel.ICD_Modify_Date));
-                    //        ICDSelList.Add(icdsel);
-                    //    }
-                    //}
-
-                    //if (PMD.PB_Surgical_Procedure_Information.SPI_Procedure_SelectedList.len != null)
-                    //{
-                    //    foreach (ProcedureSelected Sel in PMD.PB_Surgical_Procedure_Information.SPI_Procedure_SelectedList)
-                    //    {
-                    //        ProcedureSelected Procsel = Sel;
-                    //        Procsel.Proc_Unique_ID = con.GetUniqueKey();
-                    //        //Procsel.Proc_Create_Date = con.ConvertTimeZone(Procsel.Proc_TimeZone, Convert.ToDateTime(Procsel.Proc_Create_Date));
-                    //        //Procsel.Proc_Modify_Date = con.ConvertTimeZone(Procsel.Proc_TimeZone, Convert.ToDateTime(Procsel.Proc_Modify_Date));
-                    //        ProcSelList.Add(Procsel);
-                    //    }
-                    //}
-
-                    //PMD.PB_Surgical_Procedure_Information.SPI_ICD_SelectedList = ICDSelList;
-                    //PMD.PB_Surgical_Procedure_Information.SPI_CPT_SelectedList = CPTSelList;
-                    //PMD.PB_Surgical_Procedure_Information.SPI_Procedure_SelectedList = ProcSelList;
+                    PMD.PB_Surgical_Procedure_Information.SPI_TimeZone = PMD.PB_Surgical_Procedure_Information.SPI_TimeZone;                    
                     PMD.PB_Booking_Surgery_Center_ID = PMD.PB_Booking_Surgery_Center_ID;
                     PMD.PB_Booking_Surgery_Center_Name = PMD.PB_Booking_Surgery_Center_Name;
                     PMD.PB_TimeZone = PMD.PB_TimeZone;
-                    PMD.PB_Booking_Date = con.ConvertTimeZone(PMD.PB_Surgical_Procedure_Information.SPI_TimeZone, Convert.ToDateTime(PMD.PB_Surgical_Procedure_Information.SPI_Date));
+                    PMD.PB_Booking_Date = con.ConvertTimeZone(PMD.PB_Surgical_Procedure_Information.SPI_TimeZone, Convert.ToDateTime(PMD.PB_Surgical_Procedure_Information.SPI_Date),1);
                     PMD.PB_Booking_Duration = PMD.PB_Surgical_Procedure_Information.SPI_Duration;
                     PMD.PB_Booking_Time = PMD.PB_Surgical_Procedure_Information.SPI_Time;
                     
@@ -1271,114 +1038,330 @@ namespace TheCloudHealth.Controllers
             BookingResponse Response = new BookingResponse();
             try
             {
-                Dictionary<string, object> initialData = new Dictionary<string, object>
+                MT_Patient_Booking booking = new MT_Patient_Booking();
+                Query Qty = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Unique_ID", PMD.PB_Unique_ID);
+                QuerySnapshot ObjBooking = await Qty.GetSnapshotAsync();
+                if (ObjBooking != null)
+                {
+                    booking = ObjBooking.Documents[0].ConvertTo<MT_Patient_Booking>();
+                    Dictionary<string, object> initialData = new Dictionary<string, object>
                     {
+                        {"PB_Patient_Name", PMD.PB_Patient_Name},
+                        {"PB_Patient_Last_Name", PMD.PB_Patient_Last_Name},
                         {"PB_Booking_Date", con.ConvertTimeZone(PMD.PB_TimeZone, Convert.ToDateTime(PMD.PB_Booking_Date))},
                         {"PB_Booking_Time", PMD.PB_Booking_Time},
                         {"PB_Booking_Duration", PMD.PB_Booking_Duration},
                         {"PB_Alerts", PMD.PB_Alerts},
-                        {"PB_Booking_Surgery_Center_ID", PMD.PB_Booking_Surgery_Center_ID},
-                        {"PB_Booking_Surgery_Center_Name", PMD.PB_Booking_Surgery_Center_Name},
-                        {"PB_Booking_Physician_Office_ID", PMD.PB_Booking_Physician_Office_ID},
-                        {"PB_Booking_Physician_Office_Name", PMD.PB_Booking_Physician_Office_Name},
-                        {"PB_Modify_Date", con.ConvertTimeZone(PMD.PB_TimeZone, Convert.ToDateTime(PMD.PB_Modify_Date))},
+                        {"PB_Notes", PMD.PB_Notes},
                         {"PB_Status", PMD.PB_Status},
+                        {"PB_Modify_Date", con.ConvertTimeZone(PMD.PB_TimeZone, Convert.ToDateTime(PMD.PB_Modify_Date))},
                         {"PB_TimeZone", PMD.PB_TimeZone},
                     };
 
-                if (PMD.PB_Incient_Detail != null)
-                {
-                    Dictionary<string, object> Incient_Detail = new Dictionary<string, object>
+                    if (PMD.PB_Incient_Detail != null)
                     {
-                        {"Inci_Type_ID",PMD.PB_Incient_Detail.Inci_Type_ID},
-                        {"Inci_Type",PMD.PB_Incient_Detail.Inci_Type},
-                        {"Inci_Claim_No",PMD.PB_Incient_Detail.Inci_Claim_No},
-                        {"Inci_DOI",con.ConvertTimeZone(PMD.PB_Incient_Detail.Inci_TimeZone, Convert.ToDateTime(PMD.PB_Incient_Detail.Inci_DOI))},
-                        {"Inci_Employee_Name",PMD.PB_Incient_Detail.Inci_Employee_Name},
-                        {"Inci_Employee_Address",PMD.PB_Incient_Detail.Inci_Employee_Address},
-                        {"Inci_Employee_Phone_No",PMD.PB_Incient_Detail.Inci_Employee_Phone_No},
-                        {"Inci_Is_This_Lien",PMD.PB_Incient_Detail.Inci_Is_This_Lien},
-                        {"Inci_Attorney_Name",PMD.PB_Incient_Detail.Inci_Attorney_Name},
-                        {"Inci_Attorney_Phone_No",PMD.PB_Incient_Detail.Inci_Attorney_Phone_No},
-                        {"Inci_TimeOfIncident",PMD.PB_Incient_Detail.Inci_TimeOfIncident},
-                        {"Inci_Comment",PMD.PB_Incient_Detail.Inci_Comment},
-                        {"Inci_Modify_Date",con.ConvertTimeZone(PMD.PB_Incient_Detail.Inci_TimeZone,Convert.ToDateTime(PMD.PB_Incient_Detail.Inci_Modify_Date))},
-                        {"Inci_TimeZone",PMD.PB_Incient_Detail.Inci_TimeZone}
-                    };
-                    initialData.Add("PB_Incient_Detail", Incient_Detail);
+                        Dictionary<string, object> Incient_Detail;
+                        if (booking.PB_Incient_Detail != null)
+                        {
+                            Incient_Detail = new Dictionary<string, object>
+                            {
+                                {"Inci_Type_ID",PMD.PB_Incient_Detail.Inci_Type_ID},
+                                {"Inci_Type",PMD.PB_Incient_Detail.Inci_Type},
+                                {"Inci_Claim_No",PMD.PB_Incient_Detail.Inci_Claim_No},
+                                {"Inci_DOI",con.ConvertTimeZone(PMD.PB_Incient_Detail.Inci_TimeZone, Convert.ToDateTime(PMD.PB_Incient_Detail.Inci_DOI))},
+                                {"Inci_Employee_Name",PMD.PB_Incient_Detail.Inci_Employee_Name},
+                                {"Inci_Employee_Address",PMD.PB_Incient_Detail.Inci_Employee_Address},
+                                {"Inci_Employee_Phone_No",PMD.PB_Incient_Detail.Inci_Employee_Phone_No},
+                                {"Inci_Is_This_Lien",PMD.PB_Incient_Detail.Inci_Is_This_Lien},
+                                {"Inci_Attorney_Name",PMD.PB_Incient_Detail.Inci_Attorney_Name},
+                                {"Inci_Attorney_Phone_No",PMD.PB_Incient_Detail.Inci_Attorney_Phone_No},
+                                {"Inci_TimeOfIncident",PMD.PB_Incient_Detail.Inci_TimeOfIncident},
+                                {"Inci_Comment",PMD.PB_Incient_Detail.Inci_Comment},
+                                {"Inci_Modify_Date",con.ConvertTimeZone(PMD.PB_Incient_Detail.Inci_TimeZone,Convert.ToDateTime(PMD.PB_Incient_Detail.Inci_Modify_Date))},
+                                {"Inci_TimeZone",PMD.PB_Incient_Detail.Inci_TimeZone}
+                            };
+                        }
+                        else
+                        {
+                            Incient_Detail = new Dictionary<string, object>
+                            {
+                                {"Inci_Unique_ID", con.GetUniqueKey()},
+                                {"Inci_Type_ID", PMD.PB_Incient_Detail.Inci_Type_ID},
+                                {"Inci_Type", PMD.PB_Incient_Detail.Inci_Type},
+                                {"Inci_Claim_No", PMD.PB_Incient_Detail.Inci_Claim_No},
+                                {"Inci_DOI",con.ConvertTimeZone(PMD.PB_Incient_Detail.Inci_TimeZone,Convert.ToDateTime(PMD.PB_Incient_Detail.Inci_DOI))},
+                                {"Inci_Employee_Name", PMD.PB_Incient_Detail.Inci_Employee_Name},
+                                {"Inci_Employee_Address", PMD.PB_Incient_Detail.Inci_Employee_Address},
+                                {"Inci_Employee_Phone_No", PMD.PB_Incient_Detail.Inci_Employee_Phone_No},
+                                {"Inci_Is_This_Lien", PMD.PB_Incient_Detail.Inci_Is_This_Lien},
+                                {"Inci_Attorney_Name", PMD.PB_Incient_Detail.Inci_Attorney_Name},
+                                {"Inci_Attorney_Phone_No", PMD.PB_Incient_Detail.Inci_Attorney_Phone_No},
+                                {"Inci_TimeOfIncident", PMD.PB_Incient_Detail.Inci_TimeOfIncident},
+                                {"Inci_Comment", PMD.PB_Incient_Detail.Inci_Comment},
+                                {"Inci_Created_By", PMD.PB_Incient_Detail.Inci_Created_By},
+                                {"Inci_User_Name", PMD.PB_Incient_Detail.Inci_User_Name},
+                                {"Inci_Create_Date", con.ConvertTimeZone(PMD.PB_Incient_Detail.Inci_TimeZone,Convert.ToDateTime(PMD.PB_Incient_Detail.Inci_Create_Date))},
+                                {"Inci_Modify_Date", con.ConvertTimeZone(PMD.PB_Incient_Detail.Inci_TimeZone,Convert.ToDateTime(PMD.PB_Incient_Detail.Inci_Modify_Date))},
+                                {"Inci_Is_Active", PMD.PB_Incient_Detail.Inci_Is_Active},
+                                {"Inci_Is_Deleted", PMD.PB_Incient_Detail.Inci_Is_Deleted},
+                                {"Inci_TimeZone", PMD.PB_Incient_Detail.Inci_TimeZone},
+                            };
+                        }
+                        
+                        initialData.Add("PB_Incient_Detail", Incient_Detail);
+                    }
+
+                    if (PMD.PB_Surgical_Procedure_Information != null)
+                    {
+                        Dictionary<string, object> Surgical_Procedure_Information;
+                        if (booking.PB_Surgical_Procedure_Information != null)
+                        {
+                            Surgical_Procedure_Information = new Dictionary<string, object>
+                            {
+                                {"SPI_Surgery_Center_ID", PMD.PB_Surgical_Procedure_Information.SPI_Surgery_Center_ID},
+                                {"SPI_Surgery_Center_Name", PMD.PB_Surgical_Procedure_Information.SPI_Surgery_Center_Name},
+                                {"SPI_Surgeon_ID", PMD.PB_Surgical_Procedure_Information.SPI_Surgeon_ID},
+                                {"SPI_Surgeon_Name", PMD.PB_Surgical_Procedure_Information.SPI_Surgeon_Name},
+                                {"SPI_Assi_Surgeon_ID", PMD.PB_Surgical_Procedure_Information.SPI_Assi_Surgeon_ID},
+                                {"SPI_Assi_Surgeon_Name", PMD.PB_Surgical_Procedure_Information.SPI_Assi_Surgeon_Name},
+                                {"SPI_Date", con.ConvertTimeZone(PMD.PB_Surgical_Procedure_Information.SPI_TimeZone,Convert.ToDateTime(PMD.PB_Surgical_Procedure_Information.SPI_Date),1)},
+                                {"SPI_Time", PMD.PB_Surgical_Procedure_Information.SPI_Time},
+                                {"SPI_Duration", PMD.PB_Surgical_Procedure_Information.SPI_Duration},
+                                {"SPI_Anesthesia_Type_ID", PMD.PB_Surgical_Procedure_Information.SPI_Anesthesia_Type_ID},
+                                {"SPI_Anesthesia_Type", PMD.PB_Surgical_Procedure_Information.SPI_Anesthesia_Type},
+                                {"SPI_Block_ID", PMD.PB_Surgical_Procedure_Information.SPI_Block_ID},
+                                {"SPI_Block_Type", PMD.PB_Surgical_Procedure_Information.        SPI_Block_Type},
+                                {"SPI_Procedure_SelectedList", PMD.PB_Surgical_Procedure_Information.SPI_Procedure_SelectedList},
+                                {"SPI_CPT_SelectedList", PMD.PB_Surgical_Procedure_Information.SPI_CPT_SelectedList},
+                                {"SPI_ICD_SelectedList", PMD.PB_Surgical_Procedure_Information.SPI_ICD_SelectedList},
+                                {"SPI_Modify_Date", con.ConvertTimeZone(PMD.PB_Surgical_Procedure_Information.SPI_TimeZone,Convert.ToDateTime(PMD.PB_Surgical_Procedure_Information.SPI_Modify_Date))},
+                                {"SPI_TimeZone", PMD.PB_Surgical_Procedure_Information.SPI_TimeZone}
+                            };
+                        }
+                        else
+                        {
+                            Surgical_Procedure_Information = new Dictionary<string, object>
+                            {
+                                {"SPI_Unique_ID", con.GetUniqueKey()},
+                                {"SPI_Surgery_Center_ID", PMD.PB_Surgical_Procedure_Information.SPI_Surgery_Center_ID},
+                                {"SPI_Surgery_Center_Name", PMD.PB_Surgical_Procedure_Information.SPI_Surgery_Center_Name},
+                                {"SPI_Surgeon_ID", PMD.PB_Surgical_Procedure_Information.SPI_Surgeon_ID},
+                                {"SPI_Surgeon_Name", PMD.PB_Surgical_Procedure_Information.SPI_Surgeon_Name},
+                                {"SPI_Assi_Surgeon_ID", PMD.PB_Surgical_Procedure_Information.SPI_Assi_Surgeon_ID},
+                                {"SPI_Assi_Surgeon_Name", PMD.PB_Surgical_Procedure_Information.SPI_Assi_Surgeon_Name},
+                                {"SPI_Date", con.ConvertTimeZone(PMD.PB_Surgical_Procedure_Information.SPI_TimeZone,Convert.ToDateTime(PMD.PB_Surgical_Procedure_Information.SPI_Date))},
+                                {"SPI_Time", PMD.PB_Surgical_Procedure_Information.SPI_Time},
+                                {"SPI_Duration", PMD.PB_Surgical_Procedure_Information.SPI_Duration},
+                                {"SPI_Anesthesia_Type_ID", PMD.PB_Surgical_Procedure_Information.SPI_Anesthesia_Type_ID},
+                                {"SPI_Anesthesia_Type", PMD.PB_Surgical_Procedure_Information.SPI_Anesthesia_Type},
+                                {"SPI_Block_ID", PMD.PB_Surgical_Procedure_Information.SPI_Block_ID},
+                                {"SPI_Block_Type", PMD.PB_Surgical_Procedure_Information.SPI_Block_Type},
+                                {"SPI_Procedure_SelectedList", PMD.PB_Surgical_Procedure_Information.SPI_Procedure_SelectedList},
+                                {"SPI_CPT_SelectedList", PMD.PB_Surgical_Procedure_Information.SPI_CPT_SelectedList},
+                                {"SPI_ICD_SelectedList", PMD.PB_Surgical_Procedure_Information.SPI_ICD_SelectedList},
+                                {"SPI_Created_By", PMD.PB_Surgical_Procedure_Information.SPI_Created_By},
+                                {"SPI_User_Name", PMD.PB_Surgical_Procedure_Information.SPI_User_Name},
+                                {"SPI_Create_Date", con.ConvertTimeZone(PMD.PB_Surgical_Procedure_Information.SPI_TimeZone,Convert.ToDateTime(PMD.PB_Surgical_Procedure_Information.SPI_Create_Date))},
+                                {"SPI_Modify_Date", con.ConvertTimeZone(PMD.PB_Surgical_Procedure_Information.SPI_TimeZone,Convert.ToDateTime(PMD.PB_Surgical_Procedure_Information.SPI_Modify_Date))},
+                                {"SPI_Is_Active", PMD.PB_Surgical_Procedure_Information.SPI_Is_Active},
+                                {"SPI_Is_Deleted", PMD.PB_Surgical_Procedure_Information.SPI_Is_Deleted},
+                                {"SPI_TimeZone", PMD.PB_Surgical_Procedure_Information.SPI_TimeZone},
+                            };
+                        }
+                        
+                        initialData.Add("PB_Surgical_Procedure_Information", Surgical_Procedure_Information);
+                    }
+
+                    if (PMD.PB_Preoprative_Medical_Clearance != null)
+                    {
+                        Dictionary<string, object> Preoprative_Medical_Clearance;
+                        if (booking.PB_Preoprative_Medical_Clearance != null)
+                        {
+                            Preoprative_Medical_Clearance = new Dictionary<string, object>
+                            {
+                                {"PMC_Is_Require_Pre_Op_Medi_Clearance", PMD.PB_Preoprative_Medical_Clearance.PMC_Is_Require_Pre_Op_Medi_Clearance},
+                                {"PMC_Clearing_Physician_Name", PMD.PB_Preoprative_Medical_Clearance.PMC_Clearing_Physician_Name},
+                                {"PMC_Is_Require_EKG", PMD.PB_Preoprative_Medical_Clearance.PMC_Is_Require_EKG},
+                                {"PMC_Modify_Date", con.ConvertTimeZone(PMD.PB_Preoprative_Medical_Clearance.PMC_TimeZone, Convert.ToDateTime(PMD.PB_Preoprative_Medical_Clearance.PMC_Modify_Date))},
+                                {"PMC_TimeZone", PMD.PB_Preoprative_Medical_Clearance.PMC_TimeZone}
+                            };
+                        }
+                        else
+                        {
+                            Preoprative_Medical_Clearance = new Dictionary<string, object>
+                            {
+                                {"PMC_Unique_ID", con.GetUniqueKey()},
+                                {"PMC_Is_Require_Pre_Op_Medi_Clearance", PMD.PB_Preoprative_Medical_Clearance.PMC_Is_Require_Pre_Op_Medi_Clearance},
+                                {"PMC_Clearing_Physician_Name", PMD.PB_Preoprative_Medical_Clearance.PMC_Clearing_Physician_Name},
+                                {"PMC_Is_Require_EKG", PMD.PB_Preoprative_Medical_Clearance.PMC_Is_Require_EKG},
+                                {"PMC_Created_By", PMD.PB_Preoprative_Medical_Clearance.PMC_Created_By},
+                                {"PMC_User_Name", PMD.PB_Preoprative_Medical_Clearance.PMC_User_Name},
+                                {"PMC_Create_Date",con.ConvertTimeZone(PMD.PB_Preoprative_Medical_Clearance.PMC_TimeZone,Convert.ToDateTime(PMD.PB_Preoprative_Medical_Clearance.PMC_Create_Date))},
+                                {"PMC_Modify_Date", con.ConvertTimeZone(PMD.PB_Preoprative_Medical_Clearance.PMC_TimeZone,Convert.ToDateTime(PMD.PB_Preoprative_Medical_Clearance.PMC_Modify_Date))},
+                                {"PMC_Is_Active", PMD.PB_Preoprative_Medical_Clearance.PMC_Is_Active},
+                                {"PMC_Is_Deleted", PMD.PB_Preoprative_Medical_Clearance.PMC_Is_Deleted},
+                                {"PMC_TimeZone", PMD.PB_Preoprative_Medical_Clearance.PMC_TimeZone},
+                            };
+                        }
+                        
+                        initialData.Add("PB_Preoprative_Medical_Clearance", Preoprative_Medical_Clearance);
+
+                    }
+
+                    if (PMD.PB_Special_Request != null)
+                    {
+                        Dictionary<string, object> Special_Request;
+                        if (booking.PB_Special_Request != null)
+                        {
+                            Special_Request = new Dictionary<string, object>
+                            {
+                                {"SR_Is_Special_Equip_Req", PMD.PB_Special_Request.SR_Is_Special_Equip_Req},
+                                {"SR_Equip_ID", PMD.PB_Special_Request.SR_Equip_ID},
+                                {"SR_Equip_Name", PMD.PB_Special_Request.SR_Equip_Name},
+                                {"SR_Supplies_ID", PMD.PB_Special_Request.SR_Supplies_ID},
+                                {"SR_Supplies_Name", PMD.PB_Special_Request.SR_Supplies_Name},
+                                {"SR_Instrumentation_ID", PMD.PB_Special_Request.SR_Instrumentation_ID},
+                                {"SR_Instrumentation_Name", PMD.PB_Special_Request.SR_Instrumentation_Name},
+                                {"SR_Other", PMD.PB_Special_Request.SR_Other},
+                                {"SR_Modify_Date", con.ConvertTimeZone(PMD.PB_Special_Request.SR_TimeZone, Convert.ToDateTime(PMD.PB_Special_Request.SR_Modify_Date))},
+                                {"SR_TimeZone", PMD.PB_Special_Request.SR_TimeZone}
+                            };
+                        }
+                        else
+                        {
+                            Special_Request = new Dictionary<string, object>
+                            {
+                                {"SR_Unique_ID",con.GetUniqueKey()},
+                                {"SR_Is_Special_Equip_Req",PMD.PB_Special_Request.SR_Is_Special_Equip_Req},
+                                {"SR_Equip_ID",PMD.PB_Special_Request.SR_Equip_ID},
+                                {"SR_Equip_Name",PMD.PB_Special_Request.SR_Equip_Name},
+                                {"SR_Supplies_ID",PMD.PB_Special_Request.SR_Supplies_ID},
+                                {"SR_Supplies_Name",PMD.PB_Special_Request.SR_Supplies_Name},
+                                {"SR_Instrumentation_ID",PMD.PB_Special_Request.SR_Instrumentation_ID},
+                                {"SR_Instrumentation_Name",PMD.PB_Special_Request.SR_Instrumentation_Name},
+                                {"SR_Other",PMD.PB_Special_Request.SR_Other},
+                                {"SR_Created_By",PMD.PB_Special_Request.SR_Created_By},
+                                {"SR_User_Name",PMD.PB_Special_Request.SR_User_Name},
+                                {"SR_Create_Date",con.ConvertTimeZone(PMD.PB_Special_Request.SR_TimeZone,Convert.ToDateTime(PMD.PB_Special_Request.SR_Create_Date))},
+                                {"SR_Modify_Date",con.ConvertTimeZone(PMD.PB_Special_Request.SR_TimeZone,Convert.ToDateTime(PMD.PB_Special_Request.SR_Modify_Date))},
+                                {"SR_Is_Active",PMD.PB_Special_Request.SR_Is_Active},
+                                {"SR_Is_Deleted",PMD.PB_Special_Request.SR_Is_Deleted},
+                                {"SR_TimeZone",PMD.PB_Special_Request.SR_TimeZone},
+                            };
+                        }
+                        
+                        initialData.Add("PB_Special_Request", Special_Request);
+                    }
+
+                    if (PMD.PB_Insurance_Precertification_Authorization != null)
+                    {
+                        Dictionary<string, object> Insurance_Precertification_Authorization;
+                        if (booking.PB_Insurance_Precertification_Authorization != null)
+                        {
+                            Insurance_Precertification_Authorization = new Dictionary<string, object>
+                            {
+                                {"IPA_Insurace_Company_Phone_No", PMD.PB_Insurance_Precertification_Authorization.IPA_Insurace_Company_Phone_No},
+                                {"IPA_Insurace_Company_Representative", PMD.PB_Insurance_Precertification_Authorization.IPA_Insurace_Company_Representative},
+                                {"IPA_Authorization_Name", PMD.PB_Insurance_Precertification_Authorization.IPA_Authorization_Name},
+                                {"IPA_DOA", con.ConvertTimeZone(PMD.PB_Insurance_Precertification_Authorization.IPA_TimeZone, Convert.ToDateTime(PMD.PB_Insurance_Precertification_Authorization.IPA_DOA))},
+                                {"IPA_Modify_Date", con.ConvertTimeZone(PMD.PB_Insurance_Precertification_Authorization.IPA_TimeZone, Convert.ToDateTime(PMD.PB_Insurance_Precertification_Authorization.IPA_Modify_Date))},
+                                {"IPA_TimeZone", PMD.PB_Insurance_Precertification_Authorization.IPA_TimeZone}
+                            };
+                        }
+                        else
+                        {
+                            Insurance_Precertification_Authorization = new Dictionary<string, object>
+                            {
+                                {"IPA_Unique_ID",con.GetUniqueKey()},
+                                {"IPA_Insurace_Company_Phone_No",PMD.PB_Insurance_Precertification_Authorization.IPA_Insurace_Company_Phone_No},
+                                {"IPA_Insurace_Company_Representative",PMD.PB_Insurance_Precertification_Authorization.IPA_Insurace_Company_Representative},
+                                {"IPA_Authorization_Name",PMD.PB_Insurance_Precertification_Authorization.IPA_Authorization_Name},
+                                {"IPA_DOA",con.ConvertTimeZone(PMD.PB_Insurance_Precertification_Authorization.IPA_TimeZone,Convert.ToDateTime(PMD.PB_Insurance_Precertification_Authorization.IPA_DOA))},
+                                {"IPA_Created_By",PMD.PB_Insurance_Precertification_Authorization.IPA_Created_By},
+                                {"IPA_User_Name",PMD.PB_Insurance_Precertification_Authorization.IPA_User_Name},
+                                {"IPA_Create_Date",con.ConvertTimeZone(PMD.PB_Insurance_Precertification_Authorization.IPA_TimeZone,Convert.ToDateTime(PMD.PB_Insurance_Precertification_Authorization.IPA_Create_Date))},
+                                {"IPA_Modify_Date",con.ConvertTimeZone(PMD.PB_Insurance_Precertification_Authorization.IPA_TimeZone,Convert.ToDateTime(PMD.PB_Insurance_Precertification_Authorization.IPA_Modify_Date))},
+                                {"IPA_Is_Active",PMD.PB_Insurance_Precertification_Authorization.IPA_Is_Active},
+                                {"IPA_Is_Deleted",PMD.PB_Insurance_Precertification_Authorization.IPA_Is_Deleted},
+                                {"IPA_TimeZone",PMD.PB_Insurance_Precertification_Authorization.IPA_TimeZone},
+                            };
+                        }
+                    
+                        initialData.Add("PB_Insurance_Precertification_Authorization", Insurance_Precertification_Authorization);
+                    }
+                    //Main section 
+                    DocumentReference docRef = Db.Collection("MT_Patient_Booking").Document(PMD.PB_Unique_ID);
+                    WriteResult Result = await docRef.UpdateAsync(initialData);
+                    if (Result != null)
+                    {
+                        Response.Status = con.StatusSuccess;
+                        Response.Message = con.MessageSuccess;
+                        Response.Data = PMD;
+                    }
+                    else
+                    {
+                        Response.Status = con.StatusNotInsert;
+                        Response.Message = con.MessageNotInsert;
+                        Response.Data = null;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Response.Status = con.StatusFailed;
+                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
+            }
+            return ConvertToJSON(Response);
+        }
+
+        [Route("API/Booking/AssignNotification")]
+        [HttpPost]
+        public async Task<HttpResponseMessage> AssignNotification(MT_Patient_Booking PMD)
+        {
+            Db = con.SurgeryCenterDb(PMD.Slug);
+            BookingResponse Response = new BookingResponse();
+            try
+            {
+                MT_Notifications Notification = new MT_Notifications();
+                MT_Patient_Booking Booking = new MT_Patient_Booking();
+                List<MT_Notifications> NotiList = new List<MT_Notifications>();
+                Query Qry = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Unique_ID", PMD.PB_Unique_ID).WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Is_Active", true);
+                QuerySnapshot ObjQuerySnap = await Qry.GetSnapshotAsync();
+                if (ObjQuerySnap != null)
+                {
+                    Booking = ObjQuerySnap.Documents[0].ConvertTo<MT_Patient_Booking>();
+                    if (PMD.PB_Notifications_Array != null && Booking.PB_Notifications != null)
+                    {
+                        foreach (MT_Notifications noti in Booking.PB_Notifications)
+                        {
+                            NotiList.Add(noti);
+                        }
+                    }
                 }
 
-                if (PMD.PB_Surgical_Procedure_Information != null)
+                if (PMD.PB_Notifications_Array != null)
                 {
-                    Dictionary<string, object> Surgical_Procedure_Information = new Dictionary<string, object>
+                    foreach (string str in PMD.PB_Notifications_Array)
                     {
-                        {"SPI_Surgery_Center_ID", PMD.PB_Surgical_Procedure_Information.SPI_Surgery_Center_ID},
-                        {"SPI_Surgery_Center_Name", PMD.PB_Surgical_Procedure_Information.SPI_Surgery_Center_Name},
-                        {"SPI_Surgeon_ID", PMD.PB_Surgical_Procedure_Information.SPI_Surgeon_ID},
-                        {"SPI_Surgeon_Name", PMD.PB_Surgical_Procedure_Information.SPI_Surgeon_Name},
-                        {"SPI_Assi_Surgeon_ID", PMD.PB_Surgical_Procedure_Information.SPI_Assi_Surgeon_ID},
-                        {"SPI_Assi_Surgeon_Name", PMD.PB_Surgical_Procedure_Information.SPI_Assi_Surgeon_Name},
-                        {"SPI_Date", con.ConvertTimeZone(PMD.PB_Surgical_Procedure_Information.SPI_TimeZone,Convert.ToDateTime(PMD.PB_Surgical_Procedure_Information.SPI_Date))},
-                        {"SPI_Time", PMD.PB_Surgical_Procedure_Information.SPI_Time},
-                        {"SPI_Duration", PMD.PB_Surgical_Procedure_Information.SPI_Duration},
-                        {"SPI_Anesthesia_Type_ID", PMD.PB_Surgical_Procedure_Information.SPI_Anesthesia_Type_ID},
-                        {"SPI_Anesthesia_Type", PMD.PB_Surgical_Procedure_Information.SPI_Anesthesia_Type},
-                        {"SPI_Block_ID", PMD.PB_Surgical_Procedure_Information.SPI_Block_ID},
-                        {"SPI_Block_Type", PMD.PB_Surgical_Procedure_Information.        SPI_Block_Type},
-                        {"SPI_Procedure_SelectedList", PMD.PB_Surgical_Procedure_Information.SPI_Procedure_SelectedList},
-                        {"SPI_CPT_SelectedList", PMD.PB_Surgical_Procedure_Information.SPI_CPT_SelectedList},
-                        {"SPI_ICD_SelectedList", PMD.PB_Surgical_Procedure_Information.SPI_ICD_SelectedList},
-                        {"SPI_Modify_Date", con.ConvertTimeZone(PMD.PB_Surgical_Procedure_Information.SPI_TimeZone,Convert.ToDateTime(PMD.PB_Surgical_Procedure_Information.SPI_Modify_Date))},
-                        {"SPI_TimeZone", PMD.PB_Surgical_Procedure_Information.SPI_TimeZone}
-                    };
-                    initialData.Add("PB_Surgical_Procedure_Information", Surgical_Procedure_Information);
+                        Query Qry1 = Db.Collection("MT_Notifications").WhereEqualTo("NFT_Unique_ID", str).WhereEqualTo("NFT_Is_Deleted", false).WhereEqualTo("NFT_Is_Active", true);
+                        QuerySnapshot ObjQuerySnap1 = await Qry1.GetSnapshotAsync();
+                        if (ObjQuerySnap1 != null)
+                        {
+                            NotiList.Add(ObjQuerySnap1.Documents[0].ConvertTo<MT_Notifications>());
+                        }
+                    }
                 }
+                
 
-                if (PMD.PB_Preoprative_Medical_Clearance != null)
-                {
-                    Dictionary<string, object> Preoprative_Medical_Clearance = new Dictionary<string, object>
+
+                Dictionary<string, object> initialData = new Dictionary<string, object>
                     {
-                        {"PMC_Is_Require_Pre_Op_Medi_Clearance", PMD.PB_Preoprative_Medical_Clearance.PMC_Is_Require_Pre_Op_Medi_Clearance},
-                        {"PMC_Clearing_Physician_Name", PMD.PB_Preoprative_Medical_Clearance.PMC_Clearing_Physician_Name},
-                        {"PMC_Is_Require_EKG", PMD.PB_Preoprative_Medical_Clearance.PMC_Is_Require_EKG},
-                        {"PMC_Modify_Date", con.ConvertTimeZone(PMD.PB_Preoprative_Medical_Clearance.PMC_TimeZone, Convert.ToDateTime(PMD.PB_Preoprative_Medical_Clearance.PMC_Modify_Date))},
-                        {"PMC_TimeZone", PMD.PB_Preoprative_Medical_Clearance.PMC_TimeZone}
+                        {"PB_Modify_Date", con.ConvertTimeZone(PMD.PB_TimeZone, Convert.ToDateTime(PMD.PB_Modify_Date))},
+                        {"PB_TimeZone", PMD.PB_TimeZone},
+                        {"PB_Notifications", NotiList}
                     };
-                    initialData.Add("PB_Preoprative_Medical_Clearance", Preoprative_Medical_Clearance);
 
-                }
 
-                if (PMD.PB_Special_Request != null)
-                {
-                    Dictionary<string, object> Special_Request = new Dictionary<string, object>
-                    {
-                        {"SR_Is_Special_Equip_Req", PMD.PB_Special_Request.SR_Is_Special_Equip_Req},
-                        {"SR_Equip_ID", PMD.PB_Special_Request.SR_Equip_ID},
-                        {"SR_Equip_Name", PMD.PB_Special_Request.SR_Equip_Name},
-                        {"SR_Supplies_ID", PMD.PB_Special_Request.SR_Supplies_ID},
-                        {"SR_Supplies_Name", PMD.PB_Special_Request.SR_Supplies_Name},
-                        {"SR_Instrumentation_ID", PMD.PB_Special_Request.SR_Instrumentation_ID},
-                        {"SR_Instrumentation_Name", PMD.PB_Special_Request.SR_Instrumentation_Name},
-                        {"SR_Other", PMD.PB_Special_Request.SR_Other},
-                        {"SR_Modify_Date", con.ConvertTimeZone(PMD.PB_Special_Request.SR_TimeZone, Convert.ToDateTime(PMD.PB_Special_Request.SR_Modify_Date))},
-                        {"SR_TimeZone", PMD.PB_Special_Request.SR_TimeZone}
-                    };
-                    initialData.Add("PB_Special_Request", Special_Request);
-                }
-
-                if (PMD.PB_Insurance_Precertification_Authorization != null)
-                {
-                    Dictionary<string, object> Insurance_Precertification_Authorization = new Dictionary<string, object>
-                    {
-                        {"IPA_Insurace_Company_Phone_No", PMD.PB_Insurance_Precertification_Authorization.IPA_Insurace_Company_Phone_No},
-                        {"IPA_Insurace_Company_Representative", PMD.PB_Insurance_Precertification_Authorization.IPA_Insurace_Company_Representative},
-                        {"IPA_Authorization_Name", PMD.PB_Insurance_Precertification_Authorization.IPA_Authorization_Name},
-                        {"IPA_DOA", con.ConvertTimeZone(PMD.PB_Insurance_Precertification_Authorization.IPA_TimeZone, Convert.ToDateTime(PMD.PB_Insurance_Precertification_Authorization.IPA_DOA))},
-                        {"IPA_Modify_Date", con.ConvertTimeZone(PMD.PB_Insurance_Precertification_Authorization.IPA_TimeZone, Convert.ToDateTime(PMD.PB_Insurance_Precertification_Authorization.IPA_Modify_Date))},
-                        {"IPA_TimeZone", PMD.PB_Insurance_Precertification_Authorization.IPA_TimeZone}
-                    };
-                    initialData.Add("PB_Insurance_Precertification_Authorization", Insurance_Precertification_Authorization);
-                }
                 //Main section 
                 DocumentReference docRef = Db.Collection("MT_Patient_Booking").Document(PMD.PB_Unique_ID);
                 WriteResult Result = await docRef.UpdateAsync(initialData);
@@ -1403,150 +1386,68 @@ namespace TheCloudHealth.Controllers
             }
             return ConvertToJSON(Response);
         }
-        [Route("API/Booking/DownloadPDF")]
-        [HttpGet]
-        //[Obsolete]
-        public async Task<HttpResponseMessage> DownloadPDF(string BookingID,string PatientID,string Slug)
+
+
+        [Route("API/Booking/DeleteAssignedNotification")]
+        [HttpPost]
+        public async Task<HttpResponseMessage> DeleteAssignedNotification(MT_Patient_Booking PMD)
         {
-            string HTMLContent = "<html>";
-            Db = con.SurgeryCenterDb(Slug);
-            Query ObjQuery = Db.Collection("MT_PatientInfomation").WhereEqualTo("Patient_Unique_ID", PatientID).WhereEqualTo("Patient_Is_Active",true).WhereEqualTo("Patient_Is_Deleted", false);
-            QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
-            if (ObjQuerySnap != null)
+            Db = con.SurgeryCenterDb(PMD.Slug);
+            BookingResponse Response = new BookingResponse();
+            try
             {
-                MT_PatientInfomation patient = ObjQuerySnap.Documents[0].ConvertTo<MT_PatientInfomation>();
-                HTMLContent = HTMLContent + "<body style='padding:10px 10px 10px 10px'>" +
-                "<div id='Header' style='text-align: center;font-size: 12px;background: red;padding: 10px 0px 10px 0px;font-weight: bold;'>" +
-                    "Clinical Summary" +
-                "</div> " +
-                "<div id='DemographicsSection' style='padding: 10px 10px 10px 10px;'>" +
-                    //"<div  style = 'padding: 5px 0px 5px 5px;font-weight: bold;font-size: 14px'>" +
-                    "<table bgcolor='#B8DBFD' border='1' bordercolor='LightGray'><tr><td>" +
-                    "Demographics " +
-                    "<tr><td></table>" +
-                    //"</div>" +
-                        "<table  style='width:100%;padding: 2px 0px 0px 0px;border: solid 1px lightgray;' >" +
-                            "<tr>" +
-                                "<td>Name :</td>" +
-                                "<td>"+ patient.Patient_First_Name + " " + patient.Patient_Last_Name + "</td>" +
-                                "<td>Patient ID :</td>" +
-                                "<td>"+ patient.Patient_Code + "</td>" +
-                            "</tr>" +
+                MT_Notifications Notification = new MT_Notifications();
+                MT_Patient_Booking Booking = new MT_Patient_Booking();
+                List<MT_Notifications> NotiList = new List<MT_Notifications>();
+                Query Qry = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Unique_ID", PMD.PB_Unique_ID).WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Is_Active", true);
+                QuerySnapshot ObjQuerySnap = await Qry.GetSnapshotAsync();
+                if (ObjQuerySnap != null)
+                {
+                    Booking = ObjQuerySnap.Documents[0].ConvertTo<MT_Patient_Booking>();
+                    if (PMD.PB_Notifications_Array != null && Booking.PB_Notifications!=null)
+                    {
+                        foreach (MT_Notifications noti in Booking.PB_Notifications)
+                        {
+                            if (PMD.PB_Notifications_Array.Contains<string>(noti.NFT_Unique_ID) == false)
+                            {
+                                NotiList.Add(noti);
+                            }
+                        }
+                    }
+                }
 
-                            "<tr>" +
-                                "<td>Birth Date :</td>" +
-                                "<td>"+ patient.Patient_DOB + "</td>" +
-                                "<td>Gender :</td>" +
-                                "<td>"+ patient.Patient_Sex + "</td>" +
-                            "</tr>" +
+                Dictionary<string, object> initialData = new Dictionary<string, object>
+                    {
+                        {"PB_Modify_Date", con.ConvertTimeZone(PMD.PB_TimeZone, Convert.ToDateTime(PMD.PB_Modify_Date))},
+                        {"PB_TimeZone", PMD.PB_TimeZone},
+                        {"PB_Notifications", NotiList}
+                    };
 
-                            "<tr>" +
-                                "<td>Marital Status :</td>" +
-                                "<td>"+ patient.Patient_Marital_Status + "</td>" +
-                                "<td>Religious :</td>" +
-                                "<td>"+ patient.Patient_Religion + "</td>" +
-                            "</tr>" +
+                
+                //Main section 
+                DocumentReference docRef = Db.Collection("MT_Patient_Booking").Document(PMD.PB_Unique_ID);
+                WriteResult Result = await docRef.UpdateAsync(initialData);
+                if (Result != null)
+                {
+                    Response.Status = con.StatusSuccess;
+                    Response.Message = con.MessageSuccess;
+                    Response.Data = PMD;
+                }
+                else
+                {
+                    Response.Status = con.StatusNotInsert;
+                    Response.Message = con.MessageNotInsert;
+                    Response.Data = null;
+                }
 
-                            "<tr>" +
-                                "<td>Race :</td>" +
-                                "<td>"+ patient.Patient_Race + "</td>" +
-                                "<td>Ethinic :</td>" +
-                                "<td>"+ patient.Patient_Ethinicity + "</td>" +
-                            "</tr>" +
-
-                            "<tr>" +
-                                "<td>Contact Information :</td>" +
-                                "<td> Tel(Primary Home)"+ patient.Patient_Primary_No + "</td>" +
-                                "<td>Primary Home :</td>" +
-                                "<td>" + patient.Patient_Address1 + "<br>"+ patient.Patient_Address2 + "</td>" +
-                            "</tr>" +
-
-                            "<tr>" +
-                                "<td>Language :</td>" +
-                                "<td>"+ patient.Patient_Language + "</td>" +
-                                "<td></td>" +
-                                "<td></td>" +
-                            "</tr>" +
-                        "</table>" +
-
-                        //Query ObjQuery1 = Db.Collection("MT_PatientInfomation").WhereEqualTo("Patient_Unique_ID", PatientID).WhereEqualTo("Patient_Is_Active", true).WhereEqualTo("Patient_Is_Deleted", false);
-                        //QuerySnapshot ObjQuerySnap1 = await ObjQuery.GetSnapshotAsync();
-                        //if (ObjQuerySnap != null)
-                        //{ 
-
-                        //}
-
-                    "</div>";
             }
-            HTMLContent = HTMLContent + "</body></html>";
-            
-            HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK);
-
-            //Set the File Path.
-            //string filePath = HttpContext.Current.Server.MapPath("~/Images/") + "SCNavi_20191118194837.jpg";
-
-            ////Check whether File exists.
-            //if (!File.Exists(filePath))
-            //{
-            //    //Throw 404 (Not Found) exception if File not found.
-            //    response.StatusCode = HttpStatusCode.NotFound;
-            //    response.ReasonPhrase = string.Format("File not found: {0} .", "SCNavi_20191118194837.jpg");
-            //    throw new HttpResponseException(response);
-            //}
-
-            //Read the File into a Byte Array.
-            byte[] bytes = GetPDF(HTMLContent);
-
-            //Set the Response Content.
-            response.Content = new ByteArrayContent(bytes);
-
-            //Set the Response Content Length.
-            response.Content.Headers.ContentLength = bytes.LongLength;
-
-            //Set the Content Disposition Header Value and FileName.
-            response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment");
-            response.Content.Headers.ContentDisposition.FileName = "123.pdf";
-
-            //Set the File Content Type.
-            response.Content.Headers.ContentType = new MediaTypeHeaderValue(MimeMapping.GetMimeMapping("123.pdf"));
-            return response;
+            catch (Exception ex)
+            {
+                Response.Status = con.StatusFailed;
+                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
+            }
+            return ConvertToJSON(Response);
         }
-
-        [Obsolete]
-        public byte[] GetPDF(string pHTML)
-        {
-            byte[] bPDF = null;
-
-            MemoryStream ms = new MemoryStream();
-            TextReader txtReader = new StringReader(pHTML);
-
-            // 1: create object of a itextsharp document class  
-            Document doc = new Document(PageSize.A4, 25, 25, 25, 25);
-
-            // 2: we create a itextsharp pdfwriter that listens to the document and directs a XML-stream to a file  
-            PdfWriter oPdfWriter = PdfWriter.GetInstance(doc, ms);
-
-            // 3: we create a worker parse the document  
-            HTMLWorker htmlWorker = new HTMLWorker(doc);
-
-            // 4: we open document and start the worker on the document  
-            doc.Open();
-            htmlWorker.StartDocument();
-
-
-            // 5: parse the html into the document  
-            htmlWorker.Parse(txtReader);
-
-            // 6: close the document and the worker  
-            htmlWorker.EndDocument();
-            htmlWorker.Close();
-            doc.Close();
-
-            bPDF = ms.ToArray();
-
-            return bPDF;
-        }
-
 
     }
 }

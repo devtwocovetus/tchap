@@ -167,11 +167,19 @@ namespace TheCloudHealth.Lib
             return new string(Enumerable.Repeat(chars, length)
               .Select(s => s[random.Next(s.Length)]).ToArray());
         }
-        public DateTime ConvertTimeZone(string timezone,DateTime CurrentDate)
+        public DateTime ConvertTimeZone(string timezone,DateTime CurrentDate,int Special=0)
         {
             if (timezone == "")
             {
-                timezone = "US/Eastern (GMT-04:00)";
+                if (Special == 1)
+                {
+                    timezone = "US/Eastern (GMT+04:00)";
+                }
+                else
+                {
+                    timezone = "US/Eastern (GMT-04:00)";
+                }
+                
             }
 
             Double hours = 0;

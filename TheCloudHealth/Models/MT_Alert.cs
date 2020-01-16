@@ -14,6 +14,10 @@ namespace TheCloudHealth.Models
         [FirestoreProperty]
         public string Alert_Name { get; set; }
         [FirestoreProperty]
+        public string Alert_Surgery_Physician_Id { get; set; }
+        [FirestoreProperty]
+        public string Alert_Office_Type { get; set; }
+        [FirestoreProperty]
         public string Alert_Create_By { get; set; }
         [FirestoreProperty]
         public string Alert_Create_By_Type { get; set; }

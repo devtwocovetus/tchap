@@ -26,6 +26,8 @@ namespace TheCloudHealth.Models
         [FirestoreProperty]
         public string NFA_Message { get; set; }
         [FirestoreProperty]
+        public string NFA_Timing { get; set; }
+        [FirestoreProperty]
         public string NFA_Created_By { get; set; }
         [FirestoreProperty]
         public string NFA_User_Name { get; set; }
@@ -39,5 +41,7 @@ namespace TheCloudHealth.Models
         public Boolean NFA_Is_Deleted { get; set; }
         [FirestoreProperty]
         public string NFA_TimeZone { get; set; }
+        [FirestoreProperty]
+        public string NFA_Status { get; set; }
     }
 }

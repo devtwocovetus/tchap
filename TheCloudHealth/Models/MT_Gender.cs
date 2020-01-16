@@ -14,6 +14,10 @@ namespace TheCloudHealth.Models
         [FirestoreProperty]
         public string Gen_Type { get; set; }
         [FirestoreProperty]
+        public string Gen_Surgery_Physician_Id { get; set; }
+        [FirestoreProperty]
+        public string Gen_Office_Type { get; set; }
+        [FirestoreProperty]
         public Boolean Gen_Is_Active { get; set; }
         [FirestoreProperty]
         public string Gen_Create_By { get; set; }

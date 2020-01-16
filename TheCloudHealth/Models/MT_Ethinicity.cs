@@ -16,6 +16,10 @@ namespace TheCloudHealth.Models
         [FirestoreProperty]
         public string Ethi_Type { get; set; }
         [FirestoreProperty]
+        public string Ethi_Surgery_Physician_Id { get; set; }
+        [FirestoreProperty]
+        public string Ethi_Office_Type { get; set; }
+        [FirestoreProperty]
         public Boolean Ethi_Is_Active { get; set; }
         [FirestoreProperty]
         public string Ethi_Create_By { get; set; }

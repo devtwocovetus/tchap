@@ -14,7 +14,11 @@ namespace TheCloudHealth.Models
         [FirestoreProperty]
         public string Anes_Type { get; set; }
         [FirestoreProperty]
-        public string Anes_Name { get; set; }        
+        public string Anes_Name { get; set; }
+        [FirestoreProperty]
+        public string Anes_Surgery_Physician_Id { get; set; }
+        [FirestoreProperty]
+        public string Anes_Office_Type { get; set; }
         [FirestoreProperty]
         public string Anes_Create_By { get; set; }
         [FirestoreProperty]

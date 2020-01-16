@@ -573,7 +573,11 @@ namespace TheCloudHealth.Controllers
                         }
                         else
                         {
-                            logo.Logo_Login_Image = Surcenter.SurgC_Logo.Logo_Login_Image;
+                            if (Surcenter.SurgC_Logo != null)
+                            {
+                                logo.Logo_Login_Image = Surcenter.SurgC_Logo.Logo_Login_Image;
+                            }
+                            
                         }
                     }
                     if (SCMD.SurgC_Logo != null)
@@ -584,7 +588,11 @@ namespace TheCloudHealth.Controllers
                         }
                         else
                         {
-                            logo.Logo_Navigation_Image = Surcenter.SurgC_Logo.Logo_Navigation_Image;
+                            if (Surcenter.SurgC_Logo != null)
+                            {
+                                logo.Logo_Navigation_Image = Surcenter.SurgC_Logo.Logo_Navigation_Image;
+                            }
+                            
                         }
                     }
                     if (SCMD.SurgC_Logo != null)
@@ -595,7 +603,10 @@ namespace TheCloudHealth.Controllers
                         }
                         else
                         {
-                            logo.Logo_Fav_Image = Surcenter.SurgC_Logo.Logo_Fav_Image;
+                            if (Surcenter.SurgC_Logo != null)
+                            {
+                                logo.Logo_Fav_Image = Surcenter.SurgC_Logo.Logo_Fav_Image;
+                            }
                         }
                     }
                     if (SCMD.SurgC_Logo != null)

@@ -348,17 +348,20 @@
     <Compile Include="Controllers\NationalityController.cs" />
     <Compile Include="Controllers\NotiCategoryController.cs" />
     <Compile Include="Controllers\NotificationsController.cs" />
+    <Compile Include="Controllers\NotificationTimingController.cs" />
     <Compile Include="Controllers\NotiTypeController.cs" />
     <Compile Include="Controllers\PackController.cs" />
     <Compile Include="Controllers\PatientController.cs" />
     <Compile Include="Controllers\PatiFormURLController.cs" />
     <Compile Include="Controllers\PhysicianOfficeController.cs" />
     <Compile Include="Controllers\ProcedureController.cs" />
+    <Compile Include="Controllers\QBBookingController.cs" />
     <Compile Include="Controllers\RaceController.cs" />
     <Compile Include="Controllers\RelationController.cs" />
     <Compile Include="Controllers\ReligionController.cs" />
     <Compile Include="Controllers\RightMController.cs" />
     <Compile Include="Controllers\RoleController.cs" />
+    <Compile Include="Controllers\ScheduleController.cs" />
     <Compile Include="Controllers\SlugController.cs" />
     <Compile Include="Controllers\SmsController.cs" />
     <Compile Include="Controllers\SpecilityController.cs" />
@@ -367,6 +370,7 @@
     <Compile Include="Controllers\StaffMController.cs" />
     <Compile Include="Controllers\SuppliesController.cs" />
     <Compile Include="Controllers\SurgeryCenterController.cs" />
+    <Compile Include="Controllers\SysEmailTemplateController.cs" />
     <Compile Include="Controllers\SyslanguageController.cs" />
     <Compile Include="Controllers\TokenController.cs" />
     <Compile Include="Controllers\UserController.cs" />
@@ -432,6 +436,7 @@
     <Compile Include="Models\MT_Marital_Status.cs" />
     <Compile Include="Models\MT_Nationality.cs" />
     <Compile Include="Models\MT_Notifications.cs" />
+    <Compile Include="Models\MT_NotificationTiming.cs" />
     <Compile Include="Models\MT_Notification_Category.cs" />
     <Compile Include="Models\MT_Notification_Type.cs" />
     <Compile Include="Models\MT_Pack.cs" />
@@ -457,6 +462,7 @@
     <Compile Include="Models\MT_SurgC_Setting.cs" />
     <Compile Include="Models\MT_Surgery_Center.cs" />
     <Compile Include="Models\MT_Surgical_Procedure_Templates.cs" />
+    <Compile Include="Models\MT_System_EmailTemplates.cs" />
     <Compile Include="Models\Notification_Action.cs" />
     <Compile Include="Models\Patient_Forms.cs" />
     <Compile Include="Models\Patient_Primary_Insurance_Details.cs" />
@@ -465,6 +471,7 @@
     <Compile Include="Models\Patient_Secondary3_Insurance_Details.cs" />
     <Compile Include="Models\Preoprative_Medical_Clearance.cs" />
     <Compile Include="Models\ProcedureSelected.cs" />
+    <Compile Include="Models\Reject_Reason.cs" />
     <Compile Include="Models\Specilities.cs" />
     <Compile Include="Models\Suggestion.cs" />
     <Compile Include="Models\SiteURL.cs" />

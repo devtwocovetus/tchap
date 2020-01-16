@@ -16,6 +16,10 @@ namespace TheCloudHealth.Models
         [FirestoreProperty]
         public string DOC_Description { get; set; }
         [FirestoreProperty]
+        public string Doc_Surgery_Physician_Id { get; set; }
+        [FirestoreProperty]
+        public string Doc_Office_Type { get; set; }
+        [FirestoreProperty]
         public string DOC_Created_By { get; set; }
         [FirestoreProperty]
         public string DOC_User_Name { get; set; }

@@ -42,6 +42,10 @@ namespace TheCloudHealth.Models
         [FirestoreProperty]
         public List<Patient_Forms> PB_Forms { get; set; }
         [FirestoreProperty]
+        public List<MT_Notifications> PB_Notifications { get; set; }
+        [FirestoreProperty]
+        public string[] PB_Notifications_Array { get; set; }
+        [FirestoreProperty]
         public string PB_Booking_Surgery_Center_ID { get; set; }
         [FirestoreProperty]
         public string PB_Booking_Surgery_Center_Name { get; set; }
@@ -64,11 +68,15 @@ namespace TheCloudHealth.Models
         [FirestoreProperty]
         public string PB_Status { get; set; }
         [FirestoreProperty]
+        public string PB_Booked_From { get; set; }
+        [FirestoreProperty]
         public string PB_TimeZone { get; set; }
         [FirestoreProperty]
         public string Project_ID { get; set; }
         [FirestoreProperty]
-        public string PB_Reason { get; set; }
+        public List<Reject_Reason> PB_Reason { get; set; }
+        [FirestoreProperty]
+        public List<string> PB_Notes { get; set; }
         [FirestoreProperty]
         public string Slug { get; set; }
     }

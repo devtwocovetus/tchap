@@ -41,12 +41,6 @@ namespace TheCloudHealth.Models
         public List<CPTSelected> SPI_CPT_SelectedList { get; set; }
         [FirestoreProperty]
         public List<ICDSelected> SPI_ICD_SelectedList { get; set; }
-        //[FirestoreProperty]
-        //public string[] SPI_Procedure_SelectedList { get; set; }
-        //[FirestoreProperty]
-        //public string[] SPI_CPT_SelectedList { get; set; }
-        //[FirestoreProperty]
-        //public string[] SPI_ICD_SelectedList { get; set; }
         [FirestoreProperty]
         public string SPI_Created_By { get; set; }
         [FirestoreProperty]

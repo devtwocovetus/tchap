@@ -16,6 +16,8 @@ namespace TheCloudHealth.Models
         [FirestoreProperty]
         public string PF_Form_Name { get; set; }
         [FirestoreProperty]
+        public string PF_Passcode { get; set; }
+        [FirestoreProperty]
         public string PF_Created_By { get; set; }
         [FirestoreProperty]
         public string PF_User_Name { get; set; }        
