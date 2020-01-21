@@ -843,6 +843,39 @@ namespace TheCloudHealth.Controllers
             return ConvertToJSON(Response);
         }
 
+        [Route("API/Patient/CheckSSN")]
+        [HttpPost]
+        //[Authorize(Roles ="SAdmin")]
+        public async Task<HttpResponseMessage> CheckSSN(MT_PatientInfomation PMD)
+        {
+            Db = con.SurgeryCenterDb(PMD.Slug);
+            PatientEResponse Response = new PatientEResponse();
+            try
+            {
+                Query docRef = Db.Collection("MT_PatientInfomation").WhereEqualTo("Patient_Is_Deleted", false).WhereEqualTo("Patient_SSN", PMD.Patient_SSN);
+                QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
+                if (ObjQuerySnap.Documents.Count > 0)
+                {
+                    Response.Status = con.StatusDAE;
+                    Response.Message = con.MessageDAE;
+                    Response.Is_Available = true;
+                }
+                else
+                {
+                    Response.Status = con.StatusDNE;
+                    Response.Message = con.MessageDNE;
+                    Response.Is_Available = false;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Response.Status = con.StatusFailed;
+                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
+            }
+            return ConvertToJSON(Response);
+        }
+
         [Route("API/Patient/SearchPatient")]
         [HttpPost]
         //[Authorize(Roles ="SAdmin")]

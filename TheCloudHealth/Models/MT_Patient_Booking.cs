@@ -87,6 +87,7 @@ namespace TheCloudHealth.Models
         public int Status { get; set; }
         public MT_Patient_Booking Data { get; set; }
         public List<MT_Patient_Booking> DataList { get; set; }
+        public List<string> StringList { get; set; }
     }
 
     public class CountResponse

@@ -376,6 +376,41 @@ namespace TheCloudHealth.Controllers
             return ConvertToJSON(Response);
         }
 
+        [Route("API/Booking/GetPatientBookingStatusList")]
+        [HttpPost]
+        public async Task<HttpResponseMessage> GetPatientBookingStatusList(MT_Patient_Booking PMD)
+        {
+            Db = con.SurgeryCenterDb(PMD.Slug);
+            BookingResponse Response = new BookingResponse();
+            try
+            {
+                List<string> StatusList = new List<string>();
+                Query ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booking_Physician_Office_ID", PMD.PB_Booking_Physician_Office_ID).WhereEqualTo("PB_Patient_ID", PMD.PB_Patient_ID).OrderByDescending("PB_Booking_Date");
+                QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
+                if (ObjQuerySnap != null)
+                {
+                    foreach (DocumentSnapshot Docsnapshot in ObjQuerySnap.Documents)
+                    {
+                        StatusList.Add(Docsnapshot.ConvertTo<MT_Patient_Booking>().PB_Status);
+                    }
+                    Response.StringList = StatusList;
+                    Response.Status = con.StatusSuccess;
+                    Response.Message = con.MessageSuccess;
+                }
+                else
+                {
+                    Response.Status = con.StatusDNE;
+                    Response.Message = con.MessageDNE;
+                }
+            }
+            catch (Exception ex)
+            {
+                Response.Status = con.StatusFailed;
+                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
+            }
+            return ConvertToJSON(Response);
+        }
+
         [Route("API/Booking/GetBookingList")]
         [HttpPost]
         public async Task<HttpResponseMessage> GetBookingList(MT_Patient_Booking PMD)
