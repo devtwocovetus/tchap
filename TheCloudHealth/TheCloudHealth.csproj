@@ -352,7 +352,10 @@
     <Compile Include="Controllers\NotiTypeController.cs" />
     <Compile Include="Controllers\PackController.cs" />
     <Compile Include="Controllers\PatientController.cs" />
+    <Compile Include="Controllers\PatientIntakeController.cs" />
     <Compile Include="Controllers\PatiFormURLController.cs" />
+    <Compile Include="Controllers\PatiIntakeCategoryController.cs" />
+    <Compile Include="Controllers\PatiIntakeTypeController.cs" />
     <Compile Include="Controllers\PhysicianOfficeController.cs" />
     <Compile Include="Controllers\ProcedureController.cs" />
     <Compile Include="Controllers\QBBookingController.cs" />
@@ -374,6 +377,7 @@
     <Compile Include="Controllers\SyslanguageController.cs" />
     <Compile Include="Controllers\TokenController.cs" />
     <Compile Include="Controllers\UserController.cs" />
+    <Compile Include="Controllers\VirtualConsultantController.cs" />
     <Compile Include="Controllers\VoiceController.cs" />
     <Compile Include="Controllers\WhatsAppController.cs" />
     <Compile Include="Domain\Configuration.cs" />
@@ -443,6 +447,9 @@
     <Compile Include="Models\MT_PatientInfomation.cs" />
     <Compile Include="Models\MT_Patient_Booking.cs" />
     <Compile Include="Models\MT_Patient_Forms_URLs.cs" />
+    <Compile Include="Models\MT_Patient_Intake.cs" />
+    <Compile Include="Models\MT_Patient_Intake_Category.cs" />
+    <Compile Include="Models\MT_Patient_Intake_Type.cs" />
     <Compile Include="Models\MT_PhyO_Contact_Setting.cs" />
     <Compile Include="Models\MT_PhyO_Setting.cs" />
     <Compile Include="Models\MT_Physician_Office.cs" />
@@ -463,6 +470,7 @@
     <Compile Include="Models\MT_Surgery_Center.cs" />
     <Compile Include="Models\MT_Surgical_Procedure_Templates.cs" />
     <Compile Include="Models\MT_System_EmailTemplates.cs" />
+    <Compile Include="Models\MT_Virtual_Consultant_Booking.cs" />
     <Compile Include="Models\Notification_Action.cs" />
     <Compile Include="Models\Patient_Forms.cs" />
     <Compile Include="Models\Patient_Primary_Insurance_Details.cs" />
@@ -472,6 +480,7 @@
     <Compile Include="Models\Preoprative_Medical_Clearance.cs" />
     <Compile Include="Models\ProcedureSelected.cs" />
     <Compile Include="Models\Reject_Reason.cs" />
+    <Compile Include="Models\RoomDetails.cs" />
     <Compile Include="Models\Specilities.cs" />
     <Compile Include="Models\Suggestion.cs" />
     <Compile Include="Models\SiteURL.cs" />

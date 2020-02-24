@@ -70,10 +70,14 @@ namespace TheCloudHealth.Controllers
                                 QuerySnapshot ObjPatientQuerySnap = await PatientQuery.GetSnapshotAsync();
                                 if (ObjPatientQuerySnap != null)
                                 {
+                                    List<string> Namelist = new List<string>();
+                                    List<string> Emaillist = new List<string>();
                                     Patient = ObjPatientQuerySnap.Documents[0].ConvertTo<MT_PatientInfomation>();
                                     Email = Patient.Patient_Email;
                                     Phone = Patient.Patient_Primary_No;
                                     Name = Patient.Patient_First_Name + " " + Patient.Patient_Middle_Name + " " + Patient.Patient_Last_Name;
+                                    Namelist.Add(Name);
+                                    Emaillist.Add(Email);
                                     BookingDate = Booking.PB_Booking_Date;
                                     foreach (MT_Notifications noti in Booking.PB_Notifications)
                                     {
@@ -125,8 +129,8 @@ namespace TheCloudHealth.Controllers
                                                                     break;
                                                                 case "Email":
                                                                     Email email = new Email();
-                                                                    email.To_Name = Name;
-                                                                    email.To_Email = Email;
+                                                                    email.To_Name = Namelist;
+                                                                    email.To_Email = Emaillist;
                                                                     email.PlainTextContent = "";
                                                                     email.HtmlContent = action.NFA_Message;
                                                                     await EmailObj.Send(email);

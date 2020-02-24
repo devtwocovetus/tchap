@@ -1006,7 +1006,8 @@ namespace TheCloudHealth.Controllers
                         { "SurgC_SpecilitiesList", SCMD.SurgC_SpecilitiesList },
                         { "SurgC_ContactSetting", SCMD.SurgC_ContactSetting },
                         //{ "SurgC_Setting", SCMD.SurgC_Setting },
-                        { "SurgC_Modify_Date",con.ConvertTimeZone(SCMD.SurgC_TimeZone, Convert.ToDateTime(SCMD.SurgC_Modify_Date))}
+                        { "SurgC_Modify_Date",con.ConvertTimeZone(SCMD.SurgC_TimeZone, Convert.ToDateTime(SCMD.SurgC_Modify_Date))},
+                        { "SurgC_TimeZone",SCMD.SurgC_TimeZone}
                     };
                 DocumentReference docRef = Db.Collection("MT_Surgery_Center").Document(SCMD.SurgC_Unique_ID);
                 WriteResult Result = await docRef.UpdateAsync(initialData);

@@ -293,7 +293,7 @@ namespace TheCloudHealth.Controllers
             try
             {
                 List<MT_Forms> AnesList = new List<MT_Forms>();
-                Query docRef = Db.Collection("MT_Forms").WhereEqualTo("Form_Is_Deleted", false).WhereEqualTo("Form_Surgery_Physician_Id", FMD.Form_Surgery_Physician_Id);
+                Query docRef = Db.Collection("MT_Forms").WhereEqualTo("Form_Is_Deleted", false).WhereEqualTo("Form_Surgery_Physician_Id", FMD.Form_Surgery_Physician_Id).OrderByDescending("Form_Create_Date");
                 QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
                 if (ObjQuerySnap != null)
                 {
@@ -361,7 +361,10 @@ namespace TheCloudHealth.Controllers
                 {
                     foreach (DocumentSnapshot Docsnapshot in ObjQuerySnap.Documents)
                     {
-                        AnesList.Add(Docsnapshot.ConvertTo<MT_Forms>());
+                        if (Docsnapshot.ConvertTo<MT_Forms>().Form_Surgery_Physician_Id == "0" || Docsnapshot.ConvertTo<MT_Forms>().Form_Surgery_Physician_Id == FMD.Form_Surgery_Physician_Id)
+                        {
+                            AnesList.Add(Docsnapshot.ConvertTo<MT_Forms>());
+                        }
                     }
                     Response.DataList = AnesList;
                 }

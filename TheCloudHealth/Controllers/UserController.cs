@@ -474,7 +474,7 @@ namespace TheCloudHealth.Controllers
             try
             {
                 List<MT_User> AnesList = new List<MT_User>();
-                Query docRef = Db.Collection("MT_User").WhereEqualTo("UM_Is_Deleted", false).WhereEqualTo("UM_Email", UMD.UM_Email);
+                Query docRef = Db.Collection("MT_User").WhereEqualTo("UM_Is_Deleted", false).WhereEqualTo("UM_Email", UMD.UM_Email).WhereEqualTo("UM_Surgary_Physician_CenterID", UMD.UM_Surgary_Physician_CenterID);
                 QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
                 if (ObjQuerySnap.Documents.Count == 0)
                 {

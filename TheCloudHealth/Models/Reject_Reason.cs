@@ -7,7 +7,7 @@ using System.Web;
 namespace TheCloudHealth.Models
 {
     [FirestoreData]
-    public class Reject_Reason
+    public class Reason
     {
         [FirestoreProperty]
         public string RR_Message { get; set; }

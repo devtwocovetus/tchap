@@ -229,13 +229,24 @@ namespace TheCloudHealth.Controllers
             try
             {
                 List<MT_Pack> AnesList = new List<MT_Pack>();
-                Query docRef = Db.Collection("MT_Pack").WhereEqualTo("Pack_Is_Deleted", false);
+                Query docRef = Db.Collection("MT_Pack").WhereEqualTo("Pack_Is_Deleted", false).WhereEqualTo("Pack_Is_Active", true);
                 QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
                 if (ObjQuerySnap != null)
                 {
                     foreach (DocumentSnapshot Docsnapshot in ObjQuerySnap.Documents)
                     {
-                        AnesList.Add(Docsnapshot.ConvertTo<MT_Pack>());
+                        if (Pck.Pack_Surgery_Physician_Id != "28bLAlDi21ab1a937541a6")
+                        {
+                            if (Docsnapshot.ConvertTo<MT_Pack>().Pack_Surgery_Physician_Id == "28bLAlDi21ab1a937541a6" || Docsnapshot.ConvertTo<MT_Pack>().Pack_Surgery_Physician_Id == Pck.Pack_Surgery_Physician_Id || Docsnapshot.ConvertTo<MT_Pack>().Pack_Surgery_Physician_Id == Pck.Pack_SC_Id)
+                            {
+                                AnesList.Add(Docsnapshot.ConvertTo<MT_Pack>());
+                            }
+                        }
+                        else
+                        {
+                            AnesList.Add(Docsnapshot.ConvertTo<MT_Pack>());
+                        }
+                        
                     }
                     Response.DataList = AnesList.OrderBy(o => o.Pack_Name).ToList();
                 }
@@ -266,7 +277,17 @@ namespace TheCloudHealth.Controllers
                 {
                     foreach (DocumentSnapshot Docsnapshot in ObjQuerySnap.Documents)
                     {
-                        AnesList.Add(Docsnapshot.ConvertTo<MT_Pack>());
+                        if (Pck.Pack_Surgery_Physician_Id != "28bLAlDi21ab1a937541a6")
+                        {
+                            if (Docsnapshot.ConvertTo<MT_Pack>().Pack_Surgery_Physician_Id == "28bLAlDi21ab1a937541a6" || Docsnapshot.ConvertTo<MT_Pack>().Pack_Surgery_Physician_Id == Pck.Pack_Surgery_Physician_Id || Docsnapshot.ConvertTo<MT_Pack>().Pack_Surgery_Physician_Id == Pck.Pack_SC_Id)
+                            {
+                                AnesList.Add(Docsnapshot.ConvertTo<MT_Pack>());
+                            }
+                        }
+                        else
+                        {
+                            AnesList.Add(Docsnapshot.ConvertTo<MT_Pack>());
+                        }
                     }
                     Response.DataList = AnesList.OrderBy(o => o.Pack_Name).ToList();
                 }

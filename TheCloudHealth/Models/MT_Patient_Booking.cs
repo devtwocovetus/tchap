@@ -74,9 +74,23 @@ namespace TheCloudHealth.Models
         [FirestoreProperty]
         public string Project_ID { get; set; }
         [FirestoreProperty]
-        public List<Reject_Reason> PB_Reason { get; set; }
+        public List<Reason> PB_Reject { get; set; }
         [FirestoreProperty]
-        public List<string> PB_Notes { get; set; }
+        public List<Reason> PB_Approved { get; set; }
+        [FirestoreProperty]
+        public List<Reason> PB_Draft { get; set; }
+        [FirestoreProperty]
+        public List<Reason> PB_Incomplete { get; set; }
+        [FirestoreProperty]
+        public List<Reason> PB_Complete { get; set; }
+        [FirestoreProperty]
+        public List<Reason> PB_Noshow { get; set; }
+        [FirestoreProperty]
+        public List<Reason> PB_Suspended { get; set; }
+        [FirestoreProperty]
+        public List<Reason> PB_Unapproved { get; set; }
+        [FirestoreProperty]
+        public List<Reason> PB_Notes { get; set; }
         [FirestoreProperty]
         public string Slug { get; set; }
     }

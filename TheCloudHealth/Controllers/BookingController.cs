@@ -86,6 +86,7 @@ namespace TheCloudHealth.Controllers
             }
             return ConvertToJSON(Response);
         }
+
         public MT_Patient_Booking GetImages()
         {
             MT_Patient_Booking Surcenter = new MT_Patient_Booking();
@@ -304,6 +305,7 @@ namespace TheCloudHealth.Controllers
                     Dictionary<string, object> initialData = new Dictionary<string, object>
                     {
                         {"PB_Modify_Date", con.ConvertTimeZone(PMD.PB_TimeZone,Convert.ToDateTime(PMD.PB_Modify_Date))},
+                        { "PB_TimeZone",PMD.PB_TimeZone},
                         {"PB_Forms", FormsList}
                     };
                     //BookingInfo.PB_Modify_Date = con.ConvertTimeZone(PMD.PB_TimeZone,Convert.ToDateTime(PMD.PB_Modify_Date));                    
@@ -339,7 +341,6 @@ namespace TheCloudHealth.Controllers
             }
             return ConvertToJSON(Response);
         }
-
 
         [Route("API/Booking/GetPatientBookingList")]
         [HttpPost]
@@ -384,16 +385,16 @@ namespace TheCloudHealth.Controllers
             BookingResponse Response = new BookingResponse();
             try
             {
-                List<string> StatusList = new List<string>();
+                List<MT_Patient_Booking> BookingList = new List<MT_Patient_Booking>();
                 Query ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booking_Physician_Office_ID", PMD.PB_Booking_Physician_Office_ID).WhereEqualTo("PB_Patient_ID", PMD.PB_Patient_ID).OrderByDescending("PB_Booking_Date");
                 QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
                 if (ObjQuerySnap != null)
                 {
                     foreach (DocumentSnapshot Docsnapshot in ObjQuerySnap.Documents)
                     {
-                        StatusList.Add(Docsnapshot.ConvertTo<MT_Patient_Booking>().PB_Status);
+                        BookingList.Add(Docsnapshot.ConvertTo<MT_Patient_Booking>());
                     }
-                    Response.StringList = StatusList;
+                    Response.DataList = BookingList;
                     Response.Status = con.StatusSuccess;
                     Response.Message = con.MessageSuccess;
                 }
@@ -458,7 +459,8 @@ namespace TheCloudHealth.Controllers
                             }
                         }
                     }
-                    Response.DataList = patilist;
+                    
+                    Response.DataList = patilist.OrderBy(o => o.PB_Surgical_Procedure_Information.SPI_Date).ToList();
                     Response.Status = con.StatusSuccess;
                     Response.Message = con.MessageSuccess;
                 }
@@ -609,7 +611,18 @@ namespace TheCloudHealth.Controllers
             try
             {
                 List<MT_Patient_Booking> patilist = new List<MT_Patient_Booking>();
-                Query ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booked_From", "NB").WhereEqualTo("PB_Booking_Physician_Office_ID", PMD.PB_Booking_Physician_Office_ID).OrderByDescending("PB_Booking_Date");
+
+                Query ObjQuery;
+                switch (PMD.PB_Status)
+                {
+                    case "Total":
+                        ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booked_From", "NB").WhereEqualTo("PB_Booking_Physician_Office_ID", PMD.PB_Booking_Physician_Office_ID);//.OrderByDescending("PB_Booking_Date");
+                        break;
+                    default:
+                        ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booked_From", "NB").WhereEqualTo("PB_Booking_Physician_Office_ID", PMD.PB_Booking_Physician_Office_ID).WhereEqualTo("PB_Status",PMD.PB_Status);
+                        break;
+                }
+
                 QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
                 if (ObjQuerySnap != null)
                 {
@@ -617,7 +630,7 @@ namespace TheCloudHealth.Controllers
                     {
                         patilist.Add(Docsnapshot.ConvertTo<MT_Patient_Booking>());
                     }
-                    Response.DataList = patilist;
+                    Response.DataList = patilist.OrderBy(o => o.PB_Surgical_Procedure_Information.SPI_Date).ToList();
                     Response.Status = con.StatusSuccess;
                     Response.Message = con.MessageSuccess;
                 }
@@ -741,34 +754,174 @@ namespace TheCloudHealth.Controllers
             {
                 Incident_Details InciDetails = new Incident_Details();
                 MT_Patient_Booking BookingInfo = new MT_Patient_Booking();
-                List<Reject_Reason> RReasonList = new List<Reject_Reason>();
+                List<Reason> RejectList = new List<Reason>();
+                List<Reason> ApprovedList = new List<Reason>();
+                List<Reason> DraftList = new List<Reason>();
+                List<Reason> IncompleteList = new List<Reason>();
+                List<Reason> CompleteList = new List<Reason>();
+                List<Reason> NoshowList = new List<Reason>();
+                List<Reason> SuspendList = new List<Reason>();
+                List<Reason> UnapprovedList = new List<Reason>();
+
                 Query ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Unique_ID", PMD.PB_Unique_ID).WhereEqualTo("PB_Is_Deleted", false);
                 QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
                 if (ObjQuerySnap != null)
                 {
+                    Dictionary<string, object> initialData;
                     BookingInfo = ObjQuerySnap.Documents[0].ConvertTo<MT_Patient_Booking>();                    
-                    if (BookingInfo.PB_Reason != null)
+                    if (BookingInfo.PB_Reject != null)
                     {
-                        foreach (Reject_Reason RR in BookingInfo.PB_Reason)
+                        foreach (Reason RR in BookingInfo.PB_Reject)
                         {
-                            RReasonList.Add(RR);
+                            RejectList.Add(RR);
                         }
                     }
 
-                    if (PMD.PB_Reason != null)
+                    if (PMD.PB_Reject != null)
                     {
-                        foreach (Reject_Reason RR in PMD.PB_Reason)
+                        foreach (Reason RR in PMD.PB_Reject)
                         {
                             RR.RR_Create_Date = con.ConvertTimeZone(RR.RR_TimeZone, Convert.ToDateTime(RR.RR_Create_Date));
-                            RReasonList.Add(RR);
+                            RejectList.Add(RR);
                         }
                     }
-                    Dictionary<string, object> initialData = new Dictionary<string, object>
+
+                    if (BookingInfo.PB_Approved != null)
+                    {
+                        foreach (Reason RR in BookingInfo.PB_Approved)
+                        {
+                            ApprovedList.Add(RR);
+                        }
+                    }
+
+                    if (PMD.PB_Approved != null)
+                    {
+                        foreach (Reason RR in PMD.PB_Approved)
+                        {
+                            RR.RR_Create_Date = con.ConvertTimeZone(RR.RR_TimeZone, Convert.ToDateTime(RR.RR_Create_Date));
+                            ApprovedList.Add(RR);
+                        }
+                    }
+
+                    if (BookingInfo.PB_Draft != null)
+                    {
+                        foreach (Reason RR in BookingInfo.PB_Draft)
+                        {
+                            DraftList.Add(RR);
+                        }
+                    }
+
+                    if (PMD.PB_Draft != null)
+                    {
+                        foreach (Reason RR in PMD.PB_Draft)
+                        {
+                            RR.RR_Create_Date = con.ConvertTimeZone(RR.RR_TimeZone, Convert.ToDateTime(RR.RR_Create_Date));
+                            DraftList.Add(RR);
+                        }
+                    }
+
+                    if (BookingInfo.PB_Incomplete != null)
+                    {
+                        foreach (Reason RR in BookingInfo.PB_Incomplete)
+                        {
+                            IncompleteList.Add(RR);
+                        }
+                    }
+
+                    if (PMD.PB_Incomplete != null)
+                    {
+                        foreach (Reason RR in PMD.PB_Incomplete)
+                        {
+                            RR.RR_Create_Date = con.ConvertTimeZone(RR.RR_TimeZone, Convert.ToDateTime(RR.RR_Create_Date));
+                            IncompleteList.Add(RR);
+                        }
+                    }
+
+                    if (BookingInfo.PB_Complete != null)
+                    {
+                        foreach (Reason RR in BookingInfo.PB_Complete)
+                        {
+                            CompleteList.Add(RR);
+                        }
+                    }
+
+                    if (PMD.PB_Complete != null)
+                    {
+                        foreach (Reason RR in PMD.PB_Complete)
+                        {
+                            RR.RR_Create_Date = con.ConvertTimeZone(RR.RR_TimeZone, Convert.ToDateTime(RR.RR_Create_Date));
+                            CompleteList.Add(RR);
+                        }
+                    }
+
+                    if (BookingInfo.PB_Noshow != null)
+                    {
+                        foreach (Reason RR in BookingInfo.PB_Noshow)
+                        {
+                            NoshowList.Add(RR);
+                        }
+                    }
+
+                    if (PMD.PB_Noshow != null)
+                    {
+                        foreach (Reason RR in PMD.PB_Noshow)
+                        {
+                            RR.RR_Create_Date = con.ConvertTimeZone(RR.RR_TimeZone, Convert.ToDateTime(RR.RR_Create_Date));
+                            NoshowList.Add(RR);
+                        }
+                    }
+
+                    if (BookingInfo.PB_Suspended != null)
+                    {
+                        foreach (Reason RR in BookingInfo.PB_Suspended)
+                        {
+                            SuspendList.Add(RR);
+                        }
+                    }
+
+                    if (PMD.PB_Suspended != null)
+                    {
+                        foreach (Reason RR in PMD.PB_Suspended)
+                        {
+                            RR.RR_Create_Date = con.ConvertTimeZone(RR.RR_TimeZone, Convert.ToDateTime(RR.RR_Create_Date));
+                            SuspendList.Add(RR);
+                        }
+                    }
+
+                    if (BookingInfo.PB_Unapproved != null)
+                    {
+                        foreach (Reason RR in BookingInfo.PB_Unapproved)
+                        {
+                            UnapprovedList.Add(RR);
+                        }
+                    }
+
+                    if (PMD.PB_Unapproved != null)
+                    {
+                        foreach (Reason RR in PMD.PB_Unapproved)
+                        {
+                            RR.RR_Create_Date = con.ConvertTimeZone(RR.RR_TimeZone, Convert.ToDateTime(RR.RR_Create_Date));
+                            UnapprovedList.Add(RR);
+                        }
+                    }
+
+
+
+                    initialData = new Dictionary<string, object>
                     {
                         {"PB_Modify_Date", con.ConvertTimeZone(PMD.PB_TimeZone, Convert.ToDateTime(PMD.PB_Modify_Date))},
-                        {"PB_Reason", RReasonList},
-                        {"PB_Status",PMD.PB_Status }
+                        {"PB_Reject", RejectList},
+                        {"PB_Approved", ApprovedList},
+                        {"PB_Draft", DraftList},
+                        {"PB_Incomplete", IncompleteList},
+                        {"PB_Complete", CompleteList},
+                        {"PB_Noshow", NoshowList},
+                        {"PB_Suspended", SuspendList},
+                        {"PB_Unapproved", UnapprovedList},
+                        {"PB_Status",PMD.PB_Status },
+                        {"PB_TimeZone",PMD.PB_TimeZone}
                     };
+                    
 
                     DocumentReference docRef = Db.Collection("MT_Patient_Booking").Document(BookingInfo.PB_Unique_ID);
                     WriteResult Result = await docRef.UpdateAsync(initialData);
@@ -810,7 +963,7 @@ namespace TheCloudHealth.Controllers
             {
                 Incident_Details InciDetails = new Incident_Details();
                 MT_Patient_Booking BookingInfo = new MT_Patient_Booking();
-
+                List<MT_Patient_Booking> BookingList = new List<MT_Patient_Booking>();
                 //Approved Count
                 Query ObjQuery;
                 QuerySnapshot ObjQuerySnap;
@@ -898,17 +1051,41 @@ namespace TheCloudHealth.Controllers
                 if (Office_Type == "S")
                 {
                     ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booking_Surgery_Center_ID", Surgery_Center_ID);
+                    ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
+                    if (ObjQuerySnap != null && ObjQuerySnap.Documents.Count > 0)
+                    {
+                        foreach (DocumentSnapshot docsnap in ObjQuerySnap.Documents)
+                        {
+                            if (docsnap.ConvertTo<MT_Patient_Booking>().PB_Status != "WK" && docsnap.ConvertTo<MT_Patient_Booking>().PB_Status != "QB" && docsnap.ConvertTo<MT_Patient_Booking>().PB_Status != "Draft")
+                            {
+                                BookingList.Add(docsnap.ConvertTo<MT_Patient_Booking>());
+                            }
+
+                        }
+                    }
                 }
                 else if (Office_Type == "P")
                 {
                     ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booking_Physician_Office_ID", Surgery_Center_ID);
+                    ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
+                    if (ObjQuerySnap != null && ObjQuerySnap.Documents.Count > 0)
+                    {
+                        foreach (DocumentSnapshot docsnap in ObjQuerySnap.Documents)
+                        {
+                            if (docsnap.ConvertTo<MT_Patient_Booking>().PB_Status != "WK" && docsnap.ConvertTo<MT_Patient_Booking>().PB_Status != "QB")
+                            {
+                                BookingList.Add(docsnap.ConvertTo<MT_Patient_Booking>());
+                            }
+
+                        }
+                    }
                 }
                 else
                 {
                     ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false);
                 }
-                ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
-                Response.Total = ObjQuerySnap.Count;
+                
+                Response.Total = BookingList.Count();
 
                 //InComplete
 
@@ -1040,6 +1217,79 @@ namespace TheCloudHealth.Controllers
 
                 //InsurancePrecertificationAuthorization End
 
+
+                //reject
+                if (PMD.PB_Reject != null)
+                {
+                    foreach (Reason rea in PMD.PB_Reject)
+                    {
+                        rea.RR_Create_Date = con.ConvertTimeZone(rea.RR_TimeZone, Convert.ToDateTime(rea.RR_Create_Date));
+                    }
+                }
+
+                if (PMD.PB_Approved != null)
+                {
+                    foreach (Reason rea in PMD.PB_Approved)
+                    {
+                        rea.RR_Create_Date = con.ConvertTimeZone(rea.RR_TimeZone, Convert.ToDateTime(rea.RR_Create_Date));
+                    }
+                }
+
+                if (PMD.PB_Draft != null)
+                {
+                    foreach (Reason rea in PMD.PB_Draft)
+                    {
+                        rea.RR_Create_Date = con.ConvertTimeZone(rea.RR_TimeZone, Convert.ToDateTime(rea.RR_Create_Date));
+                    }
+                }
+
+                if (PMD.PB_Incomplete != null)
+                {
+                    foreach (Reason rea in PMD.PB_Incomplete)
+                    {
+                        rea.RR_Create_Date = con.ConvertTimeZone(rea.RR_TimeZone, Convert.ToDateTime(rea.RR_Create_Date));
+                    }
+                }
+
+                if (PMD.PB_Complete != null)
+                {
+                    foreach (Reason rea in PMD.PB_Complete)
+                    {
+                        rea.RR_Create_Date = con.ConvertTimeZone(rea.RR_TimeZone, Convert.ToDateTime(rea.RR_Create_Date));
+                    }
+                }
+
+                if (PMD.PB_Noshow != null)
+                {
+                    foreach (Reason rea in PMD.PB_Noshow)
+                    {
+                        rea.RR_Create_Date = con.ConvertTimeZone(rea.RR_TimeZone, Convert.ToDateTime(rea.RR_Create_Date));
+                    }
+                }
+
+                if (PMD.PB_Suspended != null)
+                {
+                    foreach (Reason rea in PMD.PB_Suspended)
+                    {
+                        rea.RR_Create_Date = con.ConvertTimeZone(rea.RR_TimeZone, Convert.ToDateTime(rea.RR_Create_Date));
+                    }
+                }
+
+                if (PMD.PB_Unapproved != null)
+                {
+                    foreach (Reason rea in PMD.PB_Unapproved)
+                    {
+                        rea.RR_Create_Date = con.ConvertTimeZone(rea.RR_TimeZone, Convert.ToDateTime(rea.RR_Create_Date));
+                    }
+                }
+
+                if (PMD.PB_Notes != null)
+                {
+                    foreach (Reason rea in PMD.PB_Notes)
+                    {
+                        rea.RR_Create_Date = con.ConvertTimeZone(rea.RR_TimeZone, Convert.ToDateTime(rea.RR_Create_Date));
+                    }
+                }
 
                 DocumentReference docRef = Db.Collection("MT_Patient_Booking").Document(UniqueID);
                 WriteResult Result = await docRef.SetAsync(PMD);

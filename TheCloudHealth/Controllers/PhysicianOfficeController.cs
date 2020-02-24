@@ -570,7 +570,11 @@ namespace TheCloudHealth.Controllers
                         }
                         else
                         {
-                            logo.Logo_Login_Image = Surcenter.PhyO_Logo.Logo_Login_Image;
+                            if (Surcenter.PhyO_Logo != null)
+                            {
+                                logo.Logo_Login_Image = Surcenter.PhyO_Logo.Logo_Login_Image;
+                            }
+                            
                         }
                     }
                     if (POMD.PhyO_Logo != null)
@@ -581,7 +585,10 @@ namespace TheCloudHealth.Controllers
                         }
                         else
                         {
-                            logo.Logo_Navigation_Image = Surcenter.PhyO_Logo.Logo_Navigation_Image;
+                            if (Surcenter.PhyO_Logo != null)
+                            {
+                                logo.Logo_Navigation_Image = Surcenter.PhyO_Logo.Logo_Navigation_Image;
+                            }
                         }
                     }
                     if (POMD.PhyO_Logo != null)
@@ -592,7 +599,10 @@ namespace TheCloudHealth.Controllers
                         }
                         else
                         {
-                            logo.Logo_Fav_Image = Surcenter.PhyO_Logo.Logo_Fav_Image;
+                            if (Surcenter.PhyO_Logo != null)
+                            {
+                                logo.Logo_Fav_Image = Surcenter.PhyO_Logo.Logo_Fav_Image;
+                            }
                         }
                     }
 
@@ -979,56 +989,9 @@ namespace TheCloudHealth.Controllers
                         { "PhyO_MobileNo", POMD.PhyO_MobileNo },
                         { "PhyO_Helpline", POMD.PhyO_Helpline },
                         { "PhyO_Website_URL", POMD.PhyO_Website_URL },
-                        { "PhyO_Surgery_Center_ID", POMD.PhyO_Surgery_Center_ID },
                         { "PhyO_Modify_Date",con.ConvertTimeZone(POMD.PhyO_TimeZone, Convert.ToDateTime(POMD.PhyO_Modify_Date))},
-                        { "PhyO_Is_Active",POMD.PhyO_Is_Active},
-                        { "PhyO_Is_Deleted",POMD.PhyO_Is_Deleted},
-                        { "PhyO_Specilities",POMD.PhyO_Specilities},
-                        { "PhyO_SpecilitiesList",POMD.PhyO_SpecilitiesList},
-                        { "PhyO_ContactSetting",POMD.PhyO_ContactSetting}
+                        { "PhyO_TimeZone",POMD.PhyO_TimeZone}
                     };
-                //List<MT_Specilities> SpelitiesList = new List<MT_Specilities>();
-                //if (POMD.PhyO_Specilities != null)
-                //{
-
-                //    foreach (MT_Specilities spe in POMD.PhyO_SpecilitiesList)
-                //    {
-                //        Query query = Db.Collection("MT_Specilities").WhereEqualTo("Spec_Unique_ID", spe.Spec_Unique_ID).WhereEqualTo("Spec_Is_Deleted", false);
-                //        QuerySnapshot QSnapshot = await query.GetSnapshotAsync();
-                //        if (QSnapshot != null)
-                //        {
-                //            SpelitiesList.Add(QSnapshot.Documents[0].ConvertTo<MT_Specilities>());
-                //        }
-
-                //    }
-                //    POMD.PhyO_SpecilitiesList = SpelitiesList;
-                    
-                //}
-                //else
-                //{
-                //    initialData = new Dictionary<string, object>
-                //    {
-                //        { "PhyO_Name", POMD.PhyO_Name },
-                //        { "PhyO_DBA_Name", POMD.PhyO_DBA_Name },
-                //        { "PhyO_Address", POMD.PhyO_Address },
-                //        { "PhyO_City", POMD.PhyO_City },
-                //        { "PhyO_State", POMD.PhyO_State },
-                //        { "PhyO_Country", POMD.PhyO_Country },
-                //        { "PhyO_Zip", POMD.PhyO_Zip },
-                //        { "PhyO_Landline", POMD.PhyO_Landline },
-                //        { "PhyO_FaxNo", POMD.PhyO_FaxNo },
-                //        { "PhyO_AlternateNo", POMD.PhyO_AlternateNo },
-                //        { "PhyO_MobileNo", POMD.PhyO_MobileNo },
-                //        { "PhyO_Helpline", POMD.PhyO_Helpline },
-                //        { "PhyO_Website_URL", POMD.PhyO_Website_URL },
-                //        { "PhyO_Surgery_Center_ID", POMD.PhyO_Surgery_Center_ID },
-                //        { "PhyO_Modify_Date",con.ConvertTimeZone(POMD.PhyO_TimeZone, Convert.ToDateTime(POMD.PhyO_Modify_Date))},
-                //        { "PhyO_Is_Active",POMD.PhyO_Is_Active},
-                //        { "PhyO_Is_Deleted",POMD.PhyO_Is_Deleted},
-                //        { "PhyO_ContactSetting",POMD.PhyO_ContactSetting}
-                //    };
-                //}
-
 
                 DocumentReference docRef = Db.Collection("MT_Physician_Office").Document(POMD.PhyO_Unique_ID);
                 WriteResult Result = await docRef.UpdateAsync(initialData);

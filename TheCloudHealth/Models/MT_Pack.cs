@@ -16,6 +16,12 @@ namespace TheCloudHealth.Models
         [FirestoreProperty]
         public string Pack_User_Name { get; set; }
         [FirestoreProperty]
+        public string Pack_Surgery_Physician_Id { get; set; }
+        [FirestoreProperty]
+        public string Pack_Office_Type { get; set; }
+        [FirestoreProperty]
+        public string Pack_SC_Id { get; set; }
+        [FirestoreProperty]
         public DateTime Pack_Create_Date { get; set; }
         [FirestoreProperty]
         public DateTime Pack_Modify_Date { get; set; }

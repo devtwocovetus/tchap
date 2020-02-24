@@ -82,7 +82,7 @@ namespace TheCloudHealth.Controllers
             try
             {
                 List<MT_Insurance_Company> InsuranceList = new List<MT_Insurance_Company>();
-                Query docRef = Db.Collection("MT_Insurance_Company").WhereEqualTo("INC_Is_Deleted", false).OrderBy("INC_Company_Name").StartAt(ICMD.INC_Company_Name + '\uf8ff');
+                Query docRef = Db.Collection("MT_Insurance_Company").WhereEqualTo("INC_Is_Deleted", false).OrderBy("INC_Company_Name").StartAt(ICMD.INC_Company_Name.ToUpper()).EndAt(ICMD.INC_Company_Name.ToUpper() + '\uf8ff');
                 QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
                 if (ObjQuerySnap != null)
                 {
