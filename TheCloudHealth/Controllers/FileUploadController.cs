@@ -18,9 +18,9 @@ namespace TheCloudHealth.Controllers
     public class FileUploadController : ApiController
     {
         ConnectionClass con;
-        FirestoreDb Db;
-        string UniqueID = "";
-        private readonly ImageUploader _imageUploader;
+        //FirestoreDb Db;
+        //string UniqueID = "";
+        //private readonly ImageUploader _imageUploader;
         public FileUploadController()
         {
             con = new ConnectionClass();
@@ -38,7 +38,7 @@ namespace TheCloudHealth.Controllers
 
         [Route("API/FileUpload/Upload")]
         [HttpPost]
-        public async Task<HttpResponseMessage> Upload()
+        public HttpResponseMessage Upload()
         {
             KnowledgeBaseResponse Response = new KnowledgeBaseResponse();
             string imageUrl = "";
@@ -55,7 +55,7 @@ namespace TheCloudHealth.Controllers
 
                         string changed_name = DateTime.Now.ToString("yyyyMMddHHmmss") + postedFile.FileName.Substring(postedFile.FileName.IndexOf('.'), (postedFile.FileName.Length - postedFile.FileName.IndexOf('.')));
 
-                       // imageUrl = await _imageUploader.UploadImage(postedFile, 10);
+                        // imageUrl = await _imageUploader.UploadImage(postedFile, 10);
                     }
                 }
                 Response.Status = con.StatusSuccess;

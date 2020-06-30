@@ -43,5 +43,17 @@ namespace TheCloudHealth.Controllers
             var token = _tokenGenerator.Generate(tok.identity, endpointId);
             return ConvertToJSON(new { tok.identity, token });
         }
+
+        [Route("API/Token/GetToken")]
+        [HttpGet]
+        public HttpResponseMessage GetToken(string Identity)
+        {
+            Token tok = new Token();
+            tok.device = "browser";
+            tok.identity = Identity;
+            if (tok.device == null || tok.identity == null) return null;
+            var token = _tokenGenerator.GenerateForVideo(Identity);
+            return ConvertToJSON(new { tok.identity, token });
+        }
     }
 }

@@ -239,6 +239,7 @@
     <Reference Include="System.Security.Principal.Windows, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>packages\System.Security.Principal.Windows.4.5.0\lib\net461\System.Security.Principal.Windows.dll</HintPath>
     </Reference>
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Text.Encodings.Web, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>packages\System.Text.Encodings.Web.4.5.0\lib\netstandard2.0\System.Text.Encodings.Web.dll</HintPath>
@@ -328,6 +329,7 @@
     <Compile Include="Controllers\BookingController.cs" />
     <Compile Include="Controllers\CloudUploadController.cs" />
     <Compile Include="Controllers\ControllerBase.cs" />
+    <Compile Include="Controllers\CountController.cs" />
     <Compile Include="Controllers\CPTController.cs" />
     <Compile Include="Controllers\DesignationController.cs" />
     <Compile Include="Controllers\DocumentCategoryController.cs" />
@@ -340,10 +342,13 @@
     <Compile Include="Controllers\IncidentController.cs" />
     <Compile Include="Controllers\InstrumentsController.cs" />
     <Compile Include="Controllers\InsuranceCompanyController.cs" />
+    <Compile Include="Controllers\IpController.cs" />
     <Compile Include="Controllers\IVRController.cs" />
     <Compile Include="Controllers\KBCategoryController.cs" />
     <Compile Include="Controllers\KnowledgeBaseController.cs" />
     <Compile Include="Controllers\LanguageController.cs" />
+    <Compile Include="Controllers\LocalizationController.cs" />
+    <Compile Include="Controllers\LogController.cs" />
     <Compile Include="Controllers\MenuController.cs" />
     <Compile Include="Controllers\NationalityController.cs" />
     <Compile Include="Controllers\NotiCategoryController.cs" />
@@ -351,11 +356,15 @@
     <Compile Include="Controllers\NotificationTimingController.cs" />
     <Compile Include="Controllers\NotiTypeController.cs" />
     <Compile Include="Controllers\PackController.cs" />
+    <Compile Include="Controllers\PageMasterController.cs" />
     <Compile Include="Controllers\PatientController.cs" />
+    <Compile Include="Controllers\PatientFormDataController.cs" />
     <Compile Include="Controllers\PatientIntakeController.cs" />
+    <Compile Include="Controllers\PatientIntakeTimingController.cs" />
     <Compile Include="Controllers\PatiFormURLController.cs" />
     <Compile Include="Controllers\PatiIntakeCategoryController.cs" />
     <Compile Include="Controllers\PatiIntakeTypeController.cs" />
+    <Compile Include="Controllers\PCategoryController.cs" />
     <Compile Include="Controllers\PhysicianOfficeController.cs" />
     <Compile Include="Controllers\ProcedureController.cs" />
     <Compile Include="Controllers\QBBookingController.cs" />
@@ -377,6 +386,8 @@
     <Compile Include="Controllers\SyslanguageController.cs" />
     <Compile Include="Controllers\TokenController.cs" />
     <Compile Include="Controllers\UserController.cs" />
+    <Compile Include="Controllers\UserPermissionController.cs" />
+    <Compile Include="Controllers\VideoController.cs" />
     <Compile Include="Controllers\VirtualConsultantController.cs" />
     <Compile Include="Controllers\VoiceController.cs" />
     <Compile Include="Controllers\WhatsAppController.cs" />
@@ -397,10 +408,12 @@
     <Compile Include="Lib\ImageUploader.cs" />
     <Compile Include="Lib\IOtherFunction.cs" />
     <Compile Include="Lib\ITwilioSMS.cs" />
+    <Compile Include="Lib\ITwilioVideo.cs" />
     <Compile Include="Lib\ITwilioVoice.cs" />
     <Compile Include="Lib\ITwilioWhatsApp.cs" />
     <Compile Include="Lib\OtherFunctionData.cs" />
     <Compile Include="Lib\TwilioSMS.cs" />
+    <Compile Include="Lib\TwilioVideo.cs" />
     <Compile Include="Lib\TwilioVoice.cs" />
     <Compile Include="Lib\TwilioWhatsApp.cs" />
     <Compile Include="Models\Alerts.cs" />
@@ -410,7 +423,7 @@
     <Compile Include="Models\Email.cs" />
     <Compile Include="Models\EnDe.cs" />
     <Compile Include="Models\Footer.cs" />
-    <Compile Include="Models\Forms.cs" />
+    <Compile Include="Models\Form_Element.cs" />
     <Compile Include="Models\ICDSelected.cs" />
     <Compile Include="Models\Incident_Details.cs" />
     <Compile Include="Models\Insurance_Precertification_Authorization.cs" />
@@ -422,6 +435,8 @@
     <Compile Include="Models\MT_Alert.cs" />
     <Compile Include="Models\MT_Anesthesia.cs" />
     <Compile Include="Models\MT_Block.cs" />
+    <Compile Include="Models\MT_Category_Detail.cs" />
+    <Compile Include="Models\MT_Category_Master.cs" />
     <Compile Include="Models\MT_CPT.cs" />
     <Compile Include="Models\MT_DBCollection.cs" />
     <Compile Include="Models\MT_Designation.cs" />
@@ -437,6 +452,8 @@
     <Compile Include="Models\MT_KBCategory.cs" />
     <Compile Include="Models\MT_Knowledger_Base.cs" />
     <Compile Include="Models\MT_Language.cs" />
+    <Compile Include="Models\MT_Localization.cs" />
+    <Compile Include="Models\MT_Log_Book.cs" />
     <Compile Include="Models\MT_Marital_Status.cs" />
     <Compile Include="Models\MT_Nationality.cs" />
     <Compile Include="Models\MT_Notifications.cs" />
@@ -444,9 +461,12 @@
     <Compile Include="Models\MT_Notification_Category.cs" />
     <Compile Include="Models\MT_Notification_Type.cs" />
     <Compile Include="Models\MT_Pack.cs" />
+    <Compile Include="Models\MT_Page_Master.cs" />
     <Compile Include="Models\MT_PatientInfomation.cs" />
+    <Compile Include="Models\MT_PatientIntakeTiming.cs" />
     <Compile Include="Models\MT_Patient_Booking.cs" />
     <Compile Include="Models\MT_Patient_Forms_URLs.cs" />
+    <Compile Include="Models\MT_Patient_Form_Data.cs" />
     <Compile Include="Models\MT_Patient_Intake.cs" />
     <Compile Include="Models\MT_Patient_Intake_Category.cs" />
     <Compile Include="Models\MT_Patient_Intake_Type.cs" />
@@ -470,6 +490,7 @@
     <Compile Include="Models\MT_Surgery_Center.cs" />
     <Compile Include="Models\MT_Surgical_Procedure_Templates.cs" />
     <Compile Include="Models\MT_System_EmailTemplates.cs" />
+    <Compile Include="Models\MT_User_Permission.cs" />
     <Compile Include="Models\MT_Virtual_Consultant_Booking.cs" />
     <Compile Include="Models\Notification_Action.cs" />
     <Compile Include="Models\Patient_Forms.cs" />

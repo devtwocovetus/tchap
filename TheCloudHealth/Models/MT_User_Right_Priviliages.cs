@@ -10,11 +10,11 @@ namespace TheCloudHealth.Models
     public class MT_User_Right_Priviliages
     {
         [FirestoreProperty]
-        public string URP_Unique_ID { get; set; }
-        [FirestoreProperty]
         public string URP_Role_ID { get; set; }
         [FirestoreProperty]
         public string URP_Right_Mater_ID { get; set; }
+        [FirestoreProperty]
+        public string URP_Category_Name { get; set; }
         [FirestoreProperty]
         public string URP_Page_Name { get; set; }
         [FirestoreProperty]
@@ -26,11 +26,7 @@ namespace TheCloudHealth.Models
         [FirestoreProperty]
         public Boolean URP_Delete { get; set; }
         [FirestoreProperty]
-        public string URP_Create_By { get; set; }
-        [FirestoreProperty]
-        public string URP_CB_Name { get; set; }
-        [FirestoreProperty]
-        public string URP_Create_By_Type { get; set; }
+        public string URP_Created_By { get; set; }
         [FirestoreProperty]
         public string URP_User_Name { get; set; }
         [FirestoreProperty]

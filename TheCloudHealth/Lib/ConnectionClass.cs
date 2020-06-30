@@ -1,8 +1,5 @@
-﻿using Google.Apis.Auth.OAuth2;
-using Google.Cloud.Firestore;
-//using Google.Cloud.Storage.V1;
+﻿using Google.Cloud.Firestore;
 using iTextSharp.text;
-using iTextSharp.text.html.simpleparser;
 using iTextSharp.text.pdf;
 using iTextSharp.tool.xml;
 using System;
@@ -12,10 +9,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
-using TheCloudHealth.Models;
 
 namespace TheCloudHealth.Lib
 {
@@ -181,7 +176,6 @@ namespace TheCloudHealth.Lib
                 }
                 
             }
-
             Double hours = 0;
             Double minutes = 0;
             DateTime SelectedTime;
@@ -205,6 +199,8 @@ namespace TheCloudHealth.Lib
 
                 }
             }
+
+
             return SelectedTime = DateTime.SpecifyKind(CurrentDate.AddHours(hours).AddMinutes(minutes), DateTimeKind.Utc);
         }
         public string DecryptData(string EncrypString)

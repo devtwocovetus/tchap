@@ -44,7 +44,7 @@ namespace TheCloudHealth.Controllers
             try
             {
                 List<string> List = new List<string>();
-                UniqueID = con.GetUniqueKey();
+                UniqueID = con.GetUniqueKey();  
                 KCMD.KNB_Unique_ID = UniqueID;
                 KCMD.KNB_Create_Date = con.ConvertTimeZone(KCMD.KNB_TimeZone, Convert.ToDateTime(KCMD.KNB_Create_Date));
                 KCMD.KNB_Modify_Date = con.ConvertTimeZone(KCMD.KNB_TimeZone, Convert.ToDateTime(KCMD.KNB_Modify_Date));
@@ -454,7 +454,6 @@ namespace TheCloudHealth.Controllers
             }
             return ConvertToJSON(Response);
         }
-
         public MT_Knowledger_Base GetImages()
         {
             MT_Knowledger_Base Surcenter = new MT_Knowledger_Base();
@@ -704,35 +703,5 @@ namespace TheCloudHealth.Controllers
             }
             return ConvertToJSON(Response);
         }
-
-        //[Route("API/KnowledgeBase/GetKBFilterWithCategory")]
-        //[HttpPost]
-        //public async Task<HttpResponseMessage> GetKBFilterWithCategory(MT_Knowledger_Base KCMD)
-        //{
-        //    Db = con.SurgeryCenterDb(KCMD.Slug);
-        //    KnowledgeBaseResponse Response = new KnowledgeBaseResponse();
-        //    try
-        //    {
-        //        List<MT_Knowledger_Base> List = new List<MT_Knowledger_Base>();
-        //        Query docRef = Db.Collection("MT_Knowledger_Base").WhereEqualTo("KNB_Is_Deleted", false).WhereEqualTo("KNB_Is_Active", true).OrderBy("KNB_Category").StartAt(KCMD.KNB_Category.ToUpper()).EndAt(KCMD.KNB_Category.ToUpper() +'\uf8ff');
-        //        QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
-        //        if (ObjQuerySnap != null)
-        //        {
-        //            foreach (DocumentSnapshot Docsnapshot in ObjQuerySnap.Documents)
-        //            {
-        //                List.Add(Docsnapshot.ConvertTo<MT_Knowledger_Base>());
-        //            }
-        //            Response.DataList = List;
-        //        }
-        //        Response.Status = con.StatusSuccess;
-        //        Response.Message = con.MessageSuccess;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Response.Status = con.StatusFailed;
-        //        Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
-        //    }
-        //    return ConvertToJSON(Response);
-        //}
     }
 }

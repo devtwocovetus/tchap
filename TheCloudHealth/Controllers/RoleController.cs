@@ -34,7 +34,7 @@ namespace TheCloudHealth.Controllers
 
         [Route("API/Role/Create")]
         [HttpPost]
-        public async Task<HttpResponseMessage> CreateAsync(MT_Role RMD)
+        public async Task<HttpResponseMessage> Create(MT_Role RMD)
         {
             Db = con.SurgeryCenterDb(RMD.Slug);
             RoleResponse Response = new RoleResponse();
@@ -49,13 +49,13 @@ namespace TheCloudHealth.Controllers
                 if (RMD.ROM_Priviliages != null)
                 {
                     foreach (MT_User_Right_Priviliages URP in RMD.ROM_Priviliages)
-                    {
-                        URP.URP_Unique_ID = con.GetUniqueKey();
+                    {                        
                         URP.URP_Role_ID = UniqueID;
                         priviliages.Add(URP);
                     }
+                    RMD.ROM_Priviliages = priviliages;
                 }
-                RMD.ROM_Priviliages = priviliages;
+                
                 DocumentReference docRef = Db.Collection("MT_Role").Document(UniqueID);
                 WriteResult Result = await docRef.SetAsync(RMD);
                 if (Result != null)
@@ -282,6 +282,7 @@ namespace TheCloudHealth.Controllers
             }
             return ConvertToJSON(Response);
         }
+
         [Route("API/Role/Select")]
         [HttpPost]
         //[Authorize(Roles = "Admin")]
@@ -320,7 +321,7 @@ namespace TheCloudHealth.Controllers
             try
             {
                 List<MT_Role> AnesList = new List<MT_Role>();
-                Query docRef = Db.Collection("MT_Role").WhereEqualTo("ROM_Is_Deleted", false);
+                Query docRef = Db.Collection("MT_Role").WhereEqualTo("ROM_Is_Deleted", false).WhereEqualTo("ROM_Surgery_Physician_Center_ID", RMD.ROM_Surgery_Physician_Center_ID);
                 QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
                 if (ObjQuerySnap != null)
                 {
@@ -351,7 +352,7 @@ namespace TheCloudHealth.Controllers
             try
             {
                 List<MT_Role> AnesList = new List<MT_Role>();
-                Query docRef = Db.Collection("MT_Role").WhereEqualTo("ROM_Is_Deleted", false).WhereEqualTo("ROM_Is_Active", true);
+                Query docRef = Db.Collection("MT_Role").WhereEqualTo("ROM_Is_Deleted", false).WhereEqualTo("ROM_Is_Active", true).WhereEqualTo("ROM_Surgery_Physician_Center_ID", RMD.ROM_Surgery_Physician_Center_ID);
                 QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
                 if (ObjQuerySnap != null)
                 {
@@ -438,6 +439,37 @@ namespace TheCloudHealth.Controllers
         [HttpPost]
         //[Authorize(Roles ="SAdmin")]
         public async Task<HttpResponseMessage> GetRolesFilterwithPO(MT_Role RMD)
+        {
+            Db = con.SurgeryCenterDb(RMD.Slug);
+            RoleResponse Response = new RoleResponse();
+            try
+            {
+                List<MT_Role> AnesList = new List<MT_Role>();
+                Query docRef = Db.Collection("MT_Role").WhereEqualTo("ROM_Is_Deleted", false).WhereEqualTo("ROM_Is_Active", true).WhereEqualTo("ROM_Surgery_Physician_Center_ID", RMD.ROM_Surgery_Physician_Center_ID).WhereEqualTo("ROM_Office_Type", RMD.ROM_Office_Type);
+                QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
+                if (ObjQuerySnap != null)
+                {
+                    foreach (DocumentSnapshot Docsnapshot in ObjQuerySnap.Documents)
+                    {
+                        AnesList.Add(Docsnapshot.ConvertTo<MT_Role>());
+                    }
+                    Response.DataList = AnesList.OrderBy(o => o.ROM_Name).ToList();
+                }
+                Response.Status = con.StatusSuccess;
+                Response.Message = con.MessageSuccess;
+            }
+            catch (Exception ex)
+            {
+                Response.Status = con.StatusFailed;
+                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
+            }
+            return ConvertToJSON(Response);
+        }
+
+        [Route("API/Role/GetPermission")]
+        [HttpPost]
+        //[Authorize(Roles ="SAdmin")]
+        public async Task<HttpResponseMessage> GetPermission(MT_Role RMD)
         {
             Db = con.SurgeryCenterDb(RMD.Slug);
             RoleResponse Response = new RoleResponse();

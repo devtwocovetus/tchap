@@ -48,9 +48,10 @@ namespace TheCloudHealth.Controllers
             {
                 UniqueID = con.GetUniqueKey();
                 PMD.PFU_Unique_ID = UniqueID;
-                PMD.PFU_Actual_URL = "http://tchdev.thecloudhealth.com/#/in/" + PMD.PFU_Booking_ID + "/" + PMD.PFU_Form_ID;
-                PMD.PFU_Dummy_URL = "http://tchdev.thecloudhealth.com/#/r/" + con.GetUrlToken();
+                PMD.PFU_Actual_URL = "https://dev.tchdemo.com/in/" + PMD.PFU_Booking_ID + "/" + PMD.PFU_Form_ID;
+                PMD.PFU_Dummy_URL = "https://dev.tchdemo.com/r/" + con.GetUrlToken() + "/" + UniqueID;
                 PMD.PFU_Is_Active = true;
+                //PMD.PFU_Passcode=
 
                 DocumentReference docRef = Db.Collection("MT_Patient_Forms_URLs").Document(UniqueID);
                 WriteResult Result = await docRef.SetAsync(PMD);
@@ -145,5 +146,48 @@ namespace TheCloudHealth.Controllers
             }
             return ConvertToJSON(Response);
         }
+
+        [Route("API/PatiFormURL/VerifyPasscode")]
+        [HttpPost]
+        //[Authorize(Roles ="SAdmin")]
+        public async Task<HttpResponseMessage> VerifyPasscode(MT_Patient_Forms_URLs PMD)
+        {
+            Db = con.SurgeryCenterDb(PMD.Slug);
+            PFURLResponse Response = new PFURLResponse();
+            try
+            {
+
+                MT_Patient_Forms_URLs user = new MT_Patient_Forms_URLs();
+                Query colref = Db.Collection("MT_Patient_Forms_URLs").WhereEqualTo("PFU_Is_Active", true).WhereEqualTo("PFU_Passcode", PMD.PFU_Passcode).WhereEqualTo("PFU_Unique_ID", PMD.PFU_Unique_ID);
+                QuerySnapshot ObjDocSnap = await colref.GetSnapshotAsync();
+                if (ObjDocSnap != null)
+                {
+                    user = ObjDocSnap.Documents[0].ConvertTo<MT_Patient_Forms_URLs>();
+                    if (user.PFU_Unique_ID != null)
+                    {
+                        Response.Status = con.StatusSuccess;
+                        Response.Message = con.MessageSuccess;
+                    }
+                    else
+                    {
+                        Response.Status = con.StatusDNE;
+                        Response.Message = con.MessageDNE;
+                    }
+                }
+                else
+                {
+                    Response.Data = null;
+                    Response.Status = con.StatusDNE;
+                    Response.Message = con.MessageDNE;
+                }
+            }
+            catch (Exception ex)
+            {
+                Response.Status = con.StatusFailed;
+                Response.Message = "Passcode Expired";
+            }
+            return ConvertToJSON(Response);
+        }
+
     }
 }

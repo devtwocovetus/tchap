@@ -18,6 +18,8 @@ namespace TheCloudHealth.Models
         [FirestoreProperty]
         public string PB_Patient_Last_Name { get; set; }
         [FirestoreProperty]
+        public string PB_Patient_Email { get; set; }
+        [FirestoreProperty]
         public DateTime PB_Booking_Date { get; set; }
         [FirestoreProperty]
         public string PB_Booking_Time { get; set; }
@@ -25,6 +27,8 @@ namespace TheCloudHealth.Models
         public string PB_Booking_No { get; set; }
         [FirestoreProperty]
         public string PB_Booking_Duration { get; set; }
+        [FirestoreProperty]
+        public MT_PatientInfomation PB_Patient_Details{ get; set; }
         [FirestoreProperty]
         public Incident_Details PB_Incient_Detail { get; set; }
         [FirestoreProperty]
@@ -102,6 +106,7 @@ namespace TheCloudHealth.Models
         public MT_Patient_Booking Data { get; set; }
         public List<MT_Patient_Booking> DataList { get; set; }
         public List<string> StringList { get; set; }
+        public Boolean IsAvailable { get; set; }
     }
 
     public class CountResponse

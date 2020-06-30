@@ -82,6 +82,7 @@ namespace TheCloudHealth.Controllers
                     {"Form_Pack_Name",FMD.Form_Pack_Name},
                     {"Form_Name",FMD.Form_Name},
                     {"Form_Description",FMD.Form_Description},
+                    {"Form_Logo",FMD.Form_Logo},
                     {"Form_Data",FMD.Form_Data},
                     {"Form_Modify_Date",con.ConvertTimeZone(FMD.Form_TimeZone, Convert.ToDateTime(FMD.Form_Modify_Date))}
                 };
@@ -228,6 +229,9 @@ namespace TheCloudHealth.Controllers
                 {
                     {"Form_Data",FMD.Form_Data},
                     {"Form_Logo",FMD.Form_Logo},
+                    {"Form_SC_PO_Name",FMD.Form_SC_PO_Name},
+                    {"Form_Address",FMD.Form_Address},
+                    {"Form_Footer",FMD.Form_Footer},
                     {"Form_Signature",FMD.Form_Signature},
                     {"Form_Modify_Date",con.ConvertTimeZone(FMD.Form_TimeZone, Convert.ToDateTime(FMD.Form_Modify_Date))}
                 };
@@ -355,7 +359,7 @@ namespace TheCloudHealth.Controllers
             try
             {
                 List<MT_Forms> AnesList = new List<MT_Forms>();
-                Query docRef = Db.Collection("MT_Forms").WhereEqualTo("Form_Is_Deleted", false).WhereEqualTo("Form_Pack_ID", FMD.Form_Pack_ID);
+                Query docRef = Db.Collection("MT_Forms").WhereEqualTo("Form_Is_Deleted", false).WhereEqualTo("Form_Is_Active", true).WhereEqualTo("Form_Pack_ID", FMD.Form_Pack_ID);
                 QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
                 if (ObjQuerySnap != null)
                 {

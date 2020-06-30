@@ -1,22 +1,17 @@
 ﻿using Google.Cloud.Firestore;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using TheCloudHealth.Models;
-using System.Threading.Tasks;
-using TheCloudHealth.Lib;
-using System.Web.Http;
-using System.Net.Http;
-using Newtonsoft.Json;
-using System.Net;
-using System.Text;
-using System.Web;
-using Newtonsoft.Json.Linq;
 using System.Linq;
-using System.IO;
-using iTextSharp.text;
-using iTextSharp.text.html.simpleparser;
-using iTextSharp.text.pdf;
-using System.Net.Http.Headers;
+using System.Net;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
+using System.Web;
+using System.Web.Http;
+using TheCloudHealth.Lib;
+using TheCloudHealth.Models;
 
 namespace TheCloudHealth.Controllers
 {
@@ -25,11 +20,12 @@ namespace TheCloudHealth.Controllers
         ConnectionClass con;
         FirestoreDb Db;
         ICreatePDF ObjPDF;
+        IEmailer ObjEmailer;
         string UniqueID = "";        
         public BookingController() {
             con = new ConnectionClass();
             ObjPDF = new CreatePDF();
-            //Db = con.Db();
+            ObjEmailer = new Emailer();
         }
 
         public HttpResponseMessage ConvertToJSON(object objectToConvert)
@@ -67,8 +63,52 @@ namespace TheCloudHealth.Controllers
                 WriteResult Result = await docRef.SetAsync(PMD);
                 if (Result != null)
                 {
-                    Response.Status = con.StatusSuccess;
-                    Response.Message = con.MessageSuccess;
+                    MT_System_EmailTemplates sysemail = new MT_System_EmailTemplates();
+                    Email email = new Email();
+                    ObjQuery = Db.Collection("MT_System_EmailTemplates").WhereEqualTo("SET_Is_Active", true).WhereEqualTo("SET_Is_Deleted", false).WhereEqualTo("SET_Name", "Appointment confirmation");
+                    ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
+                    if (ObjQuerySnap != null)
+                    {
+                        sysemail = ObjQuerySnap.Documents[0].ConvertTo<MT_System_EmailTemplates>();
+
+                        if (sysemail.SET_Bcc != null && sysemail.SET_Bcc.Length > 0)
+                        {
+                            email.Bcc_Email = sysemail.SET_Bcc.ToList();
+                        }
+
+                        if (sysemail.SET_CC != null && sysemail.SET_CC.Length > 0)
+                        {
+                            email.Cc_Email = sysemail.SET_CC.ToList();
+                        }
+                        List<string> PatiEmail = new List<string>();
+                        List<string> PatiName = new List<string>();
+                        PatiEmail.Add(PMD.PB_Patient_Email);
+                        PatiName.Add(PMD.PB_Patient_Name);
+                        email.To_Email = PatiEmail;
+                        email.To_Name = PatiName;
+                        email.From_Name = sysemail.SET_From_Name;
+                        email.From_Email = sysemail.SET_From_Email;
+                        email.HtmlContent = (sysemail.SET_Header == null ? "" : sysemail.SET_Header)
+                            + "<br/>"
+                            + "<br/>"
+                            + sysemail.SET_Message.ToString().Replace("[FirstName]", PMD.PB_Patient_Name)
+                            .Replace("[Dr Name]", PMD.PB_Surgical_Procedure_Information == null ? "" : PMD.PB_Surgical_Procedure_Information.SPI_Surgeon_Name)
+                            .Replace("[mm/dd/yy]", PMD.PB_Booking_Date.ToString("mm/dd/yy"))
+                            .Replace("[hr:mn]", PMD.PB_Booking_Time.ToString())
+                            .Replace("[FacilityName]", PMD.PB_Booking_Surgery_Center_Name)
+                            + "<br/>"
+                            + "<br/>"
+                            + sysemail.SET_Footer.ToString().Replace("[FacilityName]", PMD.PB_Booking_Surgery_Center_Name);
+                        email.Subject = "Appointment has been scheduled";
+                        var message = await ObjEmailer.Send(email);
+                        Response.Status = con.StatusSuccess;
+                        Response.Message = con.MessageSuccess + " Email Status : " + message;
+                    }
+                    else
+                    {
+                        Response.Status = con.StatusSuccess;
+                        Response.Message = con.MessageSuccess;
+                    }
                     Response.Data = PMD;
                 }
                 else
@@ -94,7 +134,7 @@ namespace TheCloudHealth.Controllers
             {
                 List<Doc_Uploaded> DocUplodList = new List<Doc_Uploaded>();
 
-                string[] DBPath;
+                //string[] DBPath;
                 int i = 0;
                 var httpRequest = HttpContext.Current.Request;
                 var postedData = httpRequest.Form[1];
@@ -308,9 +348,6 @@ namespace TheCloudHealth.Controllers
                         { "PB_TimeZone",PMD.PB_TimeZone},
                         {"PB_Forms", FormsList}
                     };
-                    //BookingInfo.PB_Modify_Date = con.ConvertTimeZone(PMD.PB_TimeZone,Convert.ToDateTime(PMD.PB_Modify_Date));                    
-                    //BookingInfo.PB_Forms = FormsList;
-                    //BookingInfo.PB_Is_Deleted = false;
 
                     DocumentReference docRef = Db.Collection("MT_Patient_Booking").Document(BookingInfo.PB_Unique_ID);
                     WriteResult Result = await docRef.UpdateAsync(initialData);
@@ -498,7 +535,7 @@ namespace TheCloudHealth.Controllers
                 }
                 else
                 {
-                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Status", "QB").WhereEqualTo("PB_Booked_From", "QB").WhereEqualTo("PB_Booking_Physician_Office_ID", PMD.PB_Booking_Physician_Office_ID);
+                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booked_From", "QB").WhereEqualTo("PB_Booking_Physician_Office_ID", PMD.PB_Booking_Physician_Office_ID);
                 }
 
                 QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
@@ -560,7 +597,7 @@ namespace TheCloudHealth.Controllers
                 }
                 else
                 {
-                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Status", "WK").WhereEqualTo("PB_Booked_From", "WK").WhereEqualTo("PB_Booking_Physician_Office_ID", PMD.PB_Booking_Physician_Office_ID);
+                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booked_From", "WK").WhereEqualTo("PB_Booking_Physician_Office_ID", PMD.PB_Booking_Physician_Office_ID);
                 }
 
                 QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
@@ -603,41 +640,81 @@ namespace TheCloudHealth.Controllers
         }
 
         [Route("API/Booking/GetBookingListFilterWithPO")]
-        [HttpPost]
-        public async Task<HttpResponseMessage> GetBookingListFilterWithPO(MT_Patient_Booking PMD)
+        [HttpGet]
+        public async Task<HttpResponseMessage> GetBookingListFilterWithPO(string SurgeryPhysicianID, string OfficeType, string Status, string Slug)
         {
-            Db = con.SurgeryCenterDb(PMD.Slug);
+            Db = con.SurgeryCenterDb(Slug);
             BookingResponse Response = new BookingResponse();
+            Query ObjQuery;
+            QuerySnapshot ObjQuerySnap;
             try
             {
+                MT_Patient_Booking Booking = new MT_Patient_Booking();
                 List<MT_Patient_Booking> patilist = new List<MT_Patient_Booking>();
-
-                Query ObjQuery;
-                switch (PMD.PB_Status)
+                if (OfficeType == "P")
                 {
-                    case "Total":
-                        ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booked_From", "NB").WhereEqualTo("PB_Booking_Physician_Office_ID", PMD.PB_Booking_Physician_Office_ID);//.OrderByDescending("PB_Booking_Date");
-                        break;
-                    default:
-                        ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booked_From", "NB").WhereEqualTo("PB_Booking_Physician_Office_ID", PMD.PB_Booking_Physician_Office_ID).WhereEqualTo("PB_Status",PMD.PB_Status);
-                        break;
-                }
-
-                QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
-                if (ObjQuerySnap != null)
-                {
-                    foreach (DocumentSnapshot Docsnapshot in ObjQuerySnap.Documents)
+                    switch (Status)
                     {
-                        patilist.Add(Docsnapshot.ConvertTo<MT_Patient_Booking>());
+                        case "Total":
+                            ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booked_From", "NB").WhereEqualTo("PB_Booking_Physician_Office_ID", SurgeryPhysicianID);//.OrderByDescending("PB_Booking_Date");
+                            break;
+                        default:
+                            ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booked_From", "NB").WhereEqualTo("PB_Booking_Physician_Office_ID", SurgeryPhysicianID).WhereEqualTo("PB_Status", Status);
+                            break;
                     }
-                    Response.DataList = patilist.OrderBy(o => o.PB_Surgical_Procedure_Information.SPI_Date).ToList();
-                    Response.Status = con.StatusSuccess;
-                    Response.Message = con.MessageSuccess;
+                    ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
+                    if (ObjQuerySnap != null)
+                    {
+                        foreach (DocumentSnapshot Docsnapshot in ObjQuerySnap.Documents)
+                        {
+                            Booking = Docsnapshot.ConvertTo<MT_Patient_Booking>();
+                            if (Booking.PB_Status != "Mark As Completed")
+                            {
+                                patilist.Add(Booking);
+                            }
+                            
+                        }
+                        Response.DataList = patilist.OrderBy(o => o.PB_Surgical_Procedure_Information.SPI_Date).ToList();
+                        Response.Status = con.StatusSuccess;
+                        Response.Message = con.MessageSuccess;
+                    }
+                    else
+                    {
+                        Response.Status = con.StatusDNE;
+                        Response.Message = con.MessageDNE;
+                    }
                 }
-                else
+                else if (OfficeType == "S")
                 {
-                    Response.Status = con.StatusDNE;
-                    Response.Message = con.MessageDNE;
+                    switch (Status)
+                    {
+                        case "Total":
+                            ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booked_From", "NB").WhereEqualTo("PB_Booking_Surgery_Center_ID", SurgeryPhysicianID);//.OrderByDescending("PB_Booking_Date");
+                            break;
+                        default:
+                            ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booked_From", "NB").WhereEqualTo("PB_Booking_Surgery_Center_ID", SurgeryPhysicianID).WhereEqualTo("PB_Status", Status);
+                            break;
+                    }
+                    ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
+                    if (ObjQuerySnap != null)
+                    {
+                        foreach (DocumentSnapshot Docsnapshot in ObjQuerySnap.Documents)
+                        {
+                            Booking = Docsnapshot.ConvertTo<MT_Patient_Booking>();
+                            if (Booking.PB_Status != "Draft" && Booking.PB_Status!= "Mark As Completed")
+                            {
+                                patilist.Add(Docsnapshot.ConvertTo<MT_Patient_Booking>());
+                            }
+                        }
+                        Response.DataList = patilist.OrderBy(o => o.PB_Surgical_Procedure_Information.SPI_Date).ToList();
+                        Response.Status = con.StatusSuccess;
+                        Response.Message = con.MessageSuccess;
+                    }
+                    else
+                    {
+                        Response.Status = con.StatusDNE;
+                        Response.Message = con.MessageDNE;
+                    }
                 }
             }
             catch (Exception ex)
@@ -664,11 +741,11 @@ namespace TheCloudHealth.Controllers
                 }
                 else if (PMD.PB_Booking_Surgery_Center_ID != "0" && PMD.PB_Booking_Surgery_Center_ID != null)
                 {
-                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booking_Surgery_Center_ID", PMD.PB_Booking_Surgery_Center_ID).WhereEqualTo("PB_Status", "Complete");
+                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booking_Surgery_Center_ID", PMD.PB_Booking_Surgery_Center_ID).WhereEqualTo("PB_Status", "Mark As Completed");
                 }
                 else
                 {
-                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booking_Physician_Office_ID", PMD.PB_Booking_Physician_Office_ID).WhereEqualTo("PB_Status", "Complete");
+                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booking_Physician_Office_ID", PMD.PB_Booking_Physician_Office_ID).WhereEqualTo("PB_Status", "Mark As Completed");
                 }
 
                 QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
@@ -927,8 +1004,56 @@ namespace TheCloudHealth.Controllers
                     WriteResult Result = await docRef.UpdateAsync(initialData);
                     if (Result != null)
                     {
-                        Response.Status = con.StatusSuccess;
-                        Response.Message = con.MessageSuccess;
+                        if (PMD.PB_Status == "Cancelled")
+                        {
+                            MT_System_EmailTemplates sysemail = new MT_System_EmailTemplates();
+                            Email email = new Email();
+                            ObjQuery = Db.Collection("MT_System_EmailTemplates").WhereEqualTo("SET_Is_Active", true).WhereEqualTo("SET_Is_Deleted", false).WhereEqualTo("SET_Name", "Appointment Cancellation");
+                            ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
+                            if (ObjQuerySnap != null)
+                            {
+                                sysemail = ObjQuerySnap.Documents[0].ConvertTo<MT_System_EmailTemplates>();
+
+                                if (sysemail.SET_Bcc != null && sysemail.SET_Bcc.Length > 0)
+                                {
+                                    email.Bcc_Email = sysemail.SET_Bcc.ToList();
+                                }
+
+                                if (sysemail.SET_CC != null && sysemail.SET_CC.Length > 0)
+                                {
+                                    email.Cc_Email = sysemail.SET_CC.ToList();
+                                }
+                                List<string> PatiEmail = new List<string>();
+                                List<string> PatiName = new List<string>();
+                                PatiEmail.Add(PMD.PB_Patient_Email);
+                                PatiName.Add(PMD.PB_Patient_Name);
+                                email.To_Email = PatiEmail;
+                                email.To_Name = PatiName;
+                                email.From_Name = sysemail.SET_From_Name;
+                                email.From_Email = sysemail.SET_From_Email;
+                                email.HtmlContent = (sysemail.SET_Header == null ? "" : sysemail.SET_Header)
+                                    + "<br/>"
+                                    + "<br/>"
+                                    + sysemail.SET_Message.ToString().Replace("[FirstName]", PMD.PB_Patient_Name)
+                                    .Replace("[Dr Name]", PMD.PB_Surgical_Procedure_Information == null ? "" : PMD.PB_Surgical_Procedure_Information.SPI_Surgeon_Name)
+                                    .Replace("[mm/dd/yy]", PMD.PB_Booking_Date.ToString("mm/dd/yy"))
+                                    .Replace("[hr:mn]", PMD.PB_Booking_Time.ToString())
+                                    .Replace("[FacilityName]", PMD.PB_Booking_Surgery_Center_Name)
+                                    + "<br/>"
+                                    + "<br/>"
+                                    + sysemail.SET_Footer.ToString().Replace("[FacilityName]", PMD.PB_Booking_Surgery_Center_Name)
+                                    .Replace("[Email]",(PMD.PB_Patient_Email==null?"":PMD.PB_Patient_Email));
+                                email.Subject = "[FirstName], your appointment has been cancelled".Replace("[FirstName]",PMD.PB_Patient_Name);
+                                var message = await ObjEmailer.Send(email);
+                                Response.Status = con.StatusSuccess;
+                                Response.Message = con.MessageSuccess + " Email Status : " + message;
+                            }
+                            else
+                            {
+                                Response.Status = con.StatusSuccess;
+                                Response.Message = con.MessageSuccess;
+                            }
+                        }
                         Response.Data = PMD;
                     }
                     else
@@ -969,15 +1094,15 @@ namespace TheCloudHealth.Controllers
                 QuerySnapshot ObjQuerySnap;
                 if (Office_Type == "S")
                 {
-                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Status", "Approved").WhereEqualTo("PB_Booking_Surgery_Center_ID", Surgery_Center_ID);
+                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Status", "Approved").WhereEqualTo("PB_Booked_From", "NB").WhereEqualTo("PB_Booking_Surgery_Center_ID", Surgery_Center_ID);
                 }
                 else if (Office_Type == "P")
                 {
-                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Status", "Approved").WhereEqualTo("PB_Booking_Physician_Office_ID", Surgery_Center_ID);
+                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Status", "Approved").WhereEqualTo("PB_Booked_From", "NB").WhereEqualTo("PB_Booking_Physician_Office_ID", Surgery_Center_ID);
                 }
                 else
                 {
-                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Status", "Approved");
+                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Status", "Approved").WhereEqualTo("PB_Booked_From", "NB");
                 }
                 ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
                 Response.Approved = ObjQuerySnap.Count;
@@ -985,15 +1110,15 @@ namespace TheCloudHealth.Controllers
 
                 if (Office_Type == "S")
                 {
-                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Status", "Action Required").WhereEqualTo("PB_Booking_Surgery_Center_ID", Surgery_Center_ID);
+                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booked_From", "NB").WhereEqualTo("PB_Status", "Action Required").WhereEqualTo("PB_Booking_Surgery_Center_ID", Surgery_Center_ID);
                 }
                 else if (Office_Type == "P")
                 {
-                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Status", "Action Required").WhereEqualTo("PB_Booking_Physician_Office_ID", Surgery_Center_ID);
+                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booked_From", "NB").WhereEqualTo("PB_Status", "Action Required").WhereEqualTo("PB_Booking_Physician_Office_ID", Surgery_Center_ID);
                 }
                 else
                 {
-                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Status", "Action Required");
+                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booked_From", "NB").WhereEqualTo("PB_Status", "Action Required");
                 }
                 
                 ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
@@ -1001,15 +1126,15 @@ namespace TheCloudHealth.Controllers
                 //In Review
                 if (Office_Type == "S")
                 {
-                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Status", "Action Required").WhereEqualTo("PB_Booking_Surgery_Center_ID", Surgery_Center_ID);
+                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booked_From", "NB").WhereEqualTo("PB_Status", "Action Required").WhereEqualTo("PB_Booking_Surgery_Center_ID", Surgery_Center_ID);
                 }
                 else if (Office_Type == "P")
                 {
-                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Status", "Action Required").WhereEqualTo("PB_Booking_Physician_Office_ID", Surgery_Center_ID);
+                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booked_From", "NB").WhereEqualTo("PB_Status", "Action Required").WhereEqualTo("PB_Booking_Physician_Office_ID", Surgery_Center_ID);
                 }
                 else
                 {
-                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Status", "Action Required");
+                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booked_From", "NB").WhereEqualTo("PB_Status", "Action Required");
                 }
                 
                 ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
@@ -1017,15 +1142,15 @@ namespace TheCloudHealth.Controllers
                 //Reject
                 if (Office_Type == "S")
                 {
-                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Status", "Rejected").WhereEqualTo("PB_Booking_Surgery_Center_ID", Surgery_Center_ID);
+                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booked_From", "NB").WhereEqualTo("PB_Status", "Rejected").WhereEqualTo("PB_Booking_Surgery_Center_ID", Surgery_Center_ID);
                 }
                 else if (Office_Type == "P")
                 {
-                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Status", "Rejected").WhereEqualTo("PB_Booking_Physician_Office_ID", Surgery_Center_ID);
+                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booked_From", "NB").WhereEqualTo("PB_Status", "Rejected").WhereEqualTo("PB_Booking_Physician_Office_ID", Surgery_Center_ID);
                 }
                 else
                 {
-                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Status", "Rejected");
+                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booked_From", "NB").WhereEqualTo("PB_Status", "Rejected");
                 }
                 
                 ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
@@ -1033,15 +1158,15 @@ namespace TheCloudHealth.Controllers
                 //Draft
                 if (Office_Type == "S")
                 {
-                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Status", "Draft").WhereEqualTo("PB_Booking_Surgery_Center_ID", Surgery_Center_ID);
+                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booked_From", "NB").WhereEqualTo("PB_Status", "Draft").WhereEqualTo("PB_Booking_Surgery_Center_ID", Surgery_Center_ID);
                 }
                 else if (Office_Type == "P")
                 {
-                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Status", "Draft").WhereEqualTo("PB_Booking_Physician_Office_ID", Surgery_Center_ID);
+                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booked_From", "NB").WhereEqualTo("PB_Status", "Draft").WhereEqualTo("PB_Booking_Physician_Office_ID", Surgery_Center_ID);
                 }
                 else
                 {
-                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Status", "Draft");
+                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booked_From", "NB").WhereEqualTo("PB_Status", "Draft");
                 }
                 
                 ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
@@ -1050,13 +1175,13 @@ namespace TheCloudHealth.Controllers
 
                 if (Office_Type == "S")
                 {
-                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booking_Surgery_Center_ID", Surgery_Center_ID);
+                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booked_From", "NB").WhereEqualTo("PB_Booking_Surgery_Center_ID", Surgery_Center_ID);
                     ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
                     if (ObjQuerySnap != null && ObjQuerySnap.Documents.Count > 0)
                     {
                         foreach (DocumentSnapshot docsnap in ObjQuerySnap.Documents)
                         {
-                            if (docsnap.ConvertTo<MT_Patient_Booking>().PB_Status != "WK" && docsnap.ConvertTo<MT_Patient_Booking>().PB_Status != "QB" && docsnap.ConvertTo<MT_Patient_Booking>().PB_Status != "Draft")
+                            if (docsnap.ConvertTo<MT_Patient_Booking>().PB_Status != "WK" && docsnap.ConvertTo<MT_Patient_Booking>().PB_Status != "QB" && docsnap.ConvertTo<MT_Patient_Booking>().PB_Status != "Draft" && docsnap.ConvertTo<MT_Patient_Booking>().PB_Status != "Mark As Completed")
                             {
                                 BookingList.Add(docsnap.ConvertTo<MT_Patient_Booking>());
                             }
@@ -1066,13 +1191,13 @@ namespace TheCloudHealth.Controllers
                 }
                 else if (Office_Type == "P")
                 {
-                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booking_Physician_Office_ID", Surgery_Center_ID);
+                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booked_From", "NB").WhereEqualTo("PB_Booking_Physician_Office_ID", Surgery_Center_ID);
                     ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
                     if (ObjQuerySnap != null && ObjQuerySnap.Documents.Count > 0)
                     {
                         foreach (DocumentSnapshot docsnap in ObjQuerySnap.Documents)
                         {
-                            if (docsnap.ConvertTo<MT_Patient_Booking>().PB_Status != "WK" && docsnap.ConvertTo<MT_Patient_Booking>().PB_Status != "QB")
+                            if (docsnap.ConvertTo<MT_Patient_Booking>().PB_Status != "WK" && docsnap.ConvertTo<MT_Patient_Booking>().PB_Status != "QB" && docsnap.ConvertTo<MT_Patient_Booking>().PB_Status != "Mark As Completed")
                             {
                                 BookingList.Add(docsnap.ConvertTo<MT_Patient_Booking>());
                             }
@@ -1082,7 +1207,7 @@ namespace TheCloudHealth.Controllers
                 }
                 else
                 {
-                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false);
+                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booked_From", "NB");
                 }
                 
                 Response.Total = BookingList.Count();
@@ -1091,15 +1216,15 @@ namespace TheCloudHealth.Controllers
 
                 if (Office_Type == "S")
                 {
-                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Status", "Incomplete").WhereEqualTo("PB_Booking_Surgery_Center_ID", Surgery_Center_ID);
+                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booked_From", "NB").WhereEqualTo("PB_Status", "Incomplete").WhereEqualTo("PB_Booking_Surgery_Center_ID", Surgery_Center_ID);
                 }
                 else if (Office_Type == "P")
                 {
-                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Status", "Incomplete").WhereEqualTo("PB_Booking_Physician_Office_ID", Surgery_Center_ID);
+                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booked_From", "NB").WhereEqualTo("PB_Status", "Incomplete").WhereEqualTo("PB_Booking_Physician_Office_ID", Surgery_Center_ID);
                 }
                 else
                 {
-                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Status", "Incomplete");
+                    ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booked_From", "NB").WhereEqualTo("PB_Status", "Incomplete");
                 }
                 ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
                 Response.InComplete = ObjQuerySnap.Count;
@@ -1295,8 +1420,52 @@ namespace TheCloudHealth.Controllers
                 WriteResult Result = await docRef.SetAsync(PMD);
                 if (Result != null)
                 {
-                    Response.Status = con.StatusSuccess;
-                    Response.Message = con.MessageSuccess;
+                    MT_System_EmailTemplates sysemail = new MT_System_EmailTemplates();
+                    Email email = new Email();
+                    ObjQuery = Db.Collection("MT_System_EmailTemplates").WhereEqualTo("SET_Is_Active", true).WhereEqualTo("SET_Is_Deleted", false).WhereEqualTo("SET_Name", "Appointment confirmation");
+                    ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
+                    if (ObjQuerySnap != null)
+                    {
+                        sysemail = ObjQuerySnap.Documents[0].ConvertTo<MT_System_EmailTemplates>();
+
+                        if (sysemail.SET_Bcc != null && sysemail.SET_Bcc.Length > 0)
+                        {
+                            email.Bcc_Email = sysemail.SET_Bcc.ToList();
+                        }
+
+                        if (sysemail.SET_CC != null && sysemail.SET_CC.Length > 0)
+                        {
+                            email.Cc_Email = sysemail.SET_CC.ToList();
+                        }
+                        List<string> PatiEmail = new List<string>();
+                        List<string> PatiName = new List<string>();
+                        PatiEmail.Add(PMD.PB_Patient_Email);
+                        PatiName.Add(PMD.PB_Patient_Name);
+                        email.To_Email = PatiEmail;
+                        email.To_Name = PatiName;
+                        email.From_Name = sysemail.SET_From_Name;
+                        email.From_Email = sysemail.SET_From_Email;
+                        email.HtmlContent = (sysemail.SET_Header==null?"": sysemail.SET_Header)
+                            + "<br/>"
+                            + "<br/>"
+                            + sysemail.SET_Message.ToString().Replace("[FirstName]", PMD.PB_Patient_Name)
+                            .Replace("[Dr Name]", PMD.PB_Surgical_Procedure_Information==null?"":PMD.PB_Surgical_Procedure_Information.SPI_Surgeon_Name)
+                            .Replace("[mm/dd/yy]", PMD.PB_Booking_Date.ToString("mm/dd/yy"))
+                            .Replace("[hr:mn]", PMD.PB_Booking_Time.ToString())
+                            .Replace("[FacilityName]", PMD.PB_Booking_Surgery_Center_Name)
+                            + "<br/>"
+                            + "<br/>"
+                            + sysemail.SET_Footer.ToString().Replace("[FacilityName]", PMD.PB_Booking_Surgery_Center_Name);
+                        email.Subject = "Appointment has been scheduled";
+                        var message = await ObjEmailer.Send(email);
+                        Response.Status = con.StatusSuccess;
+                        Response.Message = con.MessageSuccess + " Email Status : " + message;
+                    }
+                    else
+                    {
+                        Response.Status = con.StatusSuccess;
+                        Response.Message = con.MessageSuccess;
+                    }
                     Response.Data = PMD;
                 }
                 else
@@ -1341,6 +1510,8 @@ namespace TheCloudHealth.Controllers
                         {"PB_Status", PMD.PB_Status},
                         {"PB_Modify_Date", con.ConvertTimeZone(PMD.PB_TimeZone, Convert.ToDateTime(PMD.PB_Modify_Date))},
                         {"PB_TimeZone", PMD.PB_TimeZone},
+                        {"PB_Created_By", PMD.PB_Created_By},
+                        {"PB_User_Name", PMD.PB_User_Name},
                     };
 
                     if (PMD.PB_Incient_Detail != null)
@@ -1672,7 +1843,6 @@ namespace TheCloudHealth.Controllers
             return ConvertToJSON(Response);
         }
 
-
         [Route("API/Booking/DeleteAssignedNotification")]
         [HttpPost]
         public async Task<HttpResponseMessage> DeleteAssignedNotification(MT_Patient_Booking PMD)
@@ -1725,6 +1895,308 @@ namespace TheCloudHealth.Controllers
                     Response.Data = null;
                 }
 
+            }
+            catch (Exception ex)
+            {
+                Response.Status = con.StatusFailed;
+                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
+            }
+            return ConvertToJSON(Response);
+        }
+
+        [Route("API/Booking/RemoveAllBooking")]
+        [HttpPost]
+        public async Task<HttpResponseMessage> RemoveAllBooking(MT_Patient_Booking PMD)
+        {
+            Db = con.SurgeryCenterDb(PMD.Slug);
+            BookingResponse Response = new BookingResponse();
+            try
+            {
+                MT_Patient_Booking Booking = new MT_Patient_Booking();
+                Query Qry = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Booking_Physician_Office_ID", PMD.PB_Booking_Physician_Office_ID);
+                QuerySnapshot ObjQuerySnap = await Qry.GetSnapshotAsync();
+                if (ObjQuerySnap != null)
+                {
+                    foreach (DocumentSnapshot docsnap in ObjQuerySnap.Documents)
+                    {
+                        Booking = docsnap.ConvertTo<MT_Patient_Booking>();
+                        DocumentReference docRef = Db.Collection("MT_Patient_Booking").Document(Booking.PB_Unique_ID);
+                        WriteResult Result = await docRef.DeleteAsync();
+                    }
+                    
+                }
+            }
+            catch (Exception ex)
+            {
+                Response.Status = con.StatusFailed;
+                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
+            }
+            return ConvertToJSON(Response);
+        }
+
+        [Route("API/Booking/MarkAsCompleteBooking")]
+        [HttpPost]
+        public async Task<HttpResponseMessage> MarkAsCompleteBooking(MT_Patient_Booking PMD)
+        {
+            Db = con.SurgeryCenterDb(PMD.Slug);
+            BookingResponse Response = new BookingResponse();
+            try
+            {
+                MT_PatientInfomation PatientInfo = new MT_PatientInfomation();
+                Query Qry = Db.Collection("MT_PatientInfomation").WhereEqualTo("Patient_Unique_ID", PMD.PB_Patient_ID);
+                QuerySnapshot ObjQuerySnap1 = await Qry.GetSnapshotAsync();
+                if (ObjQuerySnap1 != null)
+                {
+                    PatientInfo = ObjQuerySnap1.Documents[0].ConvertTo<MT_PatientInfomation>();
+                    Dictionary<string, object> PatientData = new Dictionary<string, object>
+                    {
+                        {"Patient_Unique_ID",PatientInfo.Patient_Unique_ID},
+                        {"Patient_Code",PatientInfo.Patient_Code},
+                        {"Patient_Prefix",PatientInfo.Patient_Prefix},
+                        {"Patient_First_Name",PatientInfo.Patient_First_Name},
+                        {"Patient_Middle_Name",PatientInfo.Patient_Middle_Name},
+                        {"Patient_Last_Name",PatientInfo.Patient_Last_Name},
+                        {"Patient_DOB",con.ConvertTimeZone(PatientInfo.Patient_TimeZone,Convert.ToDateTime(PatientInfo.Patient_DOB))},
+                        {"Patient_Sex",PatientInfo.Patient_Sex},
+                        {"Patient_SSN",PatientInfo.Patient_SSN},
+                        {"Patient_Address1",PatientInfo.Patient_Address1},
+                        {"Patient_Address2",PatientInfo.Patient_Address2},
+                        {"Patient_City",PatientInfo.Patient_City},
+                        {"Patient_State",PatientInfo.Patient_State},
+                        {"Patient_Zipcode",PatientInfo.Patient_Zipcode},
+                        {"Patient_Primary_No",PatientInfo.Patient_Primary_No},
+                        {"Patient_Secondary_No",PatientInfo.Patient_Secondary_No},
+                        {"Patient_Spouse_No",PatientInfo.Patient_Spouse_No},
+                        {"Patient_Work_No",PatientInfo.Patient_Work_No},
+                        {"Patient_Emergency_No",PatientInfo.Patient_Emergency_No},
+                        {"Patient_Email",PatientInfo.Patient_Email},
+                        {"Patient_Religion",PatientInfo.Patient_Religion},
+                        {"Patient_Ethinicity",PatientInfo.Patient_Ethinicity},
+                        {"Patient_Race",PatientInfo.Patient_Race},
+                        {"Patient_Marital_Status",PatientInfo.Patient_Marital_Status},
+                        {"Patient_Nationality",PatientInfo.Patient_Nationality},
+                        {"Patient_Language",PatientInfo.Patient_Language},
+                        {"Patient_Height_In_Ft",PatientInfo.Patient_Height_In_Ft},
+                        {"Patient_Height_In_Inch",PatientInfo.Patient_Height_In_Inch},
+                        {"Patient_Weight",PatientInfo.Patient_Weight},
+                        {"Patient_Body_Mass_Index",PatientInfo.Patient_Body_Mass_Index},
+                        {"Patient_Data",PatientInfo.Patient_Data},
+                        {"Patient_Insurance_Type",PatientInfo.Patient_Insurance_Type},
+                        {"Patient_Response_Data",PatientInfo.Patient_Response_Data},
+                        {"Patient_Surgery_Physician_Center_ID",PatientInfo.Patient_Surgery_Physician_Center_ID},
+                        {"Patient_Office_Type",PatientInfo.Patient_Office_Type},
+                        {"Patient_Created_By",PatientInfo.Patient_Created_By},
+                        {"Patient_User_Name",PatientInfo.Patient_User_Name},
+                        {"Patient_Create_Date",con.ConvertTimeZone(PatientInfo.Patient_TimeZone,Convert.ToDateTime(PatientInfo.Patient_Create_Date))},
+                        {"Patient_Modify_Date",con.ConvertTimeZone(PatientInfo.Patient_TimeZone,Convert.ToDateTime(PatientInfo.Patient_Modify_Date))},
+                        {"Patient_Is_Active",PatientInfo.Patient_Is_Active},
+                        {"Patient_Is_Deleted",PatientInfo.Patient_Is_Deleted},
+                        {"Patient_TimeZone",PatientInfo.Patient_TimeZone},
+                    };
+
+                    if (PatientInfo.Patient_Primary_Insurance_Details != null)
+                    {
+                        Dictionary<string, object> PrimaryInsuranceData = new Dictionary<string, object> 
+                        {
+                            {"PPID_Unique_ID", PatientInfo.Patient_Primary_Insurance_Details.PPID_Unique_ID},
+                            {"PPID_Relation_To_Patient", PatientInfo.Patient_Primary_Insurance_Details.PPID_Relation_To_Patient},
+                            {"PPID_Subscriber_Name", PatientInfo.Patient_Primary_Insurance_Details.PPID_Subscriber_Name},
+                            {"PPID_Subscriber_SSN_No", PatientInfo.Patient_Primary_Insurance_Details.PPID_Subscriber_SSN_No},
+                            {"PPID_DOB", con.ConvertTimeZone(PatientInfo.Patient_TimeZone,Convert.ToDateTime(PatientInfo.Patient_Primary_Insurance_Details.PPID_DOB))},
+                            {"PPID_Policy_No", PatientInfo.Patient_Primary_Insurance_Details.PPID_Policy_No},
+                            {"PPID_Primary_Insurance", PatientInfo.Patient_Primary_Insurance_Details.PPID_Primary_Insurance},
+                            {"PPID_PO_Box_No", PatientInfo.Patient_Primary_Insurance_Details.PPID_PO_Box_No},
+                            {"PPID_Address", PatientInfo.Patient_Primary_Insurance_Details.PPID_Address},
+                            {"PPID_Address2", PatientInfo.Patient_Primary_Insurance_Details.PPID_Address2},
+                            {"PPID_State", PatientInfo.Patient_Primary_Insurance_Details.PPID_State},
+                            {"PPID_City", PatientInfo.Patient_Primary_Insurance_Details.PPID_City},
+                            {"PPID_Zip_Code", PatientInfo.Patient_Primary_Insurance_Details.PPID_Zip_Code},
+                            {"PPID_DocPath", PatientInfo.Patient_Primary_Insurance_Details.PPID_DocPath},
+                            {"PPID_V_Start_Date", con.ConvertTimeZone(PatientInfo.Patient_Primary_Insurance_Details.PPID_TimeZone,Convert.ToDateTime(PatientInfo.Patient_Primary_Insurance_Details.PPID_V_Start_Date))},
+                            {"PPID_V_End_Date", con.ConvertTimeZone(PatientInfo.Patient_Primary_Insurance_Details.PPID_TimeZone,Convert.ToDateTime(PatientInfo.Patient_Primary_Insurance_Details.PPID_V_End_Date))},
+                            {"PPID_Created_By", PatientInfo.Patient_Primary_Insurance_Details.PPID_Created_By                            },
+                            {"PPID_User_Name", PatientInfo.Patient_Primary_Insurance_Details.PPID_User_Name},
+                            {"PPID_Modify_Date", con.ConvertTimeZone(PatientInfo.Patient_Primary_Insurance_Details.PPID_TimeZone,Convert.ToDateTime(PatientInfo.Patient_Primary_Insurance_Details.PPID_Modify_Date))},
+                            {"PPID_Is_Active", PatientInfo.Patient_Primary_Insurance_Details.PPID_Is_Active},
+                            {"PPID_Is_Deleted", PatientInfo.Patient_Primary_Insurance_Details.PPID_Is_Deleted},
+                            {"PPID_TimeZone", PatientInfo.Patient_Primary_Insurance_Details.PPID_TimeZone},
+                        };
+                        PatientData.Add("Patient_Primary_Insurance_Details", PrimaryInsuranceData);
+                    }
+
+                    if (PatientInfo.Patient_Secondary1_Insurance_Details != null)
+                    {
+                        Dictionary<string, object> Secondary1_InsuranceData = new Dictionary<string, object>
+                        {
+                            {"PSID_Unique_ID",PatientInfo.Patient_Secondary1_Insurance_Details.PSID_Unique_ID},
+                            {"PSID_Relation_To_Patient",PatientInfo.Patient_Secondary1_Insurance_Details.PSID_Relation_To_Patient},
+                            {"PSID_Subscriber_Name",PatientInfo.Patient_Secondary1_Insurance_Details.PSID_Subscriber_Name},
+                            {"PSID_Subscriber_SSN_No",PatientInfo.Patient_Secondary1_Insurance_Details.PSID_Subscriber_SSN_No},
+                            {"PSID_DOB",con.ConvertTimeZone(PatientInfo.Patient_Secondary1_Insurance_Details.PSID_TimeZone,Convert.ToDateTime(PatientInfo.Patient_Secondary1_Insurance_Details.PSID_DOB))},
+                            {"PSID_Policy_No",PatientInfo.Patient_Secondary1_Insurance_Details.PSID_Policy_No},
+                            {"PSID_Primary_Insurance",PatientInfo.Patient_Secondary1_Insurance_Details.PSID_Primary_Insurance},
+                            {"PSID_PO_Box_No",PatientInfo.Patient_Secondary1_Insurance_Details.PSID_PO_Box_No},
+                            {"PSID_Address",PatientInfo.Patient_Secondary1_Insurance_Details.PSID_Address},
+                            {"PSID_Address2",PatientInfo.Patient_Secondary1_Insurance_Details.PSID_Address2},
+                            {"PSID_State",PatientInfo.Patient_Secondary1_Insurance_Details.PSID_State},
+                            {"PSID_City",PatientInfo.Patient_Secondary1_Insurance_Details.PSID_City},
+                            {"PSID_Zip_Code",PatientInfo.Patient_Secondary1_Insurance_Details.PSID_Zip_Code},
+                            {"PSID_DocPath",PatientInfo.Patient_Secondary1_Insurance_Details.PSID_DocPath},
+                            {"PSID_V_Start_Date",con.ConvertTimeZone(PatientInfo.Patient_Secondary1_Insurance_Details.PSID_TimeZone,Convert.ToDateTime(PatientInfo.Patient_Secondary1_Insurance_Details.PSID_V_Start_Date))},
+                            {"PSID_V_End_Date",con.ConvertTimeZone(PatientInfo.Patient_Secondary1_Insurance_Details.PSID_TimeZone,Convert.ToDateTime(PatientInfo.Patient_Secondary1_Insurance_Details.PSID_V_End_Date))},
+                            {"PSID_Trace_Number",PatientInfo.Patient_Secondary1_Insurance_Details.PSID_Trace_Number},
+                            {"PSID_Created_By",PatientInfo.Patient_Secondary1_Insurance_Details.PSID_Created_By},
+                            {"PSID_User_Name",PatientInfo.Patient_Secondary1_Insurance_Details.PSID_User_Name},
+                            {"PSID_Modify_Date",con.ConvertTimeZone(PatientInfo.Patient_Secondary1_Insurance_Details.PSID_TimeZone, Convert.ToDateTime(PatientInfo.Patient_Secondary1_Insurance_Details.PSID_Modify_Date))},
+                            {"PSID_Is_Active",PatientInfo.Patient_Secondary1_Insurance_Details.PSID_Is_Active},
+                            {"PSID_Is_Deleted",PatientInfo.Patient_Secondary1_Insurance_Details.PSID_Is_Deleted},
+                            {"PSID_TimeZone",PatientInfo.Patient_Secondary1_Insurance_Details.PSID_TimeZone},
+                        };
+                        PatientData.Add("Patient_Secondary1_Insurance_Details", Secondary1_InsuranceData);
+                    }
+
+                    if (PatientInfo.Patient_Secondary2_Insurance_Details != null)
+                    {
+                        Dictionary<string, object> Secondary2_InsuranceData = new Dictionary<string, object>
+                        {
+                            {"PSID_Unique_ID",PatientInfo.Patient_Secondary2_Insurance_Details.PSID_Unique_ID},
+                            {"PSID_Relation_To_Patient",PatientInfo.Patient_Secondary2_Insurance_Details.PSID_Relation_To_Patient},
+                            {"PSID_Subscriber_Name",PatientInfo.Patient_Secondary2_Insurance_Details.PSID_Subscriber_Name},
+                            {"PSID_Subscriber_SSN_No",PatientInfo.Patient_Secondary2_Insurance_Details.PSID_Subscriber_SSN_No},
+                            {"PSID_DOB",con.ConvertTimeZone(PatientInfo.Patient_Secondary2_Insurance_Details.PSID_TimeZone,Convert.ToDateTime(PatientInfo.Patient_Secondary2_Insurance_Details.PSID_DOB))},
+                            {"PSID_Policy_No",PatientInfo.Patient_Secondary2_Insurance_Details.PSID_Policy_No},
+                            {"PSID_Primary_Insurance",PatientInfo.Patient_Secondary2_Insurance_Details.PSID_Primary_Insurance},
+                            {"PSID_PO_Box_No",PatientInfo.Patient_Secondary2_Insurance_Details.PSID_PO_Box_No},
+                            {"PSID_Address",PatientInfo.Patient_Secondary2_Insurance_Details.PSID_Address},
+                            {"PSID_Address2",PatientInfo.Patient_Secondary2_Insurance_Details.PSID_Address2},
+                            {"PSID_State",PatientInfo.Patient_Secondary2_Insurance_Details.PSID_State},
+                            {"PSID_City",PatientInfo.Patient_Secondary2_Insurance_Details.PSID_City},
+                            {"PSID_Zip_Code",PatientInfo.Patient_Secondary2_Insurance_Details.PSID_Zip_Code},
+                            {"PSID_DocPath",PatientInfo.Patient_Secondary2_Insurance_Details.PSID_DocPath},
+                            {"PSID_V_Start_Date",con.ConvertTimeZone(PatientInfo.Patient_Secondary2_Insurance_Details.PSID_TimeZone,Convert.ToDateTime(PatientInfo.Patient_Secondary2_Insurance_Details.PSID_V_Start_Date))},
+                            {"PSID_V_End_Date",con.ConvertTimeZone(PatientInfo.Patient_Secondary2_Insurance_Details.PSID_TimeZone,Convert.ToDateTime(PatientInfo.Patient_Secondary2_Insurance_Details.PSID_V_End_Date))},
+                            {"PSID_Trace_Number",PatientInfo.Patient_Secondary2_Insurance_Details.PSID_Trace_Number},
+                            {"PSID_Created_By",PatientInfo.Patient_Secondary2_Insurance_Details.PSID_Created_By},
+                            {"PSID_User_Name",PatientInfo.Patient_Secondary2_Insurance_Details.PSID_User_Name},                            
+                            {"PSID_Modify_Date",con.ConvertTimeZone(PatientInfo.Patient_Secondary2_Insurance_Details.PSID_TimeZone, Convert.ToDateTime(PatientInfo.Patient_Secondary2_Insurance_Details.PSID_Modify_Date))},
+                            {"PSID_Is_Active",PatientInfo.Patient_Secondary2_Insurance_Details.PSID_Is_Active},
+                            {"PSID_Is_Deleted",PatientInfo.Patient_Secondary2_Insurance_Details.PSID_Is_Deleted},
+                            {"PSID_TimeZone",PatientInfo.Patient_Secondary2_Insurance_Details.PSID_TimeZone},
+                        };
+                        PatientData.Add("Patient_Secondary2_Insurance_Details", Secondary2_InsuranceData);
+                    }
+
+                    if (PatientInfo.Patient_Secondary3_Insurance_Details != null)
+                    {
+                        Dictionary<string, object> Secondary3_InsuranceData = new Dictionary<string, object>
+                        {
+                            {"PSID_Unique_ID",PatientInfo.Patient_Secondary3_Insurance_Details.PSID_Unique_ID},
+                            {"PSID_Relation_To_Patient",PatientInfo.Patient_Secondary3_Insurance_Details.PSID_Relation_To_Patient},
+                            {"PSID_Subscriber_Name",PatientInfo.Patient_Secondary3_Insurance_Details.PSID_Subscriber_Name},
+                            {"PSID_Subscriber_SSN_No",PatientInfo.Patient_Secondary3_Insurance_Details.PSID_Subscriber_SSN_No},
+                            {"PSID_DOB",con.ConvertTimeZone(PatientInfo.Patient_Secondary3_Insurance_Details.PSID_TimeZone,Convert.ToDateTime(PatientInfo.Patient_Secondary3_Insurance_Details.PSID_DOB))},
+                            {"PSID_Policy_No",PatientInfo.Patient_Secondary3_Insurance_Details.PSID_Policy_No},
+                            {"PSID_Primary_Insurance",PatientInfo.Patient_Secondary3_Insurance_Details.PSID_Primary_Insurance},
+                            {"PSID_PO_Box_No",PatientInfo.Patient_Secondary3_Insurance_Details.PSID_PO_Box_No},
+                            {"PSID_Address",PatientInfo.Patient_Secondary3_Insurance_Details.PSID_Address},
+                            {"PSID_Address2",PatientInfo.Patient_Secondary3_Insurance_Details.PSID_Address2},
+                            {"PSID_State",PatientInfo.Patient_Secondary3_Insurance_Details.PSID_State},
+                            {"PSID_City",PatientInfo.Patient_Secondary3_Insurance_Details.PSID_City},
+                            {"PSID_Zip_Code",PatientInfo.Patient_Secondary3_Insurance_Details.PSID_Zip_Code},
+                            {"PSID_DocPath",PatientInfo.Patient_Secondary3_Insurance_Details.PSID_DocPath},
+                            {"PSID_V_Start_Date",con.ConvertTimeZone(PatientInfo.Patient_Secondary3_Insurance_Details.PSID_TimeZone,Convert.ToDateTime(PatientInfo.Patient_Secondary3_Insurance_Details.PSID_V_Start_Date))},
+                            {"PSID_V_End_Date",con.ConvertTimeZone(PatientInfo.Patient_Secondary3_Insurance_Details.PSID_TimeZone,Convert.ToDateTime(PatientInfo.Patient_Secondary3_Insurance_Details.PSID_V_End_Date))},
+                            {"PSID_Trace_Number",PatientInfo.Patient_Secondary3_Insurance_Details.PSID_Trace_Number},
+                            {"PSID_Created_By",PatientInfo.Patient_Secondary3_Insurance_Details.PSID_Created_By},
+                            {"PSID_User_Name",PatientInfo.Patient_Secondary3_Insurance_Details.PSID_User_Name},
+                            {"PSID_Modify_Date",con.ConvertTimeZone(PatientInfo.Patient_Secondary3_Insurance_Details.PSID_TimeZone, Convert.ToDateTime(PatientInfo.Patient_Secondary3_Insurance_Details.PSID_Modify_Date))},
+                            {"PSID_Is_Active",PatientInfo.Patient_Secondary3_Insurance_Details.PSID_Is_Active},
+                            {"PSID_Is_Deleted",PatientInfo.Patient_Secondary3_Insurance_Details.PSID_Is_Deleted},
+                            {"PSID_TimeZone",PatientInfo.Patient_Secondary3_Insurance_Details.PSID_TimeZone},
+                        };
+                        PatientData.Add("Patient_Secondary3_Insurance_Details", Secondary3_InsuranceData);
+                    }
+                    Dictionary<string, object> initialData = new Dictionary<string, object>
+                    {
+                        {"PB_Status", "Mark As Completed"},
+                        {"PB_Modify_Date", con.ConvertTimeZone(PMD.PB_TimeZone, Convert.ToDateTime(PMD.PB_Modify_Date))},
+                        {"PB_TimeZone", PMD.PB_TimeZone},
+                        {"PB_Created_By", PMD.PB_Created_By},
+                        {"PB_User_Name", PMD.PB_User_Name},
+                        {"PB_Patient_Details", PatientData}
+                    };
+                    DocumentReference docRef = Db.Collection("MT_Patient_Booking").Document(PMD.PB_Unique_ID);
+                    WriteResult Result = await docRef.UpdateAsync(initialData);
+                    if (Result != null)
+                    {
+                        Response.Status = con.StatusSuccess;
+                        Response.Message = con.MessageSuccess;
+                        Response.Data = PMD;
+                    }
+                    else
+                    {
+                        Response.Status = con.StatusNotInsert;
+                        Response.Message = con.MessageNotInsert;
+                        Response.Data = null;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Response.Status = con.StatusFailed;
+                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
+            }
+            return ConvertToJSON(Response);
+        }
+
+        [Route("API/Booking/CheckPatientBooking")]
+        [HttpPost]
+        public async Task<HttpResponseMessage> CheckPatientBooking(MT_Patient_Booking PMD)
+        {
+            Db = con.SurgeryCenterDb(PMD.Slug);
+            BookingResponse Response = new BookingResponse();
+            try
+            {
+                List<MT_Patient_Booking> patilist = new List<MT_Patient_Booking>();
+                Query ObjQuery = Db.Collection("MT_Patient_Booking").WhereEqualTo("PB_Is_Deleted", false).WhereEqualTo("PB_Booking_Physician_Office_ID", PMD.PB_Booking_Physician_Office_ID).WhereEqualTo("PB_Patient_ID", PMD.PB_Patient_ID).OrderByDescending("PB_Booking_Date");
+                QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
+                if (ObjQuerySnap != null)
+                {
+                    if (ObjQuerySnap.Documents.Count > 0)
+                    {
+                        Response.Status = con.StatusSuccess;
+                        Response.Message = con.MessageSuccess;
+                        Response.IsAvailable = true;
+                        return ConvertToJSON(Response);
+                    }
+                    else
+                    {
+                        ObjQuery = Db.Collection("MT_Virtual_Consultant_Booking").WhereEqualTo("VCB_Is_Deleted", false).WhereEqualTo("VCB_Patient_ID", PMD.PB_Patient_ID);
+                        ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
+                        if (ObjQuerySnap != null)
+                        {
+                            if (ObjQuerySnap.Documents.Count > 0)
+                            {
+                                Response.Status = con.StatusSuccess;
+                                Response.Message = con.MessageSuccess;
+                                Response.IsAvailable = true;
+                                return ConvertToJSON(Response);
+                            }
+                        }
+                        else
+                        {
+                            Response.Status = con.StatusSuccess;
+                            Response.Message = con.MessageSuccess;
+                            Response.IsAvailable = false;
+                        }
+                    }
+                }
+                else
+                {
+                    Response.Status = con.StatusDNE;
+                    Response.Message = con.MessageDNE;
+                    Response.IsAvailable = false;
+                }
             }
             catch (Exception ex)
             {

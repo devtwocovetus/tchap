@@ -282,12 +282,101 @@ namespace TheCloudHealth.Controllers
             try
             {
                 List<MT_Staff_Members> AnesList = new List<MT_Staff_Members>();
+                MT_Staff_Members staff = new MT_Staff_Members();
                 Query docRef = Db.Collection("MT_Staff_Members").WhereEqualTo("Staff_Is_Deleted", false);
                 QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
                 if (ObjQuerySnap != null)
                 {
                     foreach (DocumentSnapshot Docsnapshot in ObjQuerySnap.Documents)
                     {
+                        staff = Docsnapshot.ConvertTo<MT_Staff_Members>();
+                        if (SMD.Staff_Surgery_Physician_Office_ID == "0")
+                        {
+                            if (staff.Staff_Created_By == "28bLAlDi21ab1a937541a6")
+                            {
+                                AnesList.Add(staff);
+                            }
+
+                        }
+                        else if (staff.Staff_Surgery_Physician_Office_ID == SMD.Staff_Surgery_Physician_Office_ID)
+                        {
+                            if (staff.Staff_Created_By != "28bLAlDi21ab1a937541a6")
+                            {
+                                AnesList.Add(staff);
+                            }
+                        }
+                        else
+                        {
+                            if (staff.Staff_Created_By != SMD.Staff_Surgery_Physician_Office_ID)
+                            {
+                                AnesList.Add(staff);
+                            }
+                        }
+                    }
+                    Response.DataList = AnesList.OrderBy(o => o.Staff_Name).ThenBy(o => o.Staff_Last_Name).ToList();
+                }
+                Response.Status = con.StatusSuccess;
+                Response.Message = con.MessageSuccess;
+            }
+            catch (Exception ex)
+            {
+                Response.Status = con.StatusFailed;
+                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
+            }
+            return ConvertToJSON(Response);
+        }
+
+        [Route("API/StaffM/ListForSA")]
+        [HttpPost]
+        //[Authorize(Roles ="SAdmin")]
+        public async Task<HttpResponseMessage> ListForSA(MT_Staff_Members SMD)
+        {
+            Db = con.SurgeryCenterDb(SMD.Slug);
+            StaffMResponse Response = new StaffMResponse();
+            try
+            {
+                List<MT_Staff_Members> AnesList = new List<MT_Staff_Members>();
+                MT_Staff_Members staff = new MT_Staff_Members();
+                Query docRef = Db.Collection("MT_Staff_Members").WhereEqualTo("Staff_Is_Deleted", false).WhereEqualTo("Staff_Created_By",SMD.Staff_Created_By);
+                QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
+                if (ObjQuerySnap != null)
+                {
+                    foreach (DocumentSnapshot Docsnapshot in ObjQuerySnap.Documents)
+                    {
+                        AnesList.Add(Docsnapshot.ConvertTo<MT_Staff_Members>());
+                        
+                    }
+                    Response.DataList = AnesList.OrderBy(o => o.Staff_Name).ThenBy(o => o.Staff_Last_Name).ToList();
+                }
+                Response.Status = con.StatusSuccess;
+                Response.Message = con.MessageSuccess;
+            }
+            catch (Exception ex)
+            {
+                Response.Status = con.StatusFailed;
+                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
+            }
+            return ConvertToJSON(Response);
+        }
+
+        [Route("API/StaffM/ListForSCPO")]
+        [HttpPost]
+        //[Authorize(Roles ="SAdmin")]
+        public async Task<HttpResponseMessage> ListForSCPO(MT_Staff_Members SMD)
+        {
+            Db = con.SurgeryCenterDb(SMD.Slug);
+            StaffMResponse Response = new StaffMResponse();
+            try
+            {
+                List<MT_Staff_Members> AnesList = new List<MT_Staff_Members>();
+                MT_Staff_Members staff = new MT_Staff_Members();
+                Query docRef = Db.Collection("MT_Staff_Members").WhereEqualTo("Staff_Is_Active", true).WhereEqualTo("Staff_Is_Deleted", false).WhereEqualTo("Staff_Surgery_Physician_Office_ID", SMD.Staff_Surgery_Physician_Office_ID);
+                QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
+                if (ObjQuerySnap != null)
+                {
+                    foreach (DocumentSnapshot Docsnapshot in ObjQuerySnap.Documents)
+                    {
+                        staff = Docsnapshot.ConvertTo<MT_Staff_Members>();
                         AnesList.Add(Docsnapshot.ConvertTo<MT_Staff_Members>());
                     }
                     Response.DataList = AnesList.OrderBy(o => o.Staff_Name).ThenBy(o => o.Staff_Last_Name).ToList();
@@ -303,6 +392,56 @@ namespace TheCloudHealth.Controllers
             return ConvertToJSON(Response);
         }
 
+        //[Route("API/StaffM/ListForSCPO")]
+        //[HttpPost]
+        ////[Authorize(Roles ="SAdmin")]
+        //public async Task<HttpResponseMessage> ListForSCPO(MT_Staff_Members SMD)
+        //{
+        //    Db = con.SurgeryCenterDb(SMD.Slug);
+        //    StaffMResponse Response = new StaffMResponse();
+        //    try
+        //    {
+        //        List<MT_Staff_Members> AnesList = new List<MT_Staff_Members>();
+        //        MT_Staff_Members staff = new MT_Staff_Members();
+        //        Query docRef = Db.Collection("MT_Staff_Members").WhereEqualTo("Staff_Is_Deleted", false);
+        //        QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
+        //        if (ObjQuerySnap != null)
+        //        {
+        //            foreach (DocumentSnapshot Docsnapshot in ObjQuerySnap.Documents)
+        //            {
+        //                staff = Docsnapshot.ConvertTo<MT_Staff_Members>();
+        //                if (SMD.Staff_Office_Type != "P")
+        //                {
+        //                    if (staff.Staff_Surgery_Physician_Office_ID == SMD.Staff_Surgery_Physician_Office_ID || staff.Staff_Created_By == SMD.Staff_Created_By)
+        //                    {
+        //                        AnesList.Add(Docsnapshot.ConvertTo<MT_Staff_Members>());
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    if (staff.Staff_Surgery_Physician_Office_ID == SMD.Staff_Surgery_Physician_Office_ID || staff.Staff_Created_By == SMD.Staff_Created_By)
+        //                    {
+        //                        if (staff.Staff_Role_Name.ToUpper() != "Admin".ToUpper())
+        //                        {
+        //                            AnesList.Add(Docsnapshot.ConvertTo<MT_Staff_Members>());
+        //                        }
+        //                    }
+        //                }
+
+        //            }
+        //            Response.DataList = AnesList.OrderBy(o => o.Staff_Name).ThenBy(o => o.Staff_Last_Name).ToList();
+        //        }
+        //        Response.Status = con.StatusSuccess;
+        //        Response.Message = con.MessageSuccess;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Response.Status = con.StatusFailed;
+        //        Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
+        //    }
+        //    return ConvertToJSON(Response);
+        //}
+
         [Route("API/StaffM/ListDD")]
         [HttpPost]
         //[Authorize(Roles ="SAdmin")]
@@ -313,13 +452,56 @@ namespace TheCloudHealth.Controllers
             try
             {
                 List<MT_Staff_Members> AnesList = new List<MT_Staff_Members>();
+                MT_Staff_Members staff = new MT_Staff_Members();
                 Query docRef = Db.Collection("MT_Staff_Members").WhereEqualTo("Staff_Is_Deleted", false).WhereEqualTo("Staff_Is_Active", true);
                 QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
                 if (ObjQuerySnap != null)
                 {
                     foreach (DocumentSnapshot Docsnapshot in ObjQuerySnap.Documents)
                     {
-                        AnesList.Add(Docsnapshot.ConvertTo<MT_Staff_Members>());
+                        staff = Docsnapshot.ConvertTo<MT_Staff_Members>();
+                        if (staff.Staff_Surgery_Physician_Office_ID == SMD.Staff_Surgery_Physician_Office_ID)
+                        {
+                            AnesList.Add(staff);
+                        }
+                        
+                    }
+                    Response.DataList = AnesList.OrderBy(o => o.Staff_Name).ThenBy(o => o.Staff_Last_Name).ToList();
+                }
+                Response.Status = con.StatusSuccess;
+                Response.Message = con.MessageSuccess;
+            }
+            catch (Exception ex)
+            {
+                Response.Status = con.StatusFailed;
+                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
+            }
+            return ConvertToJSON(Response);
+        }
+
+        [Route("API/StaffM/SurgeonList")]
+        [HttpPost]
+        //[Authorize(Roles ="SAdmin")]
+        public async Task<HttpResponseMessage> SurgeonList(MT_Staff_Members SMD)
+        {
+            Db = con.SurgeryCenterDb(SMD.Slug);
+            StaffMResponse Response = new StaffMResponse();
+            try
+            {
+                List<MT_Staff_Members> AnesList = new List<MT_Staff_Members>();
+                MT_Staff_Members staff = new MT_Staff_Members();
+                Query docRef = Db.Collection("MT_Staff_Members").WhereEqualTo("Staff_Is_Deleted", false).WhereEqualTo("Staff_Is_Active", true).WhereEqualTo("Staff_Surgery_Physician_Office_ID", SMD.Staff_Surgery_Physician_Office_ID).WhereEqualTo("Staff_Role_Name", SMD.Staff_Role_Name);
+                QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
+                if (ObjQuerySnap != null)
+                {
+                    foreach (DocumentSnapshot Docsnapshot in ObjQuerySnap.Documents)
+                    {
+                        staff = Docsnapshot.ConvertTo<MT_Staff_Members>();
+                        if (staff.Staff_Surgery_Physician_Office_ID == SMD.Staff_Surgery_Physician_Office_ID)
+                        {
+                            AnesList.Add(staff);
+                        }
+
                     }
                     Response.DataList = AnesList.OrderBy(o => o.Staff_Name).ThenBy(o => o.Staff_Last_Name).ToList();
                 }
@@ -344,13 +526,18 @@ namespace TheCloudHealth.Controllers
             try
             {
                 List<MT_Staff_Members> AnesList = new List<MT_Staff_Members>();
-                Query docRef = Db.Collection("MT_Staff_Members").WhereEqualTo("Staff_Is_Deleted", true).WhereEqualTo("Staff_Surgery_Physician_Office_ID", SMD.Staff_Surgery_Physician_Office_ID).WhereEqualTo("Staff_Office_Type", SMD.Staff_Office_Type);
+                MT_Staff_Members staff = new MT_Staff_Members();
+                Query docRef = Db.Collection("MT_Staff_Members").WhereEqualTo("Staff_Is_Deleted", true).WhereEqualTo("Staff_Surgery_Physician_Office_ID", SMD.Staff_Surgery_Physician_Office_ID);
                 QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
                 if (ObjQuerySnap != null)
                 {
                     foreach (DocumentSnapshot Docsnapshot in ObjQuerySnap.Documents)
                     {
-                        AnesList.Add(Docsnapshot.ConvertTo<MT_Staff_Members>());
+                        staff = Docsnapshot.ConvertTo<MT_Staff_Members>();
+                        if (staff.Staff_Surgery_Physician_Office_ID == SMD.Staff_Surgery_Physician_Office_ID)
+                        {
+                            AnesList.Add(staff);
+                        }
                     }
                     Response.DataList = AnesList.OrderBy(o => o.Staff_Name).ThenBy(o => o.Staff_Last_Name).ToList();
                 }
@@ -399,6 +586,39 @@ namespace TheCloudHealth.Controllers
                     Response.Is_Available = false;
                 }
 
+            }
+            catch (Exception ex)
+            {
+                Response.Status = con.StatusFailed;
+                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
+            }
+            return ConvertToJSON(Response);
+        }
+
+        [Route("API/StaffM/ListCreatedByAdmin")]
+        [HttpPost]
+        //[Authorize(Roles ="SAdmin")]
+        public async Task<HttpResponseMessage> ListCreatedByAdmin(MT_Staff_Members SMD)
+        {
+            Db = con.SurgeryCenterDb(SMD.Slug);
+            StaffMResponse Response = new StaffMResponse();
+            try
+            {
+                List<MT_Staff_Members> AnesList = new List<MT_Staff_Members>();
+                MT_Staff_Members staff = new MT_Staff_Members();
+                Query docRef = Db.Collection("MT_Staff_Members").WhereEqualTo("Staff_Is_Deleted", false).WhereEqualTo("Staff_Is_Active", true).WhereEqualTo("Staff_Created_By", SMD.Staff_Created_By);
+                QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
+                if (ObjQuerySnap != null)
+                {
+                    foreach (DocumentSnapshot Docsnapshot in ObjQuerySnap.Documents)
+                    {
+                        staff = Docsnapshot.ConvertTo<MT_Staff_Members>();
+                        AnesList.Add(staff);
+                    }
+                    Response.DataList = AnesList.OrderBy(o => o.Staff_Name).ThenBy(o => o.Staff_Last_Name).ToList();
+                }
+                Response.Status = con.StatusSuccess;
+                Response.Message = con.MessageSuccess;
             }
             catch (Exception ex)
             {

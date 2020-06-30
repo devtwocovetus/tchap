@@ -9,22 +9,21 @@ using System.Net.Http;
 using Newtonsoft.Json;
 using System.Net;
 using System.Text;
+using System.ServiceModel.Channels;
 using System.Web;
-using Newtonsoft.Json.Linq;
-using System.Linq;
 
 namespace TheCloudHealth.Controllers
 {
-    public class PatiIntakeTypeController : ApiController
+    public class LogController : ApiController
     {
         ConnectionClass con;
         FirestoreDb Db;
         string UniqueID = "";
-
-        public PatiIntakeTypeController()
+        string IPAddress = "";
+        public LogController()
         {
             con = new ConnectionClass();
-            //Db = con.Db();
+            Db = con.Db();
         }
 
         public HttpResponseMessage ConvertToJSON(object objectToConvert)
@@ -35,35 +34,48 @@ namespace TheCloudHealth.Controllers
             return response;
         }
 
-        [Route("API/PatiIntakeType/Create")]
-        [HttpPost]
-        public async Task<HttpResponseMessage> Create(MT_Patient_Intake_Type PITMD)
+        private string GetClientIp(HttpRequestMessage request = null)
         {
-            Db = con.SurgeryCenterDb(PITMD.Slug);
-            PatiIntakeTypeResponse Response = new PatiIntakeTypeResponse();
+            request = request ?? Request;
+
+            if (request.Properties.ContainsKey("MS_HttpContext"))
+            {
+                return ((HttpContextWrapper)request.Properties["MS_HttpContext"]).Request.UserHostAddress;
+            }
+            else if (request.Properties.ContainsKey(RemoteEndpointMessageProperty.Name))
+            {
+                RemoteEndpointMessageProperty prop = (RemoteEndpointMessageProperty)this.Request.Properties[RemoteEndpointMessageProperty.Name];
+                return prop.Address;
+            }
+            else if (HttpContext.Current != null)
+            {
+                return HttpContext.Current.Request.UserHostAddress;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        [Route("API/Log/Create")]
+        [HttpPost]
+        public async Task<HttpResponseMessage> Create(MT_Log_Book LBMD)
+        {
+            Db = con.SurgeryCenterDb(LBMD.Slug);
+            LogResponse Response = new LogResponse();
             try
             {
                 UniqueID = con.GetUniqueKey();
-                PITMD.PITT_Unique_ID = UniqueID;
-                Query ObjQuery = Db.Collection("MT_Patient_Intake_Type");
-                QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
-                if (ObjQuerySnap != null)
-                {
-                    PITMD.PITT_Category_Type_Code = "NTT000" + ObjQuerySnap.Documents.Count + 1.ToString();
-                }
-                else
-                {
-                    PITMD.PITT_Category_Type_Code = "NTT000" + "1";
-                }
-                PITMD.PITT_Create_Date = con.ConvertTimeZone(PITMD.PITT_TimeZone, Convert.ToDateTime(PITMD.PITT_Create_Date));
-                PITMD.PITT_Modify_Date = con.ConvertTimeZone(PITMD.PITT_TimeZone, Convert.ToDateTime(PITMD.PITT_Modify_Date));
-                DocumentReference docRef = Db.Collection("MT_Patient_Intake_Type").Document(UniqueID);
-                WriteResult Result = await docRef.SetAsync(PITMD);
+                LBMD.Unique_ID = UniqueID;
+                LBMD.Ip_Address = GetClientIp();
+                LBMD.Operation_Time = con.ConvertTimeZone(LBMD.TimeZone, Convert.ToDateTime(LBMD.Operation_Time));
+                DocumentReference docRef = Db.Collection("MT_Log_Book").Document(UniqueID);
+                WriteResult Result = await docRef.SetAsync(LBMD);
                 if (Result != null)
                 {
                     Response.Status = con.StatusSuccess;
                     Response.Message = con.MessageSuccess;
-                    Response.Data = PITMD;
+                    Response.Data = LBMD;
                 }
                 else
                 {
@@ -81,28 +93,34 @@ namespace TheCloudHealth.Controllers
             return ConvertToJSON(Response);
         }
 
-
-        [Route("API/PatiIntakeType/GetPatiIntakeTypeListFilterWithCatID")]
+        [Route("API/Log/List")]
         [HttpPost]
-        public async Task<HttpResponseMessage> GetPatiIntakeTypeListFilterWithCatID(MT_Patient_Intake_Type PITMD)
+        public async Task<HttpResponseMessage> List(MT_Log_Book LBMD)
         {
-            Db = con.SurgeryCenterDb(PITMD.Slug);
-            PatiIntakeTypeResponse Response = new PatiIntakeTypeResponse();
+            Db = con.SurgeryCenterDb(LBMD.Slug);
+            LogResponse Response = new LogResponse();
             try
             {
-                List<MT_Patient_Intake_Type> NotiCateList = new List<MT_Patient_Intake_Type>();
-                Query ObjQuery = Db.Collection("MT_Patient_Intake_Type").WhereEqualTo("PITT_Is_Deleted", false).WhereEqualTo("PITT_Is_Active", true).WhereEqualTo("PITT_Category_ID", PITMD.PITT_Category_ID).OrderBy("PITT_Category_Name");
+                List<MT_Log_Book> PMList = new List<MT_Log_Book>();
+                Query ObjQuery = Db.Collection("MT_Log_Book");
                 QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
                 if (ObjQuerySnap != null)
                 {
                     foreach (DocumentSnapshot Docsnap in ObjQuerySnap.Documents)
                     {
-                        NotiCateList.Add(Docsnap.ConvertTo<MT_Patient_Intake_Type>());
+                        PMList.Add(Docsnap.ConvertTo<MT_Log_Book>());
                     }
+
+                    Response.DataList = PMList;
                     Response.Status = con.StatusSuccess;
                     Response.Message = con.MessageSuccess;
-                    Response.DataList = NotiCateList;
                 }
+                else
+                {
+                    Response.Status = con.StatusDNE;
+                    Response.Message = con.MessageDNE;
+                }
+
             }
             catch (Exception ex)
             {

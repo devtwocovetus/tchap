@@ -32,7 +32,6 @@ namespace TheCloudHealth.Models
         [FirestoreProperty]
         public string Slug { get; set; }
     }
-
     public class NotiTimingResponse
     {
         public string Message { get; set; }

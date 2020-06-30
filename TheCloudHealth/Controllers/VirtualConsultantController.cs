@@ -55,7 +55,7 @@ namespace TheCloudHealth.Controllers
                 {
                     VCMD.VCB_Booking_No = "VCBN000" + "1";
                 }
-                VCMD.VCB_Booking_Date = con.ConvertTimeZone(VCMD.VCB_TimeZone, Convert.ToDateTime(VCMD.VCB_Booking_Date));
+                VCMD.VCB_Booking_Date = con.ConvertTimeZone(VCMD.VCB_TimeZone, Convert.ToDateTime(VCMD.VCB_Booking_Date) , 1);
                 VCMD.VCB_Create_Date = con.ConvertTimeZone(VCMD.VCB_TimeZone, Convert.ToDateTime(VCMD.VCB_Create_Date));
                 VCMD.VCB_Modify_Date = con.ConvertTimeZone(VCMD.VCB_TimeZone, Convert.ToDateTime(VCMD.VCB_Modify_Date));
                 DocumentReference docRef = Db.Collection("MT_Virtual_Consultant_Booking").Document(UniqueID);
@@ -108,7 +108,7 @@ namespace TheCloudHealth.Controllers
                     {
                         if (VCMD.VCB_Booking_Physician_Office_ID != null)
                         {
-                            if (Docsnapshot.ConvertTo<MT_Virtual_Consultant_Booking>().VCB_Status != "Draft" && Docsnapshot.ConvertTo<MT_Virtual_Consultant_Booking>().VCB_Status != "Cancelled")
+                            if (Docsnapshot.ConvertTo<MT_Virtual_Consultant_Booking>().VCB_Status != "Draft" && Docsnapshot.ConvertTo<MT_Virtual_Consultant_Booking>().VCB_Status != "Cancelled" && Docsnapshot.ConvertTo<MT_Virtual_Consultant_Booking>().VCB_Status != "Complete")
                             {
                                 patilist.Add(Docsnapshot.ConvertTo<MT_Virtual_Consultant_Booking>());
                             }
@@ -176,9 +176,9 @@ namespace TheCloudHealth.Controllers
             return ConvertToJSON(Response);
         }
 
-        [Route("API/VirtualConsultant/VCCancelledListForPO")]
+        [Route("API/VirtualConsultant/VCHistoryListForPO")]
         [HttpPost]
-        public async Task<HttpResponseMessage> VCCancelledListForPO(MT_Virtual_Consultant_Booking VCMD)
+        public async Task<HttpResponseMessage> VCHistoryListForPO(MT_Virtual_Consultant_Booking VCMD)
         {
             Db = con.SurgeryCenterDb(VCMD.Slug);
             VCBookingResponse Response = new VCBookingResponse();
@@ -202,7 +202,7 @@ namespace TheCloudHealth.Controllers
                     {
                         if (VCMD.VCB_Booking_Physician_Office_ID != null)
                         {
-                            if (Docsnapshot.ConvertTo<MT_Virtual_Consultant_Booking>().VCB_Status == "Cancelled")
+                            if (Docsnapshot.ConvertTo<MT_Virtual_Consultant_Booking>().VCB_Status == "Cancelled" || Docsnapshot.ConvertTo<MT_Virtual_Consultant_Booking>().VCB_Status == "Complete")
                             {
                                 patilist.Add(Docsnapshot.ConvertTo<MT_Virtual_Consultant_Booking>());
                             }
@@ -292,7 +292,7 @@ namespace TheCloudHealth.Controllers
                 {
                     VCMD.VCB_Booking_No = "VCBN000" + "1";
                 }
-                VCMD.VCB_Booking_Date = con.ConvertTimeZone(VCMD.VCB_TimeZone, Convert.ToDateTime(VCMD.VCB_Booking_Date));
+                VCMD.VCB_Booking_Date = con.ConvertTimeZone("", Convert.ToDateTime(VCMD.VCB_Booking_Date),1);
                 VCMD.VCB_Create_Date = con.ConvertTimeZone(VCMD.VCB_TimeZone, Convert.ToDateTime(VCMD.VCB_Create_Date));
                 VCMD.VCB_Modify_Date = con.ConvertTimeZone(VCMD.VCB_TimeZone, Convert.ToDateTime(VCMD.VCB_Modify_Date));
                 ////VCMD.VCB_Is_Deleted = false;
@@ -413,7 +413,7 @@ namespace TheCloudHealth.Controllers
             {
                 List<Doc_Uploaded> DocUplodList = new List<Doc_Uploaded>();
 
-                string[] DBPath;
+                //string[] DBPath;
                 int i = 0;
                 var httpRequest = HttpContext.Current.Request;
                 var postedData = httpRequest.Form[1];

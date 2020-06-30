@@ -1,22 +1,15 @@
 ﻿using Google.Cloud.Firestore;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using TheCloudHealth.Models;
-using System.Threading.Tasks;
-using TheCloudHealth.Lib;
-using System.Web.Http;
-using System.Net.Http;
-using Newtonsoft.Json;
-using System.Net;
-using System.Text;
-using System.Web;
-using Newtonsoft.Json.Linq;
 using System.Linq;
-using System.Net.Http.Headers;
-using System.IO;
-using iTextSharp.text;
-using iTextSharp.text.pdf;
-using iTextSharp.tool.xml;
+using System.Net;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
+using System.Web.Http;
+using TheCloudHealth.Lib;
+using TheCloudHealth.Models;
 
 namespace TheCloudHealth.Controllers
 {
@@ -1426,84 +1419,7 @@ namespace TheCloudHealth.Controllers
                     initialData1.Add("Patient_Secondary3_Insurance_Details", Secondary3_Insurance_Details);
                 }
 
-                //PMD.Patient_First_Name = PMD.Patient_First_Name.ToUpper();
-                //PMD.Patient_Middle_Name = PMD.Patient_Middle_Name.ToUpper();
-                //PMD.Patient_Last_Name = PMD.Patient_Last_Name.ToUpper();
-                //Query ObjQuery = Db.Collection("MT_PatientInfomation").WhereEqualTo("Patient_Surgery_Physician_Center_ID", PMD.Patient_Surgery_Physician_Center_ID).WhereEqualTo("Patient_Office_Type", PMD.Patient_Office_Type);
-                //QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
-                //if (ObjQuerySnap != null)
-                //{
-                //    PMD.Patient_Code = PMD.Patient_User_Name.Substring(0, 3).ToUpper() + "000" + ObjQuerySnap.Documents.Count + 1.ToString();
-                //}
-                //else
-                //{
-                //    PMD.Patient_Code = PMD.Patient_User_Name.Substring(0, 3).ToUpper() + "000" + "1";
-                //}
-                //PMD.Patient_DOB = con.ConvertTimeZone(PMD.Patient_TimeZone, Convert.ToDateTime(PMD.Patient_DOB), 1);
-                ////PMD.Patient_Create_Date = con.ConvertTimeZone(PMD.Patient_TimeZone, Convert.ToDateTime(PMD.Patient_Create_Date));
-                //PMD.Patient_Modify_Date = con.ConvertTimeZone(PMD.Patient_TimeZone, Convert.ToDateTime(PMD.Patient_Modify_Date));
-
-                //// Primary Insurance
-
-                //if (PMD.Patient_Primary_Insurance_Details != null)
-                //{
-                //    PMD.Patient_Primary_Insurance_Details.PPID_Unique_ID = con.GetUniqueKey();
-                //    PMD.Patient_Primary_Insurance_Details.PPID_Subscriber_SSN_No = PMD.Patient_Primary_Insurance_Details.PPID_Subscriber_SSN_No;
-                //    PMD.Patient_Primary_Insurance_Details.PPID_DOB = con.ConvertTimeZone(PMD.Patient_Primary_Insurance_Details.PPID_TimeZone, Convert.ToDateTime(PMD.Patient_Primary_Insurance_Details.PPID_DOB), 1);
-                //    PMD.Patient_Primary_Insurance_Details.PPID_Create_Date = con.ConvertTimeZone(PMD.Patient_Primary_Insurance_Details.PPID_TimeZone, Convert.ToDateTime(PMD.Patient_Primary_Insurance_Details.PPID_Create_Date));
-                //    PMD.Patient_Primary_Insurance_Details.PPID_Modify_Date = con.ConvertTimeZone(PMD.Patient_Primary_Insurance_Details.PPID_TimeZone, Convert.ToDateTime(PMD.Patient_Primary_Insurance_Details.PPID_Modify_Date));
-                //    PMD.Patient_Primary_Insurance_Details.PPID_V_Start_Date = con.ConvertTimeZone(PMD.Patient_Primary_Insurance_Details.PPID_TimeZone, Convert.ToDateTime(PMD.Patient_Primary_Insurance_Details.PPID_V_Start_Date));
-                //    PMD.Patient_Primary_Insurance_Details.PPID_V_End_Date = con.ConvertTimeZone(PMD.Patient_Primary_Insurance_Details.PPID_TimeZone, Convert.ToDateTime(PMD.Patient_Primary_Insurance_Details.PPID_V_End_Date));
-                //}
-
-                //// Primary Insurance End
-
-
-                //// 1st Secondary Insurance
-
-                //if (PMD.Patient_Secondary1_Insurance_Details != null)
-                //{
-                //    PMD.Patient_Secondary1_Insurance_Details.PSID_Unique_ID = con.GetUniqueKey();
-                //    PMD.Patient_Secondary1_Insurance_Details.PSID_Subscriber_SSN_No = PMD.Patient_Secondary1_Insurance_Details.PSID_Subscriber_SSN_No;
-                //    PMD.Patient_Secondary1_Insurance_Details.PSID_DOB = con.ConvertTimeZone(PMD.Patient_Secondary1_Insurance_Details.PSID_TimeZone, Convert.ToDateTime(PMD.Patient_Secondary1_Insurance_Details.PSID_DOB), 1);
-                //    PMD.Patient_Secondary1_Insurance_Details.PSID_Create_Date = con.ConvertTimeZone(PMD.Patient_Secondary1_Insurance_Details.PSID_TimeZone, Convert.ToDateTime(PMD.Patient_Secondary1_Insurance_Details.PSID_Create_Date));
-                //    PMD.Patient_Secondary1_Insurance_Details.PSID_Modify_Date = con.ConvertTimeZone(PMD.Patient_Secondary1_Insurance_Details.PSID_TimeZone, Convert.ToDateTime(PMD.Patient_Secondary1_Insurance_Details.PSID_Modify_Date));
-                //    PMD.Patient_Secondary1_Insurance_Details.PSID_V_Start_Date = con.ConvertTimeZone(PMD.Patient_Secondary1_Insurance_Details.PSID_TimeZone, Convert.ToDateTime(PMD.Patient_Secondary1_Insurance_Details.PSID_V_Start_Date));
-                //    PMD.Patient_Secondary1_Insurance_Details.PSID_V_End_Date = con.ConvertTimeZone(PMD.Patient_Secondary1_Insurance_Details.PSID_TimeZone, Convert.ToDateTime(PMD.Patient_Secondary1_Insurance_Details.PSID_V_End_Date));
-                //}
-
-                //// 1st Secondary Insurance End
-
-                //// 2st Secondary Insurance
-
-                //if (PMD.Patient_Secondary2_Insurance_Details != null)
-                //{
-                //    PMD.Patient_Secondary2_Insurance_Details.PSID_Unique_ID = con.GetUniqueKey();
-                //    PMD.Patient_Secondary2_Insurance_Details.PSID_Subscriber_SSN_No = PMD.Patient_Secondary2_Insurance_Details.PSID_Subscriber_SSN_No;
-                //    PMD.Patient_Secondary2_Insurance_Details.PSID_DOB = con.ConvertTimeZone(PMD.Patient_Secondary2_Insurance_Details.PSID_TimeZone, Convert.ToDateTime(PMD.Patient_Secondary2_Insurance_Details.PSID_DOB), 1);
-                //    PMD.Patient_Secondary2_Insurance_Details.PSID_Create_Date = con.ConvertTimeZone(PMD.Patient_Secondary2_Insurance_Details.PSID_TimeZone, Convert.ToDateTime(PMD.Patient_Secondary2_Insurance_Details.PSID_Create_Date));
-                //    PMD.Patient_Secondary2_Insurance_Details.PSID_Modify_Date = con.ConvertTimeZone(PMD.Patient_Secondary2_Insurance_Details.PSID_TimeZone, Convert.ToDateTime(PMD.Patient_Secondary2_Insurance_Details.PSID_Modify_Date));
-                //    PMD.Patient_Secondary2_Insurance_Details.PSID_V_Start_Date = con.ConvertTimeZone(PMD.Patient_Secondary2_Insurance_Details.PSID_TimeZone, Convert.ToDateTime(PMD.Patient_Secondary2_Insurance_Details.PSID_V_Start_Date));
-                //    PMD.Patient_Secondary2_Insurance_Details.PSID_V_End_Date = con.ConvertTimeZone(PMD.Patient_Secondary2_Insurance_Details.PSID_TimeZone, Convert.ToDateTime(PMD.Patient_Secondary2_Insurance_Details.PSID_V_End_Date));
-                //}
-
-                //// 2st Secondary Insurance End
-
-
-                //// 3st Secondary Insurance
-
-                //if (PMD.Patient_Secondary3_Insurance_Details != null)
-                //{
-                //    PMD.Patient_Secondary3_Insurance_Details.PSID_Unique_ID = con.GetUniqueKey();
-                //    PMD.Patient_Secondary3_Insurance_Details.PSID_Subscriber_SSN_No = PMD.Patient_Secondary3_Insurance_Details.PSID_Subscriber_SSN_No;
-                //    PMD.Patient_Secondary3_Insurance_Details.PSID_DOB = con.ConvertTimeZone(PMD.Patient_Secondary3_Insurance_Details.PSID_TimeZone, Convert.ToDateTime(PMD.Patient_Secondary3_Insurance_Details.PSID_DOB), 1);
-                //    PMD.Patient_Secondary3_Insurance_Details.PSID_Create_Date = con.ConvertTimeZone(PMD.Patient_Secondary3_Insurance_Details.PSID_TimeZone, Convert.ToDateTime(PMD.Patient_Secondary3_Insurance_Details.PSID_Create_Date));
-                //    PMD.Patient_Secondary3_Insurance_Details.PSID_Modify_Date = con.ConvertTimeZone(PMD.Patient_Secondary3_Insurance_Details.PSID_TimeZone, Convert.ToDateTime(PMD.Patient_Secondary3_Insurance_Details.PSID_Modify_Date));
-                //    PMD.Patient_Secondary3_Insurance_Details.PSID_V_Start_Date = con.ConvertTimeZone(PMD.Patient_Secondary3_Insurance_Details.PSID_TimeZone, Convert.ToDateTime(PMD.Patient_Secondary3_Insurance_Details.PSID_V_Start_Date));
-                //    PMD.Patient_Secondary3_Insurance_Details.PSID_V_End_Date = con.ConvertTimeZone(PMD.Patient_Secondary3_Insurance_Details.PSID_TimeZone, Convert.ToDateTime(PMD.Patient_Secondary3_Insurance_Details.PSID_V_End_Date));
-                //}
-
-                //// 3st Secondary Insurance End
+                
 
                 DocumentReference docRef = Db.Collection("MT_PatientInfomation").Document(PMD.Patient_Unique_ID);
                 WriteResult Result = await docRef.UpdateAsync(initialData1);
@@ -1538,6 +1454,43 @@ namespace TheCloudHealth.Controllers
                     Response.Data = null;
                 }
 
+            }
+            catch (Exception ex)
+            {
+                Response.Status = con.StatusFailed;
+                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
+            }
+            return ConvertToJSON(Response);
+        }
+
+        [Route("API/Patient/RemoveAllPatient")]
+        [HttpPost]
+        public async Task<HttpResponseMessage> RemoveAllPatient(MT_PatientInfomation PMD)
+        {
+            Db = con.SurgeryCenterDb(PMD.Slug);
+            PatientInfoResponse Response = new PatientInfoResponse();
+            try
+            {
+                MT_PatientInfomation patient = new MT_PatientInfomation();
+                Query ObjQuery = Db.Collection("MT_PatientInfomation").WhereEqualTo("Patient_Is_Deleted", false).WhereEqualTo("Patient_Surgery_Physician_Center_ID", PMD.Patient_Surgery_Physician_Center_ID);
+                QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
+                if (ObjQuerySnap != null)
+                {
+                    foreach (DocumentSnapshot Docsnapshot in ObjQuerySnap.Documents)
+                    {
+                        patient = Docsnapshot.ConvertTo<MT_PatientInfomation>();
+                        DocumentReference docRef = Db.Collection("MT_PatientInfomation").Document(patient.Patient_Unique_ID);
+                        WriteResult Result = await docRef.DeleteAsync();
+
+                    }
+                    Response.Status = con.StatusSuccess;
+                    Response.Message = con.MessageSuccess;
+                }
+                else
+                {
+                    Response.Status = con.StatusDNE;
+                    Response.Message = con.MessageDNE;
+                }
             }
             catch (Exception ex)
             {

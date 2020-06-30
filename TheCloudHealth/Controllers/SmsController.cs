@@ -86,7 +86,7 @@ namespace TheCloudHealth.Controllers
                 res.Content = new StringContent(response.ToString(), Encoding.UTF8, "text/xml");
                 return res;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return res;
             }

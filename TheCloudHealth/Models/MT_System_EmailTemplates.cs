@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
 
 namespace TheCloudHealth.Models
 {
@@ -20,9 +21,14 @@ namespace TheCloudHealth.Models
         [FirestoreProperty]
         public string SET_From_Name { get; set; }
         [FirestoreProperty]
-        public string SET_CC { get; set; }
+        public string[] SET_To { get; set; }
+        [FirestoreProperty]
+        public string[] SET_CC { get; set; }
+        [FirestoreProperty]
+        public string[] SET_Bcc { get; set; }
         [FirestoreProperty]
         public string SET_Header { get; set; }
+        [AllowHtml]
         [FirestoreProperty]
         public string SET_Message { get; set; }
         [FirestoreProperty]

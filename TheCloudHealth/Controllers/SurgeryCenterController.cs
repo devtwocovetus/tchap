@@ -1,19 +1,17 @@
 ﻿using Google.Cloud.Firestore;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using TheCloudHealth.Models;
-using System.Threading.Tasks;
-using TheCloudHealth.Lib;
-using System.Web.Http;
-using System.Net.Http;
-using Newtonsoft.Json;
-using System.Net;
-using System.Text;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
 using System.Web;
-using System.Web.Script.Serialization;
-using Newtonsoft.Json.Linq;
-using static System.Net.WebRequestMethods;
+using System.Web.Http;
+using TheCloudHealth.Lib;
+using TheCloudHealth.Models;
 
 namespace TheCloudHealth.Controllers
 {
@@ -832,23 +830,25 @@ namespace TheCloudHealth.Controllers
                 if (SelectSnap != null)
                 {
                     Surcenter = SelectSnap.Documents[0].ConvertTo<MT_Surgery_Center>();
-                    Surcenter.SurgC_Modify_Date = con.ConvertTimeZone(SCMD.SurgC_TimeZone, Convert.ToDateTime(SCMD.SurgC_Modify_Date));
                     if (Surcenter.SurgC_SliderList != null)
                     {
                         foreach (Slider slid in Surcenter.SurgC_SliderList)
                         {
-                            if (slid.Slider_Unique_ID == SCMD.SurgC_Slider.Slider_Unique_ID)
+                            if (slid.Slider_Unique_ID != SCMD.SurgC_Slider.Slider_Unique_ID)
                             {
-                                slid.Slider_Is_Deleted = SCMD.SurgC_Slider.Slider_Is_Deleted;
-                                slid.Slider_Modify_Date = con.ConvertTimeZone(SCMD.SurgC_TimeZone, Convert.ToDateTime(SCMD.SurgC_Modify_Date));
+                                SliderList.Add(slid);
                             }
-                            SliderList.Add(slid);
+                            
                         }
                     }
-                    Surcenter.SurgC_SliderList = SliderList;
-
+                    Dictionary<string, object> initialData = new Dictionary<string, object>
+                     {
+                        {"SurgC_SliderList", SliderList},
+                        {"SurgC_Modify_Date", con.ConvertTimeZone(SCMD.SurgC_TimeZone, Convert.ToDateTime(SCMD.SurgC_Modify_Date))},
+                        { "SurgC_TimeZone", SCMD.SurgC_TimeZone}
+                     };
                     DocumentReference docRef = Db.Collection("MT_Surgery_Center").Document(SCMD.SurgC_Unique_ID);
-                    WriteResult Result = await docRef.SetAsync(Surcenter, SetOptions.Overwrite);
+                    WriteResult Result = await docRef.UpdateAsync(initialData);
                     if (Result != null)
                     {
                         Response.Status = con.StatusSuccess;
@@ -857,8 +857,8 @@ namespace TheCloudHealth.Controllers
                     }
                     else
                     {
-                        Response.Status = con.StatusNotInsert;
-                        Response.Message = con.MessageNotInsert;
+                        Response.Status = con.StatusNotDeleted;
+                        Response.Message = con.MessageNotDeleted;
                         Response.Data = null;
                     }
                 }
@@ -1187,15 +1187,17 @@ namespace TheCloudHealth.Controllers
             try
             {
                 List<MT_Surgery_Center> AnesList = new List<MT_Surgery_Center>();
+                MT_Surgery_Center objsc=new MT_Surgery_Center();
                 Query docRef = Db.Collection("MT_Surgery_Center").WhereEqualTo("SurgC_Is_Deleted", false);
                 QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
                 if (ObjQuerySnap != null)
                 {
                     foreach (DocumentSnapshot Docsnapshot in ObjQuerySnap.Documents)
                     {
-                        AnesList.Add(Docsnapshot.ConvertTo<MT_Surgery_Center>());
+                        objsc = Docsnapshot.ConvertTo<MT_Surgery_Center>();
+                        AnesList.Add(objsc);
                     }
-                    Response.DataList = AnesList.OrderBy(o => o.SurgC_DBA_Name).ToList();
+                    Response.DataList = AnesList.OrderByDescending(o => o.SurgC_Modify_Date).ToList();
                 }
                 Response.Status = con.StatusSuccess;
                 Response.Message = con.MessageSuccess;
@@ -1426,7 +1428,7 @@ namespace TheCloudHealth.Controllers
                     SurgeryCenter.SurgC_DB_Setting = DBCollection;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 throw;

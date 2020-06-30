@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
 
 namespace TheCloudHealth.Models
 {
@@ -18,6 +19,7 @@ namespace TheCloudHealth.Models
         public List<string> Cc_Email { get; set; }
         public string Subject { get; set; }
         public string PlainTextContent { get; set; }
+        [AllowHtml]
         public string HtmlContent { get; set; }
     }
     public class EmailResponse {

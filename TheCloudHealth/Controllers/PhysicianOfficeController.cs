@@ -111,7 +111,7 @@ namespace TheCloudHealth.Controllers
                     result = true;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }
@@ -826,23 +826,27 @@ namespace TheCloudHealth.Controllers
                 if (SelectSnap != null)
                 {
                     Surcenter = SelectSnap.Documents[0].ConvertTo<MT_Physician_Office>();
-                    Surcenter.PhyO_Modify_Date = con.ConvertTimeZone(POMD.PhyO_TimeZone, Convert.ToDateTime(POMD.PhyO_Modify_Date));
                     if (Surcenter.PhyO_SliderList != null)
                     {
                         foreach (Slider slid in Surcenter.PhyO_SliderList)
                         {
-                            if (slid.Slider_Unique_ID == POMD.PhyO_Slider.Slider_Unique_ID)
+                            if (slid.Slider_Unique_ID != POMD.PhyO_Slider.Slider_Unique_ID)
                             {
-                                slid.Slider_Is_Deleted = POMD.PhyO_Slider.Slider_Is_Deleted;
-                                slid.Slider_Modify_Date = con.ConvertTimeZone(POMD.PhyO_TimeZone, Convert.ToDateTime(POMD.PhyO_Modify_Date));
+                                SliderList.Add(slid);
                             }
-                            SliderList.Add(slid);
+                            
                         }
                     }
-                    Surcenter.PhyO_SliderList = SliderList;
+
+                    Dictionary<string, object> initialData = new Dictionary<string, object>
+                    {
+                        {"PhyO_SliderList", SliderList},
+                        {"PhyO_Modify_Date", con.ConvertTimeZone(POMD.PhyO_TimeZone, Convert.ToDateTime(POMD.PhyO_Modify_Date))},
+                        {"PhyO_TimeZone", POMD.PhyO_TimeZone}
+                    };
 
                     DocumentReference docRef = Db.Collection("MT_Physician_Office").Document(POMD.PhyO_Unique_ID);
-                    WriteResult Result = await docRef.SetAsync(Surcenter, SetOptions.Overwrite);
+                    WriteResult Result = await docRef.UpdateAsync(initialData);
                     if (Result != null)
                     {
                         Response.Status = con.StatusSuccess;
@@ -1165,7 +1169,7 @@ namespace TheCloudHealth.Controllers
                     {
                         AnesList.Add(Docsnapshot.ConvertTo<MT_Physician_Office>());
                     }
-                    Response.DataList = AnesList.OrderBy(o => o.PhyO_Name).ToList();
+                    Response.DataList = AnesList.OrderByDescending(o => o.PhyO_Modify_Date).ToList();
                 }
                 Response.Status = con.StatusSuccess;
                 Response.Message = con.MessageSuccess;

@@ -26,6 +26,12 @@ namespace TheCloudHealth.Models
         [FirestoreProperty]
         public string Form_Type { get; set; }
         [FirestoreProperty]
+        public string Form_SC_PO_Name { get; set; }
+        [FirestoreProperty]
+        public string Form_Address { get; set; }
+        [FirestoreProperty]
+        public string Form_Footer { get; set; }
+        [FirestoreProperty]
         public string Form_Surgery_Physician_Id { get; set; }
         [FirestoreProperty]
         public string Form_Office_Type { get; set; }

@@ -9,6 +9,8 @@ namespace TheCloudHealth.Domain
     public interface ITokenGenerator
     {
         string Generate(string identity, string endpointId);
+
+        string GenerateForVideo(string identity);
     }
 
     public class TokenGenerator : ITokenGenerator
@@ -20,6 +22,28 @@ namespace TheCloudHealth.Domain
             {
                 new IpMessagingGrant {EndpointId = endpointId, ServiceSid = Configuration.IpmServiceSID}
             };
+
+
+            var token = new Token(
+                Configuration.AccountSID,
+                Configuration.ApiKey,
+                Configuration.ApiSecret,
+                identity,
+                grants: grants);
+
+            return token.ToJwt();
+        }
+
+        [Obsolete]
+        public string GenerateForVideo(string identity)
+        {
+            //var grants = new HashSet<IGrant>{};
+
+            var grant = new VideoGrant();
+
+            //grant.Room = RoomName;
+            var grants = new HashSet<IGrant> { grant };
+
 
             var token = new Token(
                 Configuration.AccountSID,

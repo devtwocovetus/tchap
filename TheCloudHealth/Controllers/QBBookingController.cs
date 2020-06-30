@@ -19,8 +19,8 @@ namespace TheCloudHealth.Controllers
     {
         ConnectionClass con;
         FirestoreDb Db;
-        ICreatePDF ObjPDF;
-        string UniqueID = "";
+        //ICreatePDF ObjPDF;
+        //string UniqueID = "";
         public QBBookingController()
         {
             con = new ConnectionClass();

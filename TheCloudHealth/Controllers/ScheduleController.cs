@@ -26,7 +26,7 @@ namespace TheCloudHealth.Controllers
         DateTime BookingDate;
         DateTime NoticationSendingDay;
         int Days = 0;
-        int i,j;
+        //int i,j;
 
         public ScheduleController()
         {

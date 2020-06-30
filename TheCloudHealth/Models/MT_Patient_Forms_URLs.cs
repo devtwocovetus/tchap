@@ -20,6 +20,8 @@ namespace TheCloudHealth.Models
         [FirestoreProperty]
         public string PFU_Form_Name { get; set; }
         [FirestoreProperty]
+        public string PFU_Passcode { get; set; }
+        [FirestoreProperty]
         public List<Patient_Forms> PFU_Form_List { get; set; }
         [FirestoreProperty]
         public Boolean PFU_Is_Active { get; set; }

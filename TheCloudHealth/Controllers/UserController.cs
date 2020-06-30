@@ -402,6 +402,50 @@ namespace TheCloudHealth.Controllers
             return ConvertToJSON(Response);
         }
 
+        [Route("API/User/ResetPass")]
+        [HttpPost]
+        //[Authorize(Roles ="SAdmin")]
+        public async Task<HttpResponseMessage> ResetPass(MT_User UMD)
+        {
+            //Db = con.SurgeryCenterDb(Objuser.Project_ID);
+            UserResponse Response = new UserResponse();
+            try
+            {
+                MT_User User = new MT_User();
+                Query QueryRef = Db.Collection("MT_User").WhereEqualTo("UM_Email", UMD.UM_Email);
+                QuerySnapshot ObjQuerySnap = await QueryRef.GetSnapshotAsync();
+                if (ObjQuerySnap != null)
+                {
+                    User = ObjQuerySnap.Documents[0].ConvertTo<MT_User>();
+                }
+
+                Dictionary<string, object> initialData = new Dictionary<string, object>
+                {
+                    { "UM_Password", UMD.UM_Password }
+                };
+                DocumentReference docRef = Db.Collection("MT_User").Document(User.UM_Unique_ID);
+                WriteResult Result = await docRef.UpdateAsync(initialData);
+                if (Result != null)
+                {
+                    Response.Status = con.StatusSuccess;
+                    Response.Message = con.MessageSuccess;
+                    Response.Data = UMD;
+                }
+                else
+                {
+                    Response.Status = con.StatusNotUpdate;
+                    Response.Message = con.MessageNotUpdate;
+                    Response.Data = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                Response.Status = con.StatusFailed;
+                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
+            }
+            return ConvertToJSON(Response);
+        }
+
         [Route("API/User/List")]
         [HttpGet]
         //[Authorize(Roles ="SAdmin")]
@@ -467,28 +511,75 @@ namespace TheCloudHealth.Controllers
         [Route("API/User/CheckEmail")]
         [HttpPost]
         //[Authorize(Roles ="SAdmin")]
-        public async Task<HttpResponseMessage> CheckEmailAsync(MT_User UMD)
+        public async Task<HttpResponseMessage> CheckEmail(MT_User UMD)
         {
-            //Db = con.SurgeryCenterDb(UMD.Project_ID);
-            UserCEmailResponse Response = new UserCEmailResponse();
+            CommodelResponse Response = new CommodelResponse();
+            Boolean Result = false;
             try
             {
-                List<MT_User> AnesList = new List<MT_User>();
-                Query docRef = Db.Collection("MT_User").WhereEqualTo("UM_Is_Deleted", false).WhereEqualTo("UM_Email", UMD.UM_Email).WhereEqualTo("UM_Surgary_Physician_CenterID", UMD.UM_Surgary_Physician_CenterID);
+                MT_User User = new MT_User();
+                Query docRef = Db.Collection("MT_User").WhereEqualTo("UM_Is_Deleted", false).WhereEqualTo("UM_Is_Active", true).WhereEqualTo("UM_Email", UMD.UM_Email);
                 QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
-                if (ObjQuerySnap.Documents.Count == 0)
+                if (ObjQuerySnap != null)
                 {
-                    Response.Status = con.StatusSuccess;
-                    Response.Message = con.MessageSuccess;
-                    Response.Is_Available = true;
+                    if (ObjQuerySnap.Documents.Count > 0)
+                    {
+                        Response.Where = "In User";
+                        Result = false;
+                    }
+                    else
+                    {
+                        Result = true;
+                    }
                 }
                 else
                 {
-                    Response.Status = con.StatusAE;
-                    Response.Message = con.MessageAE;
-                    Response.Is_Available = false;
+                    Result = true;
                 }
-                
+                if (Result == true)
+                {
+                    docRef = Db.Collection("MT_Staff_Members").WhereEqualTo("Staff_Is_Deleted", false).WhereEqualTo("Staff_Is_Active", true).WhereEqualTo("Staff_Email", UMD.UM_Email);
+                    ObjQuerySnap = await docRef.GetSnapshotAsync();
+                    if (ObjQuerySnap != null)
+                    {
+                        if (ObjQuerySnap.Documents.Count > 0)
+                        {
+                            Response.Where = "Staff";
+                            Result = false;
+                        }
+                        else
+                        {
+                            Result = true;
+                        }
+                    }
+                    else
+                    {
+                        Result = true;
+                    }
+                }
+
+                if (Result == true)
+                {
+                    docRef = Db.Collection("MT_PatientInfomation").WhereEqualTo("Patient_Is_Deleted", false).WhereEqualTo("Patient_Is_Active", true).WhereEqualTo("Patient_Email", UMD.UM_Email);
+                    ObjQuerySnap = await docRef.GetSnapshotAsync();
+                    if (ObjQuerySnap != null)
+                    {
+                        if (ObjQuerySnap.Documents.Count > 0)
+                        {
+                            Response.Where = "Patient";
+                            Result = false;
+                        }
+                        else
+                        {
+                            Result = true;
+                        }
+                    }
+                    else
+                    {
+                        Result = true;
+                    }
+                }
+                Response.Result = Result;
             }
             catch (Exception ex)
             {
@@ -589,5 +680,55 @@ namespace TheCloudHealth.Controllers
             return ConvertToJSON(Response); ;
         }
 
+        [Route("API/User/TruncateUserMaster")]
+        [HttpPost]
+        //[Authorize(Roles ="SAdmin")]
+        public async Task<HttpResponseMessage> TruncateUserMaster()
+        {
+            //Db = con.SurgeryCenterDb(UMD.Project_ID);
+            UserResponse Response = new UserResponse();
+            try
+            {
+                MT_User User = new MT_User();
+                CollectionReference docRef = Db.Collection("MT_User");
+                QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
+                if (ObjQuerySnap != null)
+                {
+                    foreach (DocumentSnapshot Docsnapshot in ObjQuerySnap.Documents)
+                    {
+                        User=Docsnapshot.ConvertTo<MT_User>();
+                        if (User.UM_Unique_ID != "28bLAlDi21ab1a937541a6")
+                        {
+                            DocumentReference DocRef = Db.Collection("MT_User").Document(User.UM_Unique_ID);
+                            WriteResult Result = await DocRef.DeleteAsync();
+                            if (Result != null)
+                            {
+                                Response.Status = con.StatusSuccess;
+                                Response.Message = con.MessageSuccess;
+                                Response.Data = null;
+                            }
+                        }                        
+                    }
+                    
+                }
+                Response.Status = con.StatusSuccess;
+                Response.Message = con.MessageSuccess;
+            }
+            catch (Exception ex)
+            {
+                Response.Status = con.StatusFailed;
+                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
+            }
+            return ConvertToJSON(Response);
+        }
+
+    }
+
+    public class CommodelResponse
+    {
+        public string Where { get; set; }
+        public Boolean Result { get; set; }
+        public int Status { get; set; }
+        public string Message { get; set; }
     }
 }

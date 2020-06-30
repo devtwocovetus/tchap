@@ -22,10 +22,6 @@ namespace TheCloudHealth.Models
         [FirestoreProperty]
         public string ROM_Created_By { get; set; }
         [FirestoreProperty]
-        public string ROM_CB_Name { get; set; }
-        [FirestoreProperty]
-        public string ROM_Created_By_Type { get; set; }
-        [FirestoreProperty]
         public DateTime ROM_Create_Date { get; set; }
         [FirestoreProperty]
         public DateTime ROM_Modify_Date { get; set; }

@@ -184,19 +184,24 @@ namespace TheCloudHealth.Controllers
         [Route("API/RightM/List")]
         [HttpGet]
         //[Authorize(Roles ="SAdmin")]
-        public async Task<HttpResponseMessage> GetAsync()
+        public async Task<HttpResponseMessage> List(string CategoryName)
         {
             RightResponse Response = new RightResponse();
             try
             {
                 List<MT_Right> AnesList = new List<MT_Right>();
+                MT_Right Right = new MT_Right();
                 Query docRef = Db.Collection("MT_Right").WhereEqualTo("RM_Is_Deleted", false);
                 QuerySnapshot ObjQuerySnap = await docRef.GetSnapshotAsync();
                 if (ObjQuerySnap != null)
                 {
                     foreach (DocumentSnapshot Docsnapshot in ObjQuerySnap.Documents)
                     {
-                        AnesList.Add(Docsnapshot.ConvertTo<MT_Right>());
+                        Right = Docsnapshot.ConvertTo<MT_Right>();
+                        if (Right.RM_Category_Name == CategoryName)
+                        {
+                            AnesList.Add(Right);
+                        }
                     }
                     Response.DataList = AnesList.OrderBy(o => o.RM_Category_Name).ThenBy(o => o.RM_Page_Name).ToList();
                 }

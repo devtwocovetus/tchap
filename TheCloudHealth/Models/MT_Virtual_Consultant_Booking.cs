@@ -22,6 +22,8 @@ namespace TheCloudHealth.Models
         [FirestoreProperty]
         public string VCB_Booking_No { get; set; }
         [FirestoreProperty]
+        public string VCB_Time_Slot { get; set; }
+        [FirestoreProperty]
         public string VCB_Doctor_ID { get; set; }
         [FirestoreProperty]
         public string VCB_Doctor_Name { get; set; }

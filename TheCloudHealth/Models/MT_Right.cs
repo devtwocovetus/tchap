@@ -24,10 +24,6 @@ namespace TheCloudHealth.Models
         [FirestoreProperty]
         public string RM_Created_By { get; set; }
         [FirestoreProperty]
-        public string RM_CB_Name { get; set; }
-        [FirestoreProperty]
-        public string RM_Created_By_Type { get; set; }
-        [FirestoreProperty]
         public DateTime RM_Create_Date { get; set; }
         [FirestoreProperty]
         public DateTime RM_Modify_Date { get; set; }
@@ -37,8 +33,6 @@ namespace TheCloudHealth.Models
         public MT_Right_Details RM_Right_Details { get; set; }
         [FirestoreProperty]
         public string RM_TimeZone { get; set; }
-        [FirestoreProperty]
-        public string Project_ID { get; set; }
     }
     public class RightResponse {
         public string Message { get; set; }

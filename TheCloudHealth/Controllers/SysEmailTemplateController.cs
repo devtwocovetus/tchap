@@ -24,7 +24,7 @@ namespace TheCloudHealth.Controllers
     {
         ConnectionClass con;
         FirestoreDb Db;
-        ICreatePDF ObjPDF;
+        //ICreatePDF ObjPDF;
         string UniqueID = "";
         public SysEmailTemplateController()
         {
@@ -87,16 +87,31 @@ namespace TheCloudHealth.Controllers
             {
                 Dictionary<string, object> initialData = new Dictionary<string, object>
                 {
-                    {"SET_Name", SEMD.SET_Name},
                     {"SET_Description", SEMD.SET_Description},
                     {"SET_From_Email", SEMD.SET_From_Email},
                     {"SET_From_Name", SEMD.SET_From_Name},
-                    {"SET_CC", SEMD.SET_CC},
+                    {"SET_To", SEMD.SET_To},
+                    {"SET_Header", SEMD.SET_Header},
                     {"SET_Message", SEMD.SET_Message},
                     {"SET_Footer", SEMD.SET_Footer},
                     {"SET_Modify_Date", con.ConvertTimeZone(SEMD.SET_TimeZone, Convert.ToDateTime(SEMD.SET_Modify_Date))},
                     {"SET_TimeZone", SEMD.SET_TimeZone}
                 };
+                if (SEMD.SET_CC != null)
+                {
+                    if (SEMD.SET_CC.Length > 0)
+                    {
+                        initialData.Add("SET_CC", SEMD.SET_CC);
+                    }
+                }
+
+                if (SEMD.SET_Bcc != null)
+                {
+                    if (SEMD.SET_Bcc.Length > 0)
+                    {
+                        initialData.Add("SET_Bcc", SEMD.SET_Bcc);
+                    }
+                }
                 DocumentReference docRef = Db.Collection("MT_System_EmailTemplates").Document(SEMD.SET_Unique_ID);
                 WriteResult Result = await docRef.UpdateAsync(initialData);
                 if (Result != null)
@@ -228,6 +243,37 @@ namespace TheCloudHealth.Controllers
             return ConvertToJSON(Response);
         }
 
+        [Route("API/SysEmailTemplate/SelectWithName")]
+        [HttpPost]
+        public async Task<HttpResponseMessage> SelectWithName(MT_System_EmailTemplates SEMD)
+        {
+            Db = con.SurgeryCenterDb(SEMD.Slug);
+            SETemplatesResponse Response = new SETemplatesResponse();
+            try
+            {
+                Query TempQuery = Db.Collection("MT_System_EmailTemplates").WhereEqualTo("SET_Is_Active", true).WhereEqualTo("SET_Is_Deleted", false).OrderBy("SET_Name").StartAt(SEMD.SET_Name.Trim()).EndAt(SEMD.SET_Name.Trim() + '\uf8ff');
+                QuerySnapshot ObjQuerySnap = await TempQuery.GetSnapshotAsync();
+                if (ObjQuerySnap != null)
+                {
+                    Response.Data = ObjQuerySnap.Documents[0].ConvertTo<MT_System_EmailTemplates>();
+                    Response.Status = con.StatusSuccess;
+                    Response.Message = con.MessageSuccess;
+                }
+                else
+                {
+                    Response.Data = null;
+                    Response.Status = con.StatusDNE;
+                    Response.Message = con.MessageDNE;
+                }
+            }
+            catch (Exception ex)
+            {
+                Response.Status = con.StatusFailed;
+                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
+            }
+            return ConvertToJSON(Response);
+        }
+
         [Route("API/SysEmailTemplate/List")]
         [HttpPost]
         public async Task<HttpResponseMessage> List(MT_System_EmailTemplates SEMD)
@@ -237,7 +283,7 @@ namespace TheCloudHealth.Controllers
             try
             {
                 List<MT_System_EmailTemplates> TempList = new List<MT_System_EmailTemplates>();
-                Query TempQuery = Db.Collection("MT_System_EmailTemplates").WhereEqualTo("SET_Is_Deleted", false).WhereEqualTo("SET_Surgery_Physician_Id", SEMD.SET_Surgery_Physician_Id).OrderBy("SET_Name");
+                Query TempQuery = Db.Collection("MT_System_EmailTemplates").WhereEqualTo("SET_Is_Deleted", false).OrderBy("SET_Name");
                 QuerySnapshot ObjQuerySnap = await TempQuery.GetSnapshotAsync();
                 if (ObjQuerySnap != null)
                 {
@@ -272,7 +318,7 @@ namespace TheCloudHealth.Controllers
             SETemplatesResponse Response = new SETemplatesResponse();
             try
             {
-                Query TempQuery = Db.Collection("MT_System_EmailTemplates").WhereEqualTo("SET_Is_Deleted", true).WhereEqualTo("SET_Surgery_Physician_Id", SEMD.SET_Surgery_Physician_Id).OrderBy("SET_Name");
+                Query TempQuery = Db.Collection("MT_System_EmailTemplates").WhereEqualTo("SET_Is_Deleted", true).OrderBy("SET_Name");
                 QuerySnapshot ObjQuerySnap = await TempQuery.GetSnapshotAsync();
                 if (ObjQuerySnap != null)
                 {

@@ -58,7 +58,7 @@ namespace TheCloudHealth.Models
         [FirestoreProperty]
         public string Patient_Nationality { get; set; }
         [FirestoreProperty]
-        public string Patient_Language { get; set; }
+        public string Patient_Language { get; set; }        
         [FirestoreProperty]
         public string Patient_Height_In_Ft { get; set; }
         [FirestoreProperty]

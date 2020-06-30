@@ -40,9 +40,6 @@ namespace TheCloudHealth.Controllers
             EquipmentResponse Response = new EquipmentResponse();
             try
             {
-
-
-
                 UniqueID = con.GetUniqueKey();
                 EMD.Equip_Unique_ID = UniqueID;
                 EMD.Equip_Create_Date = con.ConvertTimeZone(EMD.Equip_TimeZone, Convert.ToDateTime(EMD.Equip_Create_Date));

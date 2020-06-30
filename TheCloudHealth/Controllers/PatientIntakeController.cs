@@ -347,6 +347,7 @@ namespace TheCloudHealth.Controllers
                  {
                      {"PIT_Actions", ActionList},
                      {"PIT_Modify_Date", con.ConvertTimeZone(PIMD.PIT_TimeZone, Convert.ToDateTime(PIMD.PIT_Modify_Date))},
+                     {"PIT_TimeZone",PIMD.PIT_TimeZone }
                  };
 
                 DocumentReference docRef = Db.Collection("MT_Patient_Intake").Document(PIMD.PIT_Unique_ID);
@@ -402,7 +403,7 @@ namespace TheCloudHealth.Controllers
 
                 Dictionary<string, object> initialData = new Dictionary<string, object>
                  {
-                     {"PIT_Actions", ActionList},
+                     {"PIT_Actions", ActionList}
                  };
 
                 DocumentReference docRef = Db.Collection("MT_Patient_Intake").Document(PIMD.PIT_Unique_ID);
@@ -432,7 +433,7 @@ namespace TheCloudHealth.Controllers
 
         [Route("API/PatientIntake/List")]
         [HttpPost]
-        public async Task<HttpResponseMessage> GetNotiListFilterWithPO(MT_Patient_Intake PIMD)
+        public async Task<HttpResponseMessage> List(MT_Patient_Intake PIMD)
         {
             Db = con.SurgeryCenterDb(PIMD.Slug);
             PatientIntakeResponse Response = new PatientIntakeResponse();
@@ -440,6 +441,36 @@ namespace TheCloudHealth.Controllers
             {
                 List<MT_Patient_Intake> NotiList = new List<MT_Patient_Intake>();
                 Query ObjQuery = Db.Collection("MT_Patient_Intake").WhereEqualTo("PIT_Is_Deleted", false).WhereEqualTo("PIT_Is_Active", true).OrderByDescending("PIT_Create_Date");
+                QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
+                if (ObjQuerySnap != null)
+                {
+                    foreach (DocumentSnapshot Docsnap in ObjQuerySnap.Documents)
+                    {
+                        NotiList.Add(Docsnap.ConvertTo<MT_Patient_Intake>());
+                    }
+                    Response.Status = con.StatusSuccess;
+                    Response.Message = con.MessageSuccess;
+                    Response.DataList = NotiList;
+                }
+            }
+            catch (Exception ex)
+            {
+                Response.Status = con.StatusFailed;
+                Response.Message = con.MessageFailed + ", Exception : " + ex.Message;
+            }
+            return ConvertToJSON(Response);
+        }
+
+        [Route("API/PatientIntake/GetPatiIntakeListFilterWithPO")]
+        [HttpPost]
+        public async Task<HttpResponseMessage> GetPatiIntakeListFilterWithPO(MT_Patient_Intake PIMD)
+        {
+            Db = con.SurgeryCenterDb(PIMD.Slug);
+            PatientIntakeResponse Response = new PatientIntakeResponse();
+            try
+            {
+                List<MT_Patient_Intake> NotiList = new List<MT_Patient_Intake>();
+                Query ObjQuery = Db.Collection("MT_Patient_Intake").WhereEqualTo("PIT_Is_Deleted", false).WhereEqualTo("PIT_Is_Active", true).WhereEqualTo("PIT_Surgery_Physician_Id", PIMD.PIT_Surgery_Physician_Id).OrderByDescending("PIT_Create_Date");
                 QuerySnapshot ObjQuerySnap = await ObjQuery.GetSnapshotAsync();
                 if (ObjQuerySnap != null)
                 {
